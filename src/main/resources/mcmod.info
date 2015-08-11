@@ -1,0 +1,16 @@
+[
+{
+  "modid": "ocminecart",
+  "name": "OC-Minecarts",
+  "description": "Adds Computer in a Minecart and more.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://oc.cil.li",
+  "updateUrl": "",
+  "authorList": ["feldim2425"],
+  "credits": "Sangar (OpenComputers API)",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
