@@ -16,7 +16,7 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if(y!=-10){
+		if(y!=-10){			//if y is -10 then we send the Entity ID with the par. x
 			TileEntity entity = world.getTileEntity(x, y, z);
 			if(entity!=null){
 				switch(ID){
@@ -27,7 +27,7 @@ public class GuiHandler implements IGuiHandler{
 			}
 		}
 		else{
-			Entity entity  =world.getEntityByID(x);
+			Entity entity  = world.getEntityByID(x);
 			if(entity!=null){
 				switch(ID){
 				case 1:
@@ -42,7 +42,7 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		if(y!=-10){			//if y=-10 then I send a Entity ID with the par. x
+		if(y!=-10){			//if y is -10 then we send the Entity ID with the par. x
 			TileEntity entity = world.getTileEntity(x, y, z);
 			if(entity!=null){
 				switch(ID){
@@ -56,9 +56,9 @@ public class GuiHandler implements IGuiHandler{
 			Entity entity = world.getEntityByID(x);
 			if(entity!=null){
 				switch(ID){
-				case 1:
-					if(entity instanceof ComputerCart)
-						return new ComputerCartGui(player.inventory,(ComputerCart) entity);
+					case 1:
+						if(entity instanceof ComputerCart);
+							return new ComputerCartGui(player.inventory,(ComputerCart) entity);
 				}
 			}
 		}

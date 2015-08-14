@@ -60,7 +60,8 @@ public class AdvCart extends EntityMinecart{
 		this.dataWatcher.updateObject(24, mode);
 	}
 	
-	/*public boolean interactFirst(EntityPlayer p){
+	//This is just debug Code to test minecart break
+	/*public boolean interactFirst(EntityPlayer p){   
 		String msg="";
 		int m;
 		

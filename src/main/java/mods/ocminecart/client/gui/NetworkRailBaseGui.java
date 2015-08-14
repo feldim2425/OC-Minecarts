@@ -15,6 +15,7 @@ import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.ICrafting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 import cpw.mods.fml.common.registry.LanguageRegistry;
@@ -24,6 +25,8 @@ public class NetworkRailBaseGui extends GuiContainer{
 	public static final ResourceLocation texture = new ResourceLocation(OCMinecart.MODID,"textures/gui/netrailbasegui.png");
 	
 	private NetworkRailBaseTile tile;
+	private int oldMode;
+	private GuiButton modeBt;
 	
 	public NetworkRailBaseGui(InventoryPlayer inventory, NetworkRailBaseTile entity) {
 		super(new NetworkRailBaseContainer(inventory,entity));
@@ -37,8 +40,12 @@ public class NetworkRailBaseGui extends GuiContainer{
 	public void initGui(){
 		super.initGui();
 		
-		this.buttonList.add(new GuiButton(0, this.guiLeft+8, this.guiTop+34, 100, 20, this.getModeButtonTxt()));
+		this.oldMode = this.tile.getMode();
+		
+		this.modeBt = new GuiButton(0, this.guiLeft+8, this.guiTop+34, 100, 20, this.getModeButtonTxt());
+		this.buttonList.add(this.modeBt);
 	}
+	
 	
 	private String getModeButtonTxt(){
 		String buttonTxt  = "";
@@ -62,8 +69,6 @@ public class NetworkRailBaseGui extends GuiContainer{
 	public void actionPerformed(GuiButton button){
 		switch(button.id){
 		case 0:
-			tile.onButtonPress(0);
-			button.displayString = getModeButtonTxt();
 			ModNetwork.channel.sendToServer(new GuiButtonClick(tile,0));
 			break;
 		}
@@ -89,6 +94,15 @@ public class NetworkRailBaseGui extends GuiContainer{
 	@Override
 	public boolean doesGuiPauseGame(){
 		return false;
+	}
+	
+	public void updateScreen(){
+		super.updateScreen();
+		
+		if(this.tile.getMode() != this.oldMode){
+			this.modeBt.displayString = this.getModeButtonTxt();
+			this.oldMode = this.tile.getMode();
+		}
 	}
 
 }

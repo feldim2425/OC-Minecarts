@@ -30,7 +30,9 @@ public class NetworkRailBase extends BlockContainer {
 	
 	
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitx, float hity, float hitz){
-		player.openGui(OCMinecart.instance, 0, world, x, y, z);
+		if(!world.isRemote){
+			player.openGui(OCMinecart.instance, 0, world, x, y, z);
+		}
 		return true;
 	}
 	

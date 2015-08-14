@@ -13,7 +13,6 @@ import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.util.IPlugable;
 import mods.ocminecart.common.util.Plug;
 import mods.ocminecart.network.ModNetwork;
-import mods.ocminecart.network.message.RailBaseModeUpdate;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -104,6 +103,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 		if(camoItem!=null)camoItem.writeToNBT(item);
 		nbt.setTag("CamoItem",item);
 	}
+	
 	   @Override
 	   public Packet getDescriptionPacket()
 	   {
@@ -111,6 +111,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	       this.writeSyncableDataToNBT(syncData);
 	       return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord, this.zCoord, 1, syncData);
 	   }
+	   
 	   @Override
 	   public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt)
 	   {
@@ -118,14 +119,12 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	   }
 	
 	private void writeSyncableDataToNBT(NBTTagCompound syncData){
-		syncData.setInteger("conMode", Mode);
 		NBTTagCompound item = new NBTTagCompound();
 		if(camoItem!=null)camoItem.writeToNBT(item);
 		syncData.setTag("CamoItem",item);
 	}
 	
 	private void readSyncableDataFromNBT(NBTTagCompound syncData) {
-		if(syncData.hasKey("conMode")) Mode = syncData.getInteger("conMode");
 		camoItem=ItemStack.loadItemStackFromNBT((NBTTagCompound) syncData.getTag("CamoItem"));
 		if(camoItem !=camoItemOld) updateCamo();
 	}
@@ -329,10 +328,6 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 		if(buttonID==0){
 			this.Mode += 1;
 			if(this.Mode > 2) this.Mode = 0;
-			
-			NBTTagCompound sync = new NBTTagCompound();
-			sync.setInteger("conMode", Mode);
-			if(!this.worldObj.isRemote) ModNetwork.sendToNearPlayers(new RailBaseModeUpdate(this,this.Mode), this);
 		}
 	}
 	

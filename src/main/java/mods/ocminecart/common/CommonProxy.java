@@ -19,9 +19,9 @@ public class CommonProxy {
 	public void init() {
 		NetworkRegistry.INSTANCE.registerGuiHandler(OCMinecart.instance, new GuiHandler());
 		
-		Recipes.init();
 		DisassembleRegister.register();
 		AssembleRegister.register();
+		Recipes.init();
 	}
 
 	public void preInit() {

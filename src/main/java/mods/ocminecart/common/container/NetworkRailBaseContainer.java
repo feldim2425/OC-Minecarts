@@ -1,11 +1,14 @@
 package mods.ocminecart.common.container;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mods.ocminecart.common.SlotGhost;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -13,6 +16,7 @@ import net.minecraft.item.ItemStack;
 public class NetworkRailBaseContainer extends Container {
 	
 	private NetworkRailBaseTile entity;
+	private int oldMode;
 	
 	public NetworkRailBaseContainer(InventoryPlayer inventory,NetworkRailBaseTile entity) {
 		this.entity=entity;
@@ -34,6 +38,33 @@ public class NetworkRailBaseContainer extends Container {
 		
 		for(int i=0;i<9;i++){
 			this.addSlotToContainer(new Slot(inventory, i, x+i*18, y+58));
+		}
+	}
+	
+	public void addCraftingToCrafters(ICrafting craft){
+		 super.addCraftingToCrafters(craft);
+		 craft.sendProgressBarUpdate(this, 0, this.entity.getMode());
+	}
+	
+	public void detectAndSendChanges()
+    {
+        super.detectAndSendChanges();
+
+        for(int i=0;i<this.crafters.size();i+=1){
+        	ICrafting craft = (ICrafting) this.crafters.get(i);
+        	
+        	if(this.entity.getMode() != this.oldMode){
+        		craft.sendProgressBarUpdate(this, 0, this.entity.getMode());
+        	}
+        }
+        
+        this.oldMode = this.entity.getMode();
+    }
+	
+	@SideOnly(Side.CLIENT)
+    public void updateProgressBar(int updateid, int value){
+		if(updateid == 0){
+			this.entity.setMode(value);
 		}
 	}
 	

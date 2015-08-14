@@ -4,11 +4,8 @@ import java.util.Iterator;
 
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.network.message.ComputercartInventory;
-import mods.ocminecart.network.message.EntitySyncData;
-import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.GuiButtonClick;
 import mods.ocminecart.network.message.GuiEntityButtonClick;
-import mods.ocminecart.network.message.RailBaseModeUpdate;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
@@ -27,11 +24,8 @@ public class ModNetwork {
 		channel=NetworkRegistry.INSTANCE.newSimpleChannel(OCMinecart.MODID.toLowerCase());
 		
 		channel.registerMessage(GuiButtonClick.Handler.class, GuiButtonClick.class, 0, Side.SERVER);
-		channel.registerMessage(RailBaseModeUpdate.Handler.class, RailBaseModeUpdate.class, 1, Side.CLIENT);
-		channel.registerMessage(GuiEntityButtonClick.Handler.class, GuiEntityButtonClick.class, 2, Side.SERVER);
-		channel.registerMessage(ComputercartInventory.Handler.class, ComputercartInventory.class, 3, Side.CLIENT);
-		channel.registerMessage(EntitySyncRequest.Handler.class, EntitySyncRequest.class, 4, Side.SERVER);
-		channel.registerMessage(EntitySyncData.Handler.class, EntitySyncData.class, 5, Side.CLIENT);
+		channel.registerMessage(GuiEntityButtonClick.Handler.class, GuiEntityButtonClick.class, 1, Side.SERVER);
+	//	channel.registerMessage(ComputercartInventory.Handler.class, ComputercartInventory.class, 2, Side.CLIENT);
 	}
 	
 	public static void sendToNearPlayers(IMessage msg, TileEntity entity){

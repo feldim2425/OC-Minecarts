@@ -61,15 +61,12 @@ public class ComputerCartGui extends GuiContainer {
 		super(new ComputerCartContainer(inventory,entity));
 		this.container=(ComputerCartContainer) this.inventorySlots;
 		
-		for(int i=0;i<entity.compinv.getSizeInventory();i+=1){
-			if(entity.compinv.getStackInSlot(i)!=null) System.out.println(entity.compinv.getStackInSlot(i).getDisplayName());
-		}
+		System.out.println(entity.compinv.getSizeInventory());
 		
-		this.initComponents(this.container.getEntity().compinv.getComponents());
-		ComponetInventory compinv = this.container.getEntity().compinv;
-		for(int i=0;i<compinv.getSizeInventory();i+=1){
-			if(compinv.getStackInSlot(i)!=null)
-			OCMinecart.logger.log(Level.INFO, compinv.getStackInSlot(i).getDisplayName());
+		this.initComponents(entity.compinv.getComponents());
+		for(int i=0;i<entity.compinv.getSizeInventory();i+=1){
+			if(entity.compinv.getStackInSlot(i)!=null)
+			OCMinecart.logger.log(Level.INFO, entity.compinv.getStackInSlot(i).getDisplayName());
 		}
 		
 		this.ySize= (container.getHasScreen()) ? ComputerCartContainer.YSIZE_SCR : ComputerCartContainer.YSIZE_NOSCR;

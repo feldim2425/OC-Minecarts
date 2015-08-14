@@ -53,7 +53,6 @@ public class ComputercartInventory implements IMessage{
 				Entity e = w.getEntityByID(message.entityid);
 				if(e != null && (e instanceof ComputerCart)){
 					((ComputerCart)e).compinv.setInventorySlotContents(message.slot, message.stack);
-					System.out.println("GOT IT");
 				}
 			}
 			return null;

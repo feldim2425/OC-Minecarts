@@ -318,7 +318,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	    for (int slot=0; slot< this.getSizeInventory(); slot+=1) {
 	    	ItemStack stack = this.getStackInSlot(slot);
 	    	if (stack != null && this.components[slot]!=null) {
-	    		this.save(this.components[slot], Driver.driverFor(stack), stack);
+	    		this.save(this.components[slot], Driver.driverFor(stack,host.getClass()), stack);
 	    	}
 	     }
 	}

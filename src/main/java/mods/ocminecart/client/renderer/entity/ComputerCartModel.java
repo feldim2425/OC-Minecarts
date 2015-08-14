@@ -40,14 +40,14 @@ public class ComputerCartModel extends ModelBase {
   {
     Shape1.render(f);
     Shape3.render(f);
-    if(((ComputerCart) entity).machine().isRunning()){
+    /*if(((ComputerCart) entity).machine().isRunning()){
     	ComputerCart cart = (ComputerCart) entity;
     	GL11.glDisable(GL11.GL_LIGHTING);
     	Minecraft.getMinecraft().entityRenderer.disableLightmap(0);
     	GL11.glEnable(GL11.GL_BLEND);
     	GL11.glColor3d(cart.getRGBColor()[0], cart.getRGBColor()[1], cart.getRGBColor()[2]);
-    }
-    else GL11.glColor3d(0,0,0);
+    }*/
+    //else GL11.glColor3d(0,0,0);
     Shape2.render(f);
     GL11.glEnable(GL11.GL_LIGHTING);
     Minecraft.getMinecraft().entityRenderer.enableLightmap(0);

@@ -16,9 +16,7 @@ public class GuiEntityButtonClick implements IMessage {
 	public int dimId;
 	public int buttonid;
 	
-	public GuiEntityButtonClick(){
-		
-	}
+	public GuiEntityButtonClick(){}
 	
 	public GuiEntityButtonClick(Entity entity, int button){
 		enID = entity.getEntityId();
