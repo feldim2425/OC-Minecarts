@@ -55,13 +55,10 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	private int Mode = 0;
 	private boolean moving=false;
 	
-	private static final ForgeDirection[] RAIL_SIDE={ForgeDirection.UP};
-	private static final ForgeDirection[] CABLE_SIDE={ForgeDirection.DOWN, ForgeDirection.NORTH,ForgeDirection.SOUTH,ForgeDirection.EAST,ForgeDirection.WEST};
-	
 	public NetworkRailBaseTile(){
 		if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
-			rail = new Plug(this,RAIL_SIDE );
-			side = new Plug(this,CABLE_SIDE );
+			rail = new Plug(this);
+			side = new Plug(this);
 			
 			rail.setNode(Network.newNode(rail, Visibility.Network).withConnector().create());
 			side.setNode(Network.newNode(side,Visibility.Network).withConnector(500D).create());

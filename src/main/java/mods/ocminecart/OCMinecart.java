@@ -31,8 +31,6 @@ public class OCMinecart {
 	@SidedProxy(serverSide="mods.ocminecart.common.CommonProxy", clientSide="mods.ocminecart.client.ClientProxy")
 	public static CommonProxy proxy;
 	
-	public static OCMinecart mod;
-	
 	public static Configuration config;
 	
 	public static CreativeTabs itemGroup = new CreativeTabs(OCMinecart.MODID+".modtab"){
@@ -46,7 +44,6 @@ public class OCMinecart {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event){
-		OCMinecart.mod=this;
 		
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		Settings.init();

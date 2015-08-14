@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.logging.log4j.Level;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
@@ -170,16 +172,12 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	
 	public void connectComponents(){
 		for(int slot=0;slot<this.getSizeInventory();slot+=1){
-			if(FMLCommonHandler.instance().getEffectiveSide().isClient()) System.out.println("1");
 			ItemStack stack = this.getStackInSlot(slot);
 			if(stack!=null && this.components[slot]==null && this.isComponentSlot(slot, stack)){
-				if(FMLCommonHandler.instance().getEffectiveSide().isClient()) System.out.println("2");
 				Item drv = Driver.driverFor(stack);
 				if(drv!=null){
-					if(FMLCommonHandler.instance().getEffectiveSide().isClient()) System.out.println("3");
 					ManagedEnvironment env = drv.createEnvironment(stack, host);
 					if(env!=null){
-						if(FMLCommonHandler.instance().getEffectiveSide().isClient()) System.out.println("4");
 						try{	
 							env.load(dataTag(drv,stack));
 						}
@@ -195,7 +193,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 			}
 		}
 		
-		API.network.joinNewNetwork(node);
+		API.network.joinNewNetwork(this.node());
 		for(int i=0;i<this.components.length;i+=1){
 			if(this.components[i]!=null && this.components[i].node()!=null) this.connectItemNode(this.components[i].node());
 		}

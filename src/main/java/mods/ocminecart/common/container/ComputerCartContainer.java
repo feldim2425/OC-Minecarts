@@ -1,5 +1,13 @@
 package mods.ocminecart.common.container;
 
+import java.util.Iterator;
+
+import org.apache.logging.log4j.Level;
+
+import cpw.mods.fml.common.FMLCommonHandler;
+import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.network.ManagedEnvironment;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -16,15 +24,27 @@ public class ComputerCartContainer extends Container {
 	
 	private ComputerCart entity;
 	private boolean hasScreen;
+	public TextBuffer textbuffer;
 	
 	
 	public ComputerCartContainer(InventoryPlayer inventory,ComputerCart entity) {
 		this.entity=entity;
 		this.hasScreen=true;
 		
-		//this.addSlotToContainer()
+		this.initComponents(this.entity.getCompinv().getComponents());
+		OCMinecart.logger.log(Level.INFO," TextBuffer : " + String.valueOf(this.textbuffer!=null) +"  >  Server : "+FMLCommonHandler.instance().getEffectiveSide().isServer());
+		
+		this.addSlotToContainer(new Slot(entity.compinv, 0 , 170,156 - ((this.hasScreen) ? 0 : DELTA)));
 		
 		this.addPlayerInv(6, 174 -((this.hasScreen) ? 0 : DELTA), inventory);
+	}
+	
+	private void initComponents(Iterable<ManagedEnvironment> iterable){
+		Iterator<ManagedEnvironment> list = iterable.iterator();
+		while(list.hasNext()){
+			ManagedEnvironment env = list.next();
+			if(env instanceof TextBuffer) this.textbuffer = (TextBuffer) env;
+		}
 	}
 	
 	@Override

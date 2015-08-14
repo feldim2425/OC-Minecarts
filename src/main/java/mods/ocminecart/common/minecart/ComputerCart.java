@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.UUID;
 
+import li.cil.oc.api.API;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Analyzable;
 import li.cil.oc.api.network.Environment;
+import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import mods.ocminecart.OCMinecart;
@@ -38,6 +40,9 @@ import org.apache.logging.log4j.Level;
 public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot{
 	
 	private int tier = -1;
+	private Machine machine;
+	private boolean firstupdate = true;
+	
 	public ComponetInventory compinv = new ComponetInventory(this){
 
 		@Override
@@ -59,8 +64,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		}
 		
 	};
-	
-	private Machine machine;
 	
 	
 	public ComputerCart(World p_i1712_1_) {
@@ -91,12 +94,39 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		super.readEntityFromNBT(nbt);
 		if(nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
 		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier");
+		if(nbt.hasKey("machine")) this.machine.load(nbt.getCompoundTag("machine"));
+		if(nbt.hasKey("compnode")) this.compinv.node().load(nbt.getCompoundTag("compnode"));
+		
+		this.compinv.connectComponents();
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound nbt){
 		super.writeEntityToNBT(nbt);
+		
+		this.compinv.saveComponents();
+		
 		nbt.setTag("components", this.compinv.writeNTB());
 		nbt.setInteger("tier", this.tier);
+		
+		NBTTagCompound machine = new NBTTagCompound();
+		this.machine.save(machine);
+		nbt.setTag("machine", machine);
+		
+		NBTTagCompound compnode = new NBTTagCompound();
+		this.compinv.node().save(compnode);
+		nbt.setTag("compnode", machine);
+	}
+	
+	public void onUpdate(){
+		super.onUpdate();
+		if(this.firstupdate){
+			this.firstupdate=false;
+			if(!this.worldObj.isRemote){
+				API.network.joinNewNetwork(this.machine.node());
+				API.network.joinNewNetwork(this.compinv.node());
+				this.machine.node().connect(this.compinv.node());
+			}
+		}
 	}
 	
 	/*--------------------*/
@@ -172,14 +202,21 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 
 	@Override
 	public Iterable<ItemStack> internalComponents() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<ItemStack> components = new ArrayList<ItemStack>();
+		for(int i=0;i<compinv.getSizeInventory();i+=1){
+			if(compinv.getStackInSlot(i)!=null)
+				components.add(compinv.getStackInSlot(i));
+		}
+		return components;
 	}
 
 	@Override
 	public int componentSlot(String address) {
-		// TODO Auto-generated method stub
-		return 0;
+		for(int i=0;i<this.compinv.getSizeInventory();i+=1){
+			ManagedEnvironment env = this.compinv.getSlotComponent(i);
+			if(env != null && env.node()!=null && env.node().address() == address) return i;
+		}
+		return -1;
 	}
 
 	@Override
@@ -470,6 +507,10 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			float hitY, float hitZ) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public ComponetInventory getCompinv() {
+		return this.compinv;
 	}
 	
 }

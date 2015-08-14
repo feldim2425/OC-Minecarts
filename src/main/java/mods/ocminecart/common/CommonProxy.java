@@ -31,7 +31,7 @@ public class CommonProxy {
 		ModItems.init();
 		ModBlocks.init();
 		
-		EntityRegistry.registerModEntity(ComputerCart.class, "computercart", 1,OCMinecart.mod, 80, 1, true);
+		EntityRegistry.registerModEntity(ComputerCart.class, "computercart", 1,OCMinecart.instance, 80, 1, true);
 		
 	}
 	

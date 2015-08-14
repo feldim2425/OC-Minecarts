@@ -21,12 +21,10 @@ import li.cil.oc.api.network.SidedEnvironment;
 public class Plug implements Environment, Persistable{
 	
 	private IPlugable master;
-	private ForgeDirection[] sides;
 	private Node netnode;
 	
-	public Plug(IPlugable master, ForgeDirection[] sides){
+	public Plug(IPlugable master){
 		this.master=master;
-		this.sides=sides;
 	}
 	
 	public void setNode(Node snode){
@@ -56,21 +54,9 @@ public class Plug implements Environment, Persistable{
 	public IPlugable getMaster(){
 		return this.master;
 	}
-	
-	public ForgeDirection[] getSides(){
-		return this.sides;
-	}
-	
-	public boolean aktiveOnSide(ForgeDirection side){
-		for(int i=0;i<sides.length;++i){
-			if(sides[i].equals(side)) return true;
-		}
-		return false;
-	}
 
 	@Override
 	public void load(NBTTagCompound nbt) {
-		int numsides[] = nbt.getIntArray("sides");
 		NBTTagCompound ntag = nbt.getCompoundTag("node");
 		
 		if(this.netnode instanceof ComponentConnector) ((ComponentConnector)this.netnode).load(nbt);
@@ -82,8 +68,6 @@ public class Plug implements Environment, Persistable{
 
 	@Override
 	public void save(NBTTagCompound nbt) {
-		nbt.setIntArray("sides", forgeToIntArray(sides));
-		
 		NBTTagCompound ntag = new NBTTagCompound();
 		if(this.netnode instanceof ComponentConnector) ((ComponentConnector)this.netnode).save(nbt);
 		else if(this.netnode instanceof Connector) ((Connector)this.netnode).save(nbt);
@@ -91,24 +75,4 @@ public class Plug implements Environment, Persistable{
 		else this.netnode.save(ntag);
 		nbt.setTag("node", ntag);
 	}
-	
-	private int[] forgeToIntArray(ForgeDirection[] fside){
-		int[] iside = new int[fside.length];
-		
-		for(int i=0;i<fside.length;i+=1){
-			iside[i] = fside[i].ordinal();
-		}
-		
-		return iside;
-	}
-	
-	private ForgeDirection[] intToForgeArray(int[] iside){
-		ForgeDirection[] fside = new ForgeDirection[iside.length];
-		
-		for(int i=0;i<iside.length;i+=1){
-			fside[i] = ForgeDirection.VALID_DIRECTIONS[iside[i]];
-		}
-		return fside;
-	}
-
 }
