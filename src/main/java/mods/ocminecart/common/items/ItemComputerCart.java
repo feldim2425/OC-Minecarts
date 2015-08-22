@@ -4,37 +4,27 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang3.tuple.Pair;
-import org.lwjgl.input.Keyboard;
-
 import li.cil.oc.common.Tier;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.BlockRailBase;
-import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
-import net.minecraft.dispenser.IBehaviorDispenseItem;
-import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.lwjgl.input.Keyboard;
+
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemComputerCart extends MinecartItem{
 
@@ -43,7 +33,6 @@ public class ItemComputerCart extends MinecartItem{
     public ItemComputerCart()
     {
     	super();
-    	this.setTextureName(OCMinecart.MODID+":cart1");
         this.setUnlocalizedName(OCMinecart.MODID+".itemcomputercart");
         this.setHasSubtypes(true);
     }

@@ -2,6 +2,7 @@ package mods.ocminecart;
 
 import mods.ocminecart.common.CommonProxy;
 import mods.ocminecart.common.blocks.ModBlocks;
+import mods.ocminecart.common.items.ModItems;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraftforge.common.config.Configuration;
@@ -36,7 +37,7 @@ public class OCMinecart {
 	public static CreativeTabs itemGroup = new CreativeTabs(OCMinecart.MODID+".modtab"){
 		@Override
 		public Item getTabIconItem() {
-			return Item.getItemFromBlock(ModBlocks.block_NetworkRail);
+			return ModItems.item_ComputerCartCase;
 		}
 	};
 	
