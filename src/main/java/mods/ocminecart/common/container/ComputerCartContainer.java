@@ -24,13 +24,12 @@ public class ComputerCartContainer extends Container {
 	public static final int DELTA = YSIZE_SCR - YSIZE_NOSCR; 
 	
 	private ComputerCart entity;
-	private boolean hasScreen;
+	private boolean hasScreen=false;
 	public TextBuffer textbuffer;
 	
 	
 	public ComputerCartContainer(InventoryPlayer inventory,ComputerCart entity) {
 		this.entity=entity;
-		this.hasScreen=true;
 		
 		this.initComponents(this.entity.getCompinv().getComponents());
 		
@@ -43,7 +42,7 @@ public class ComputerCartContainer extends Container {
 		Iterator<ManagedEnvironment> list = iterable.iterator();
 		while(list.hasNext()){
 			ManagedEnvironment env = list.next();
-			if(env instanceof TextBuffer) this.textbuffer = (TextBuffer) env;
+			if(env instanceof TextBuffer) this.hasScreen=true;
 		}
 	}
 	

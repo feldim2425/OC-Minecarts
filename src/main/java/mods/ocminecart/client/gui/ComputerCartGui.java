@@ -1,8 +1,12 @@
 package mods.ocminecart.client.gui;
 
+import java.util.Iterator;
+
 import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
 import li.cil.oc.client.renderer.gui.BufferRenderer;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.ImageButton;
@@ -16,6 +20,7 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
+import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
 public class ComputerCartGui extends GuiContainer {
@@ -48,11 +53,21 @@ public class ComputerCartGui extends GuiContainer {
 		super(new ComputerCartContainer(inventory,entity));
 		this.container=(ComputerCartContainer) this.inventorySlots;
 		
-		this.textbuffer = new li.cil.oc.common.component.TextBuffer(entity);
-		this.textbuffer.setMaximumResolution((int)maxBufferWidth, (int)maxBufferHeight);
+		this.initComponents(entity.compinv.getComponents());
 		
 		this.ySize= (container.getHasScreen()) ? ComputerCartContainer.YSIZE_SCR : ComputerCartContainer.YSIZE_NOSCR;
 		this.xSize= ComputerCartContainer.XSIZE;
+	}
+	
+	private void initComponents(Iterable<ManagedEnvironment> iterable){
+		Iterator<ManagedEnvironment> list = iterable.iterator();
+		while(list.hasNext()){
+			ManagedEnvironment env = list.next();
+			if(env instanceof TextBuffer){
+				this.textbuffer = (TextBuffer) env;
+				OCMinecart.logger.log(Level.INFO, "Screen");
+			}
+		}
 	}
 	
 	public void initGui(){
