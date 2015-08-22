@@ -1,7 +1,5 @@
 package mods.ocminecart;
 
-import scala.Int;
-import net.minecraftforge.common.config.Configuration;
 
 public class Settings {
 	

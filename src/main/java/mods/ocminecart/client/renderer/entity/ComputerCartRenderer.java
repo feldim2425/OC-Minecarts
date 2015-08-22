@@ -1,19 +1,14 @@
 package mods.ocminecart.client.renderer.entity;
 
-import org.lwjgl.opengl.GL11;
-
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
-import net.minecraft.block.Block;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelMinecart;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
+
+import org.lwjgl.opengl.GL11;
 
 public class ComputerCartRenderer extends Render {
 	

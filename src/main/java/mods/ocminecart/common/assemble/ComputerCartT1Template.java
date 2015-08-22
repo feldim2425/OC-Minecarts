@@ -9,15 +9,10 @@ import mods.ocminecart.common.assemble.util.Complexity;
 import mods.ocminecart.common.assemble.util.General;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
-
-import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.Level;
-
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
-import net.minecraft.util.IChatComponent;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ComputerCartT1Template {
 	

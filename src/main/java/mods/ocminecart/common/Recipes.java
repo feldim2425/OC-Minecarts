@@ -1,16 +1,14 @@
 package mods.ocminecart.common;
 
 
-import org.apache.logging.log4j.Level;
-
+import li.cil.oc.api.API;
+import li.cil.oc.api.detail.ItemAPI;
 import mods.ocminecart.common.blocks.ModBlocks;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import li.cil.oc.api.API;
-import li.cil.oc.api.detail.ItemAPI;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class Recipes {

@@ -2,7 +2,6 @@ package mods.ocminecart.common.util;
 
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
-import net.minecraftforge.common.util.ForgeDirection;
 
 public interface IPlugable {
 	

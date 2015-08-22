@@ -1,12 +1,9 @@
 package mods.ocminecart.common.assemble.util;
 
-import java.util.ArrayList;
-
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Slot;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.util.IChatComponent;
 
 public class ComponentCheck {
 	

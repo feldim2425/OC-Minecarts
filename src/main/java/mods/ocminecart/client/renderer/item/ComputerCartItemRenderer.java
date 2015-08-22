@@ -1,16 +1,13 @@
 package mods.ocminecart.client.renderer.item;
 
-import org.lwjgl.opengl.GL11;
-
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.client.renderer.entity.ComputerCartModel;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
+
+import org.lwjgl.opengl.GL11;
 
 public class ComputerCartItemRenderer implements IItemRenderer {
 	

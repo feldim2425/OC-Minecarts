@@ -1,7 +1,5 @@
 package mods.ocminecart.common.tileentity;
 
-import org.apache.logging.log4j.Level;
-
 import li.cil.oc.api.Network;
 import li.cil.oc.api.network.Analyzable;
 import li.cil.oc.api.network.Connector;
@@ -12,7 +10,6 @@ import li.cil.oc.api.network.Visibility;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.util.IPlugable;
 import mods.ocminecart.common.util.Plug;
-import mods.ocminecart.network.ModNetwork;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
@@ -27,9 +24,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.ForgeDirection;
 import appeng.api.movable.IMovableTile;
-import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.registry.LanguageRegistry;
+import cpw.mods.fml.common.Optional;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -333,7 +329,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	@SideOnly(Side.CLIENT)
 	public IIcon getTopIcon(){ return this.camoTop; }
 
-	public Node[] onAnalyze(EntityPlayer player, int side, float hitX, float hitY, float hitZ) { return new Node[]{this.side.node()};}
+	public Node[] onAnalyze(EntityPlayer player, int side, float hitX, float hitY, float hitZ) { return null; }
 
 	/*-------AE2-Spatial-Storage-Handler------*/
 

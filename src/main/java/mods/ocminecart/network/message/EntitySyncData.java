@@ -1,10 +1,11 @@
 package mods.ocminecart.network.message;
 
+import io.netty.buffer.ByteBuf;
 import mods.ocminecart.common.ISyncEntity;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import io.netty.buffer.ByteBuf;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
@@ -22,7 +23,7 @@ public class EntitySyncData implements IMessage{
 		dimId = entity.worldObj.provider.dimensionId;
 		if(entity instanceof ISyncEntity){
 			nbt = new NBTTagCompound();
-			((ISyncEntity) entity).readSyncData(nbt);
+			((ISyncEntity) entity).writeSyncData(nbt);
 		}
 		else nbt = null;
 	}
@@ -46,11 +47,11 @@ public class EntitySyncData implements IMessage{
 		@Override
 		public IMessage onMessage(EntitySyncData message, MessageContext ctx) {
 			if(message.nbt != null){	//If the nbt is null then the entity is not syncable and we dosn't need to handle this
-				World world = ctx.getServerHandler().playerEntity.worldObj;
+				World world = Minecraft.getMinecraft().theWorld;
 				if(world != null && world.provider.dimensionId == message.dimId){ // just to make sure that the player has not moved to an other dimension
 					Entity entity = world.getEntityByID(message.enID);
 					if(entity != null && (entity instanceof ISyncEntity)){
-						((ISyncEntity) entity).writeSyncData(message.nbt);
+						((ISyncEntity) entity).readSyncData(message.nbt);
 					}
 				}
 			}

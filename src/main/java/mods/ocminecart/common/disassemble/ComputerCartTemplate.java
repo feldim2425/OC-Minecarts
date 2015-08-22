@@ -3,12 +3,12 @@ package mods.ocminecart.common.disassemble;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import li.cil.oc.common.Tier;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.item.ItemStack;
+
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ComputerCartTemplate {
 	

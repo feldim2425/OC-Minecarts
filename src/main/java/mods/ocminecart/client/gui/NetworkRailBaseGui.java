@@ -1,24 +1,18 @@
 package mods.ocminecart.client.gui;
 
-import li.cil.oc.api.component.TextBuffer;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.container.NetworkRailBaseContainer;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.GuiButtonClick;
-
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiLabel;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.ICrafting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-import cpw.mods.fml.common.registry.LanguageRegistry;
+
+import org.lwjgl.opengl.GL11;
 
 public class NetworkRailBaseGui extends GuiContainer{
 	

@@ -1,12 +1,11 @@
 package mods.ocminecart.client.renderer.entity;
 
-import org.lwjgl.opengl.GL11;
-
-import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
+
+import org.lwjgl.opengl.GL11;
 
 public class ComputerCartModel extends ModelBase {
 	ModelRenderer Shape1;

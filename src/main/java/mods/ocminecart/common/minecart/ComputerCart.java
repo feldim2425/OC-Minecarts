@@ -15,11 +15,13 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.common.ISyncEntity;
 import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventory;
+import mods.ocminecart.network.message.EntitySyncRequest;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -34,10 +36,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.Level;
 
 
-public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot{
+public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot, ISyncEntity{
 	
 	private int tier = -1;
 	private Machine machine;
@@ -114,7 +115,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		
 		NBTTagCompound compnode = new NBTTagCompound();
 		this.compinv.node().save(compnode);
-		nbt.setTag("compnode", machine);
+		nbt.setTag("compnode", compnode);
 	}
 	
 	public void onUpdate(){
@@ -126,7 +127,23 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 				API.network.joinNewNetwork(this.compinv.node());
 				this.machine.node().connect(this.compinv.node());
 			}
+			else{
+				ModNetwork.channel.sendToServer(new EntitySyncRequest(this));
+			}
 		}
+		
+	}
+	
+	@Override
+	public void writeSyncData(NBTTagCompound nbt) {
+		this.compinv.saveComponents();
+		nbt.setTag("components", this.compinv.writeNTB());
+	}
+
+	@Override
+	public void readSyncData(NBTTagCompound nbt) {
+		this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
+		this.compinv.connectComponents();
 	}
 	
 	/*--------------------*/

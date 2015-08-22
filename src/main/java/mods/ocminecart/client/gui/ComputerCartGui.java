@@ -1,34 +1,22 @@
 package mods.ocminecart.client.gui;
 
-import java.util.Iterator;
-
-import li.cil.oc.api.Driver;
 import li.cil.oc.api.component.TextBuffer;
-import li.cil.oc.api.driver.Item;
-import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
 import li.cil.oc.client.renderer.gui.BufferRenderer;
-import li.cil.oc.common.ComponentTracker;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.ImageButton;
 import mods.ocminecart.common.container.ComputerCartContainer;
-import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.minecart.ComputerCart;
-
-import org.apache.logging.log4j.Level;
-import org.lwjgl.opengl.GL11;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+
+import org.lwjgl.opengl.GL11;
 
 public class ComputerCartGui extends GuiContainer {
 	
@@ -62,7 +50,6 @@ public class ComputerCartGui extends GuiContainer {
 		
 		this.textbuffer = new li.cil.oc.common.component.TextBuffer(entity);
 		this.textbuffer.setMaximumResolution((int)maxBufferWidth, (int)maxBufferHeight);
-		this.textbuffer.setResolution((int)maxBufferWidth, (int)maxBufferHeight);
 		
 		this.ySize= (container.getHasScreen()) ? ComputerCartContainer.YSIZE_SCR : ComputerCartContainer.YSIZE_NOSCR;
 		this.xSize= ComputerCartContainer.XSIZE;

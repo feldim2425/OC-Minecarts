@@ -1,22 +1,13 @@
 package mods.ocminecart.common.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.ForgeDirection;
 import li.cil.oc.api.Persistable;
-import li.cil.oc.api.detail.Builder;
 import li.cil.oc.api.network.Component;
 import li.cil.oc.api.network.ComponentConnector;
 import li.cil.oc.api.network.Connector;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
-import li.cil.oc.api.network.SidedEnvironment;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class Plug implements Environment, Persistable{
 	

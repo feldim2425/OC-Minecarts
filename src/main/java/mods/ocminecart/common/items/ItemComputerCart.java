@@ -34,6 +34,7 @@ public class ItemComputerCart extends MinecartItem{
     {
     	super();
         this.setUnlocalizedName(OCMinecart.MODID+".itemcomputercart");
+        this.setTextureName(OCMinecart.MODID+":computercartcase_1"); //random texture to prevent errors. You should not see this Icon because 3D Renderer.
         this.setHasSubtypes(true);
     }
     

@@ -1,20 +1,14 @@
 package mods.ocminecart.client;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import li.cil.oc.api.driver.item.Slot;
-import li.cil.oc.common.Tier;
+import mods.ocminecart.Settings;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
 
 public class SlotIcons {
-	
-	private static final String OC_Domain = "opencomputers:";
 	
 	private final static String[] SLOT_TYPES  = new String[]{
 		Slot.Card, Slot.ComponentBus, Slot.Container, Slot.CPU, "eeprom", Slot.Floppy, Slot.HDD, Slot.Memory, 
@@ -27,12 +21,12 @@ public class SlotIcons {
 	
 	public static void register(IIconRegister register){
 		for(int i=0;i<SLOT_TYPES.length;i+=1){
-			sloticons.put(SLOT_TYPES[i], register.registerIcon(OC_Domain+"icons/"+SLOT_TYPES[i]));
+			sloticons.put(SLOT_TYPES[i], register.registerIcon(Settings.OC_ResLoc+":icons/"+SLOT_TYPES[i]));
 		}
 		
-		tiericons.put(-1, register.registerIcon(OC_Domain+"icons/na"));
+		tiericons.put(-1, register.registerIcon(Settings.OC_ResLoc+":icons/na"));
 		for(int i=0;i<3;i+=1){
-			tiericons.put(i, register.registerIcon(OC_Domain+"icons/tier"+i));
+			tiericons.put(i, register.registerIcon(Settings.OC_ResLoc+":icons/tier"+i));
 		}
 	}
 	

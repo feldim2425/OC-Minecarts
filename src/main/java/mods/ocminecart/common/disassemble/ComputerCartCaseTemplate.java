@@ -1,6 +1,5 @@
 package mods.ocminecart.common.disassemble;
 
-import li.cil.oc.common.block.Item;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.item.ItemStack;
 

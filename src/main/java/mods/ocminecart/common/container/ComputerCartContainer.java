@@ -2,9 +2,6 @@ package mods.ocminecart.common.container;
 
 import java.util.Iterator;
 
-import org.apache.logging.log4j.Level;
-
-import cpw.mods.fml.common.FMLCommonHandler;
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
 import mods.ocminecart.OCMinecart;
@@ -14,6 +11,10 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+
+import org.apache.logging.log4j.Level;
+
+import cpw.mods.fml.common.FMLCommonHandler;
 
 public class ComputerCartContainer extends Container {
 	
@@ -32,7 +33,6 @@ public class ComputerCartContainer extends Container {
 		this.hasScreen=true;
 		
 		this.initComponents(this.entity.getCompinv().getComponents());
-		OCMinecart.logger.log(Level.INFO," TextBuffer : " + String.valueOf(this.textbuffer!=null) +"  >  Server : "+FMLCommonHandler.instance().getEffectiveSide().isServer());
 		
 		this.addSlotToContainer(new Slot(entity.compinv, 0 , 170,156 - ((this.hasScreen) ? 0 : DELTA)));
 		
