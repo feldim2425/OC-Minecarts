@@ -1,4 +1,4 @@
-package mods.ocminecart.common;
+package mods.ocminecart.common.container.slots;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

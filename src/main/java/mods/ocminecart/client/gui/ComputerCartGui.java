@@ -11,12 +11,14 @@ import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.ImageButton;
 import mods.ocminecart.common.container.ComputerCartContainer;
+import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
@@ -63,10 +65,7 @@ public class ComputerCartGui extends GuiContainer {
 		Iterator<ManagedEnvironment> list = iterable.iterator();
 		while(list.hasNext()){
 			ManagedEnvironment env = list.next();
-			if(env instanceof TextBuffer){
-				this.textbuffer = (TextBuffer) env;
-				OCMinecart.logger.log(Level.INFO, "Screen");
-			}
+			if(env instanceof TextBuffer) this.textbuffer = (TextBuffer) env;
 		}
 	}
 	
@@ -97,6 +96,8 @@ public class ComputerCartGui extends GuiContainer {
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture((container.getHasScreen())? textureScreen : textureNoScreen );
 		this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+		
+		this.renderGuiSlots();
 		
 	}
 	@Override
@@ -144,5 +145,20 @@ public class ComputerCartGui extends GuiContainer {
 	      	RenderHelper.enableStandardItemLighting();
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glPopMatrix();
+	}
+	
+	private void renderGuiSlots(){
+		Iterator<Slot> list = this.container.inventorySlots.iterator();
+		this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+	    GL11.glDisable(GL11.GL_LIGHTING);
+		while(list.hasNext()){
+			Slot slot = list.next();
+			if(slot instanceof ContainerSlot){
+				IIcon typeicon = SlotIcons.fromSlot(((ContainerSlot) slot).getSlotType());
+				if(typeicon!=null) this.drawTexturedModelRectFromIcon(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
+			}
+		}
 	}
 }

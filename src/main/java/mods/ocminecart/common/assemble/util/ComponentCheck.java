@@ -24,8 +24,8 @@ public class ComponentCheck {
 			}
 		}
 		
-		if(!hasCPU) return("a CPU");
-		if(!hasRAM) return("some Memory");
+		if(!hasCPU) return("Insert a CPU");
+		if(!hasRAM) return("Insert some Memory");
 		return null;
 	}
 }

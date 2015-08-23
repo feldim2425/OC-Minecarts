@@ -10,7 +10,7 @@ public class General {
 		String need = ComponentCheck.checkRequiredComponents(inventory);
 		if(need!=null){
 			IChatComponent[] warnings = new IChatComponent[]{ new ChatComponentText("Insert "+need+"!") };
-			return new Object[]{false, new ChatComponentText(EnumChatFormatting.RED+"Add "+need), warnings};
+			return new Object[]{false, new ChatComponentText(EnumChatFormatting.RED+need), warnings};
 		}
 		if(Complexity.calculate(inventory)>maxcomplexity){
 			return new Object[]{false, new ChatComponentText(EnumChatFormatting.RED+"Complexity: "+Complexity.calculate(inventory)+" / "+maxcomplexity)};
