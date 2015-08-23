@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
+import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
@@ -227,10 +229,10 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	}
 	
 	protected void onItemRemoved(int slot, ItemStack stack){
-		if(this.components[slot]!=null){
+		if(this.components[slot]!=null && FMLCommonHandler.instance().getEffectiveSide().isServer()){
 			ManagedEnvironment component = this.components[slot];
 			this.components[slot]=null;
-			if(this.updatingCompoents.contains(component)) this.updatingCompoents.remove(component);
+			if(this.updatingCompoents!=null && this.updatingCompoents.contains(component)) this.updatingCompoents.remove(component);
 			component.node().remove();
 			this.save(component, Driver.driverFor(stack), stack);
 			component.node().remove();
@@ -313,6 +315,14 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	    		this.save(this.components[slot], Driver.driverFor(stack,host.getClass()), stack);
 	    	}
 	     }
+	}
+	
+	public ItemStack getContainer(int index){
+		if(index >= 0 && index <= 2 && this.getStackInSlot(index)!=null){
+			Item it = Driver.driverFor(this.getStackInSlot(index));
+			if(it instanceof Container) return this.getStackInSlot(index);
+		}
+		return null;
 	}
 	
 	@Override

@@ -34,9 +34,9 @@ public class ComputerCartContainer extends Container {
 		
 		this.initComponents(this.entity.getCompinv().getComponents());
 		
-		//This slots are only for Debug / Testing
-		this.addSlotToContainer(new Slot(entity.compinv, 0 , 170,156 - ((this.hasScreen) ? 0 : DELTA)));
-		this.addSlotToContainer(new ContainerSlot(entity.compinv, 1 , 188,156 - ((this.hasScreen) ? 0 : DELTA), 1 , li.cil.oc.api.driver.item.Slot.CPU));
+		this.addSlotToContainer(new ContainerSlot(entity.compinv, 20 , 188,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(0)));
+		this.addSlotToContainer(new ContainerSlot(entity.compinv, 21 , 206,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(1)));
+		this.addSlotToContainer(new ContainerSlot(entity.compinv, 22 , 224,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(2)));
 		
 		this.addPlayerInv(6, 174 -((this.hasScreen) ? 0 : DELTA), inventory);
 	}

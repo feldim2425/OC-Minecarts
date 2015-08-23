@@ -364,35 +364,30 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 
 	@Override
 	public int tier() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.tier();
 	}
 	/*-----------------------------*/
 	
 	/*-------Inventory--------*/
 	@Override
 	public int[] getAccessibleSlotsFromSide(int p_94128_1_) {
-		// TODO Auto-generated method stub
-		return null;
+		return new int[]{};
 	}
 
 	@Override
-	public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_,
-			int p_102007_3_) {
+	public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_,int p_102007_3_) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_,
-			int p_102008_3_) {
+	public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_,int p_102008_3_) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public int getSizeInventory() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
