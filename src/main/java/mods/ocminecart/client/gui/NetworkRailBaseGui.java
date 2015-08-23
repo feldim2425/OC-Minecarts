@@ -74,7 +74,7 @@ public class NetworkRailBaseGui extends GuiContainer{
 		GL11.glColor3d(1F, 1F, 1F);
 		
 		Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
-		this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+		func_146110_a(this.guiLeft,this.guiTop,0,0,this.xSize,this.ySize, this.xSize,this.ySize);  //Same as drawTexturedModalRect, but allows custom image sizes
 		
 	}
 	
