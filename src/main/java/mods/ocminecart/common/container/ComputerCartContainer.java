@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,10 +11,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-
-import org.apache.logging.log4j.Level;
-
-import cpw.mods.fml.common.FMLCommonHandler;
 
 public class ComputerCartContainer extends Container {
 	

@@ -6,7 +6,6 @@ import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
 import li.cil.oc.client.renderer.gui.BufferRenderer;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.ImageButton;
@@ -22,7 +21,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
-import org.apache.logging.log4j.Level;
 import org.lwjgl.opengl.GL11;
 
 public class ComputerCartGui extends GuiContainer {

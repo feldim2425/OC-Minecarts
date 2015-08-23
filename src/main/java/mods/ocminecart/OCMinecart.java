@@ -1,7 +1,6 @@
 package mods.ocminecart;
 
 import mods.ocminecart.common.CommonProxy;
-import mods.ocminecart.common.blocks.ModBlocks;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -60,9 +59,5 @@ public class OCMinecart {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event){
 		proxy.postInit();
-	}
-	
-	public String getModId(){ //Used in EntityRegister
-		return OCMinecart.MODID;
 	}
 }
