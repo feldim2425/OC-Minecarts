@@ -9,6 +9,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ContainerSlot extends Slot{
 	
@@ -42,4 +44,22 @@ public class ContainerSlot extends Slot{
 	 public String getSlotType(){
 		 return this.type;
 	 }
+	 
+
+	public boolean isItemValid(ItemStack stack){
+		if(this.type != li.cil.oc.api.driver.item.Slot.Any && this.tier != Tier.Any()){
+			Item drv = Driver.driverFor(stack);
+			if(drv == null) return false;
+			if((drv.slot(stack) == this.type || drv.slot(stack) == li.cil.oc.api.driver.item.Slot.Any) && drv.tier(stack)<=this.tier) return this.inventory.isItemValidForSlot(this.slotNumber, stack);
+			return false;
+		}
+		else if(this.type != li.cil.oc.api.driver.item.Slot.None && this.tier != Tier.None()) return false;
+		return this.inventory.isItemValidForSlot(this.slotNumber, stack);
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public boolean func_111238_b(){
+		return type != li.cil.oc.api.driver.item.Slot.None && tier != Tier.None();
+	}
+
 }

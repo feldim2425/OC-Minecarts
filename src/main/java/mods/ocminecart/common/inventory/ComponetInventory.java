@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
-import cpw.mods.fml.common.FMLCommonHandler;
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.EnvironmentHost;
@@ -25,6 +24,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import cpw.mods.fml.common.FMLCommonHandler;
 
 // This Class is just a Java rewrite of li.cil.oc.common.inventory.ComponentInventory and Inventory (Credits to Sangar)
 public abstract class ComponetInventory implements IInventory, Environment{
@@ -129,8 +129,8 @@ public abstract class ComponetInventory implements IInventory, Environment{
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
-		Item driver = Driver.driverFor(stack, host.getClass());
-		if(driver!=null && driver.slot(stack)==this.getSlotType(slot) && (driver.tier(stack) <= this.getSlotTier(slot) || driver.tier(stack) == Tier.None()))
+		Item driver = Driver.driverFor(stack);
+		if(driver!=null && (driver.slot(stack)==this.getSlotType(slot) || this.getSlotType(slot) == Slot.Any) && (driver.tier(stack) <= this.getSlotTier(slot) || driver.tier(stack) == Tier.None()))
 			return true;
 		return false;
 	}
