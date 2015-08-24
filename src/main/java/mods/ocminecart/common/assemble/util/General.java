@@ -9,7 +9,7 @@ public class General {
 	public static Object[] validate(IInventory inventory, int maxcomplexity){
 		String need = ComponentCheck.checkRequiredComponents(inventory);
 		if(need!=null){
-			IChatComponent[] warnings = new IChatComponent[]{ new ChatComponentText("Insert "+need+"!") };
+			IChatComponent[] warnings = new IChatComponent[]{ new ChatComponentText(need+"!") };
 			return new Object[]{false, new ChatComponentText(EnumChatFormatting.RED+need), warnings};
 		}
 		if(Complexity.calculate(inventory)>maxcomplexity){

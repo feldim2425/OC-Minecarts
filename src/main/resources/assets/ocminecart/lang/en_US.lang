@@ -11,6 +11,7 @@ tile.ocminecart.networkrailbase.name=Network Rail Controller
 
 gui.ocminecart.networkrailbase.title=Network Rail Controller
 gui.ocminecart.networkrailbase.info=Connection Type
+gui.ocminecart.manual=OC-Minecarts
 
 tooltip.ocminecart.instcomponents=Installed Components
 tooltip.ocminecart.viewcomponents=Hold %s to view installed components.

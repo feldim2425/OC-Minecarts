@@ -1,5 +1,6 @@
 package mods.ocminecart.client;
 
+import mods.ocminecart.client.manual.ManualRegister;
 import mods.ocminecart.client.renderer.entity.ComputerCartRenderer;
 import mods.ocminecart.client.renderer.item.ComputerCartItemRenderer;
 import mods.ocminecart.common.CommonProxy;
@@ -14,5 +15,7 @@ public class ClientProxy extends CommonProxy {
 		
 		RenderingRegistry.registerEntityRenderingHandler(ComputerCart.class, new ComputerCartRenderer());
 		MinecraftForgeClient.registerItemRenderer(ModItems.item_ComputerCart, new ComputerCartItemRenderer());
+		
+		ManualRegister.registermanual();
 	}
 }
