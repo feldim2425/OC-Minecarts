@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import li.cil.oc.api.API;
+import li.cil.oc.api.Manual;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
 import li.cil.oc.api.machine.Machine;
@@ -36,6 +37,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.Level;
 
 
 public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot, ISyncEntity{
@@ -88,6 +90,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	protected void entityInit(){
 		super.entityInit();
 		this.machine = li.cil.oc.api.Machine.create(this);
+		this.machine.setCostPerTick(0.0);
 	}
 	
 	/*------NBT-Stuff-------*/
@@ -120,6 +123,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	
 	public void onUpdate(){
 		super.onUpdate();
+		if(this.machine.isRunning() && !this.worldObj.isRemote) OCMinecart.logger.log(Level.INFO,"MACHINE ON");
 		if(this.firstupdate){
 			this.firstupdate=false;
 			if(!this.worldObj.isRemote){
@@ -159,7 +163,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 	
 	public boolean interactFirst(EntityPlayer p){
-		if(!this.worldObj.isRemote){
+		boolean openwiki = p.getHeldItem()!=null && p.isSneaking() && p.getHeldItem().getItem() == API.items.get("manual").item();
+
+		if(this.worldObj.isRemote && openwiki){
+			Manual.navigate(OCMinecart.MODID+"/%LANGUAGE%/item/cart.md");
+			Manual.openFor(p);
+		}
+		else if(!this.worldObj.isRemote && !openwiki){
+			//this.machine.start();
 			p.openGui(OCMinecart.instance, 1, this.worldObj, this.getEntityId(), -10, 0);
 		}
 		return true;
@@ -341,7 +352,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	@Override
 	public Node node() {
 		// TODO Auto-generated method stub
-		return null;
+		return this.machine.node();
 	}
 
 	@Override
@@ -490,14 +501,19 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 
 	@Override
 	public int componentCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		int count = 0;
+		Iterator<ManagedEnvironment> list=this.compinv.getComponents().iterator();
+		while(list.hasNext()){
+			count+=1;
+			list.next();
+		}
+		return count;
 	}
 
 	@Override
 	public Environment getComponentInSlot(int index) {
-		// TODO Auto-generated method stub
-		return null;
+		if(index>=this.compinv.getSizeInventory()) return null;
+		return this.compinv.getSlotComponent(index);
 	}
 
 	@Override
@@ -525,4 +541,10 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return this.compinv;
 	}
 	
+	public void setDead(){
+		super.setDead();
+		this.machine.stop();
+		this.machine.node().remove();
+		this.compinv.node().remove();
+	}
 }

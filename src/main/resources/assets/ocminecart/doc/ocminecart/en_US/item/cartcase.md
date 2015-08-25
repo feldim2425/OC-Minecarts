@@ -8,6 +8,4 @@ Put this item into an [Assembler](/%LANGUAGE%/block/assembler.md) to make a [Com
 - Tier 2 max. Compelxity: 18
 - Tier 3 max. Compelxity: 20
 
-You can disassemble this item using a [Disassembler](/%LANGUAGE%/block/disassembler.md)
-
-There is also a Creative Tier (Compelxity over 9000) you can't craft or disassemble it and it will get destroyed if you disassemble a creative Computer Cart  
+There is also a Creative Tier Case (Compelxity over 9000). You can't craft or disassemble it and it will get destroyed if you disassemble a creative Computer Cart  
