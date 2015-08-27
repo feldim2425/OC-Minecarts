@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.logging.log4j.Level;
+
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.api.driver.item.Slot;
+import li.cil.oc.api.machine.MachineHost;
+import li.cil.oc.api.network.Component;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
@@ -29,17 +33,15 @@ import cpw.mods.fml.common.FMLCommonHandler;
 // This Class is just a Java rewrite of li.cil.oc.common.inventory.ComponentInventory and Inventory (Credits to Sangar)
 public abstract class ComponetInventory implements IInventory, Environment{
 	
-	protected EnvironmentHost host;
+	protected MachineHost host;
 	private ItemStack[] slots;
-	private Node node;
 	
 	private ArrayList<ManagedEnvironment> updatingCompoents = new ArrayList<ManagedEnvironment>();
 	private ManagedEnvironment[] components = new ManagedEnvironment[this.getSizeInventory()];
 	
-	public ComponetInventory(EnvironmentHost host){
+	public ComponetInventory(MachineHost host){
 		this.host = host;
 		this.slots = new ItemStack[this.getSizeInventory()];
-		this.node = Network.newNode(this, Visibility.None).create();
 	}
 
 	@Override
@@ -129,8 +131,8 @@ public abstract class ComponetInventory implements IInventory, Environment{
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
-		Item driver = Driver.driverFor(stack);
-		if(driver!=null && (driver.slot(stack)==this.getSlotType(slot) || this.getSlotType(slot) == Slot.Any) && (driver.tier(stack) <= this.getSlotTier(slot) || driver.tier(stack) == Tier.None()))
+		Item driver = Driver.driverFor(stack,host.getClass());
+		if(driver!=null && (driver.slot(stack)==this.getSlotType(slot) || this.getSlotType(slot) == Slot.Any) && driver.tier(stack) <= this.getSlotTier(slot))
 			return true;
 		return false;
 	}
@@ -145,11 +147,11 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	}
 	
 	public int getSlotTier(int slot){
-		return Tier.Three();
+		return Tier.Any();
 	}
 	
 	public Node node(){
-		return node;
+		return this.host.machine().node();
 	}
 	
 	public void updateComponents() {
@@ -170,7 +172,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 		for(int slot=0;slot<this.getSizeInventory();slot+=1){
 			ItemStack stack = this.getStackInSlot(slot);
 			if(stack!=null && this.components[slot]==null && this.isComponentSlot(slot, stack)){
-				Item drv = Driver.driverFor(stack);
+				Item drv = Driver.driverFor(stack,host.getClass());
 				if(drv!=null){
 					ManagedEnvironment env = drv.createEnvironment(stack, host);
 					if(env!=null){
@@ -191,7 +193,9 @@ public abstract class ComponetInventory implements IInventory, Environment{
 		
 		API.network.joinNewNetwork(this.node());
 		for(int i=0;i<this.components.length;i+=1){
-			if(this.components[i]!=null && this.components[i].node()!=null) this.connectItemNode(this.components[i].node());
+			if(this.components[i]!=null && this.components[i].node()!=null){
+				this.connectItemNode(this.components[i].node());
+			}
 		}
 	}
 	
@@ -202,13 +206,13 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	}
 	
 	public void connectItemNode(Node node){
-		if(this.node!=null && node!=null && this.node.network()!=null){
-			this.node.connect(node);
+		if(this.node()!=null && node!=null && this.node().network()!=null){
+			this.node().connect(node);
 		}
 	}
 	
-	protected void onItemAdded(int slot, ItemStack stack){
-		Item drv = Driver.driverFor(stack);
+	synchronized protected void onItemAdded(int slot, ItemStack stack){
+		Item drv = Driver.driverFor(stack,host.getClass());
 		if(drv!=null){
 			ManagedEnvironment env = drv.createEnvironment(stack, host);
 			if(env!=null){
@@ -218,6 +222,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 				catch(Throwable e){
 					OCMinecart.logger.warn("An item component of type"+env.getClass().getName()+" (provided by driver "+drv.getClass().getName()+") threw an error while loading.",e);
 				}
+				
 				this.components[slot] = env;
 				this.connectItemNode(env.node());
 				if(env.canUpdate() && !this.updatingCompoents.contains(env)){
@@ -228,7 +233,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 		}
 	}
 	
-	protected void onItemRemoved(int slot, ItemStack stack){
+	synchronized protected void onItemRemoved(int slot, ItemStack stack){
 		if(this.components[slot]!=null && FMLCommonHandler.instance().getEffectiveSide().isServer()){
 			ManagedEnvironment component = this.components[slot];
 			this.components[slot]=null;
@@ -295,7 +300,6 @@ public abstract class ComponetInventory implements IInventory, Environment{
 			byte slot = invslot.getByte("slot");
 			if(slot>=0 && slot<this.getSizeInventory()) this.updateSlot(slot, stack);
 		}
-		this.connectComponents();
 	}
 	
 	public Iterable<ManagedEnvironment> getComponents(){
