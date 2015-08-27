@@ -8,9 +8,12 @@ import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.SidedEnvironment;
 import li.cil.oc.api.network.Visibility;
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.client.gui.NetworkRailBaseGui;
 import mods.ocminecart.common.util.IPlugable;
 import mods.ocminecart.common.util.Plug;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemBlock;
@@ -253,7 +256,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	public int getInventoryStackLimit() {return 1;}
 
 	public boolean isUseableByPlayer(EntityPlayer player) {
-		return player.getDistance(this.xCoord, this.yCoord, this.zCoord)<=64;
+		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : player.getDistanceSq((double)this.xCoord + 0.5D, (double)this.yCoord + 0.5D, (double)this.zCoord + 0.5D) <= 64.0D;
 	}
 
 	public void openInventory() {}
