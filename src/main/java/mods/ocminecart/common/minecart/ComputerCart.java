@@ -8,13 +8,17 @@ import li.cil.oc.api.API;
 import li.cil.oc.api.Manual;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
+import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Analyzable;
+import li.cil.oc.api.network.Component;
+import li.cil.oc.api.network.Connector;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
+import li.cil.oc.integration.opencomputers.DriverCPU;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.ISyncEntity;
 import mods.ocminecart.common.inventory.ComponetInventory;
@@ -29,6 +33,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -39,12 +45,15 @@ import net.minecraftforge.fluids.FluidTankInfo;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.Level;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+
 
 public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot, ISyncEntity{
 	
 	private int tier = -1;
 	private Machine machine;
 	private boolean firstupdate = true;
+	private boolean chDim = false;
 	
 	public ComponetInventory compinv = new ComponetInventory(this){
 
@@ -87,23 +96,31 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		
 	}
 	
+	@Override
 	protected void entityInit(){
 		super.entityInit();
 		this.machine = li.cil.oc.api.Machine.create(this);
-		this.machine.setCostPerTick(0.0);
+		if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
+			this.machine.setCostPerTick(1.0);
+		}
+		
 	}
 	
-	/*------NBT-Stuff-------*/
+	/*------NBT/Sync-Stuff-------*/
+	@Override
 	public void readEntityFromNBT(NBTTagCompound nbt){
 		super.readEntityFromNBT(nbt);
+		
 		if(nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
 		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier");
-		if(nbt.hasKey("machine")) this.machine.load(nbt.getCompoundTag("machine"));
-		if(nbt.hasKey("compnode")) this.compinv.node().load(nbt.getCompoundTag("compnode"));
 		
-		this.compinv.connectComponents();
+		this.machine.onHostChanged();
+		if(nbt.hasKey("machine"))this.machine.load(nbt.getCompoundTag("machine"));
+		
+		this.connectNetwork();
 	}
 	
+	@Override
 	public void writeEntityToNBT(NBTTagCompound nbt){
 		super.writeEntityToNBT(nbt);
 		
@@ -115,27 +132,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		NBTTagCompound machine = new NBTTagCompound();
 		this.machine.save(machine);
 		nbt.setTag("machine", machine);
-		
-		NBTTagCompound compnode = new NBTTagCompound();
-		this.compinv.node().save(compnode);
-		nbt.setTag("compnode", compnode);
-	}
-	
-	public void onUpdate(){
-		super.onUpdate();
-		if(this.machine.isRunning() && !this.worldObj.isRemote) OCMinecart.logger.log(Level.INFO,"MACHINE ON");
-		if(this.firstupdate){
-			this.firstupdate=false;
-			if(!this.worldObj.isRemote){
-				API.network.joinNewNetwork(this.machine.node());
-				API.network.joinNewNetwork(this.compinv.node());
-				this.machine.node().connect(this.compinv.node());
-			}
-			else{
-				ModNetwork.channel.sendToServer(new EntitySyncRequest(this));
-			}
-		}
-		
 	}
 	
 	@Override
@@ -152,16 +148,46 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	
 	/*--------------------*/
 	
-	/*-----Minecart/Entity-Stuff-------*/
+	/*------Interaction-------*/
+	
 	@Override
-	public int getMinecartType() {
-		return -1;
-	}
-
-	public static EntityMinecart create(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier) {
-		return new ComputerCart(w, x, y, z, components, tier);
+	public void onUpdate(){
+		super.onUpdate();
+		if(this.firstupdate){
+			this.firstupdate=false;
+			if(this.worldObj.isRemote) ModNetwork.channel.sendToServer(new EntitySyncRequest(this));
+			else{
+				if(this.machine.node().network()==null){
+					this.connectNetwork();
+				}
+			}
+		}
+		
+		if(!this.worldObj.isRemote){
+			this.machine.update();
+			this.compinv.updateComponents();
+			((Connector)this.machine.node()).changeBuffer(50); //Just for testing (Infinite Energy)
+		}
+		
 	}
 	
+	private void connectNetwork(){
+		API.network.joinNewNetwork(machine.node());
+		this.compinv.connectComponents();
+	}
+	
+	@Override
+	public void setDead(){
+		super.setDead();
+		if (!this.worldObj.isRemote && !this.chDim) {
+			this.machine.stop();
+			this.machine.node().remove();
+			this.compinv.disconnectComponents();
+			this.compinv.saveComponents();
+		}
+	}
+	
+	@Override
 	public boolean interactFirst(EntityPlayer p){
 		boolean openwiki = p.getHeldItem()!=null && p.isSneaking() && p.getHeldItem().getItem() == API.items.get("manual").item();
 
@@ -170,10 +196,28 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			Manual.openFor(p);
 		}
 		else if(!this.worldObj.isRemote && !openwiki){
-			//this.machine.start();
+			this.machine.start();
 			p.openGui(OCMinecart.instance, 1, this.worldObj, this.getEntityId(), -10, 0);
 		}
 		return true;
+	}
+	
+	@Override
+	public Node[] onAnalyze(EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
+		return new Node[]{this.machine.node()};
+	}
+	
+	
+	/*------------------------*/
+	
+	/*-----Minecart/Entity-Stuff-------*/
+	@Override
+	public int getMinecartType() {
+		return -1;
+	}
+
+	public static EntityMinecart create(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier) {
+		return new ComputerCart(w, x, y, z, components, tier);
 	}
 	
 	@Override
@@ -190,8 +234,21 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return ItemComputerCart.setTags(stack, components, tier);
 	}
 	
-	public boolean hasCustomInventoryName(){ return true; } // Drop Item on Kill when Player is in Creative Mode
+	@Override
+	public void travelToDimension(int dim){
+		try{
+			this.chDim = true;
+			super.travelToDimension(dim);
+		}
+		finally{
+			this.chDim = false;
+			this.setDead();
+		}
+	}
 	
+	@Override
+	public boolean hasCustomInventoryName(){ return true; } // Drop Item on Kill when Player is in Creative Mode
+	@Override
 	public ItemStack getPickedResult(MovingObjectPosition target){ return null; } 
 	
 	/*----------------------------------*/
@@ -232,7 +289,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	public Iterable<ItemStack> internalComponents() {
 		ArrayList<ItemStack> components = new ArrayList<ItemStack>();
 		for(int i=0;i<compinv.getSizeInventory();i+=1){
-			if(compinv.getStackInSlot(i)!=null)
+			if(compinv.getStackInSlot(i)!=null && this.compinv.isComponentSlot(i, compinv.getStackInSlot(i)))
 				components.add(compinv.getStackInSlot(i));
 		}
 		return components;
@@ -530,21 +587,10 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return false;
 	}
 
-	@Override
-	public Node[] onAnalyze(EntityPlayer player, int side, float hitX,
-			float hitY, float hitZ) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public ComponetInventory getCompinv() {
 		return this.compinv;
 	}
 	
-	public void setDead(){
-		super.setDead();
-		this.machine.stop();
-		this.machine.node().remove();
-		this.compinv.node().remove();
-	}
+	
 }
