@@ -4,23 +4,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.logging.log4j.Level;
-
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
-import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.machine.MachineHost;
-import li.cil.oc.api.network.Component;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
-import li.cil.oc.api.network.Visibility;
 import li.cil.oc.common.Tier;
-import li.cil.oc.server.network.Network;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import net.minecraft.entity.player.EntityPlayer;

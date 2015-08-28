@@ -43,8 +43,7 @@ public class OCMinecart {
 	//public static CreativeTabs itemGroup = li.cil.oc.api.CreativeTab.instance;
 	
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event){
-		
+	public void preInit(FMLPreInitializationEvent event){	
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		Settings.init();
 		

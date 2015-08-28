@@ -1,9 +1,7 @@
 package mods.ocminecart.common.container;
 
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.container.slots.SlotGhost;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;

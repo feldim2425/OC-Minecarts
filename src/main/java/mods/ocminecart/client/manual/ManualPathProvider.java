@@ -1,5 +1,6 @@
 package mods.ocminecart.client.manual;
 
+import li.cil.oc.api.manual.PathProvider;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.blocks.ModBlocks;
 import mods.ocminecart.common.items.ModItems;
@@ -7,7 +8,6 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import li.cil.oc.api.manual.PathProvider;
 
 public class ManualPathProvider implements PathProvider{
 	

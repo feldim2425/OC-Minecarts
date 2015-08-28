@@ -1,11 +1,11 @@
 package mods.ocminecart.client.manual;
 
-import net.minecraft.item.ItemStack;
 import li.cil.oc.api.Manual;
 import li.cil.oc.api.prefab.ItemStackTabIconRenderer;
 import li.cil.oc.api.prefab.ResourceContentProvider;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.items.ModItems;
+import net.minecraft.item.ItemStack;
 
 public class ManualRegister {
 	

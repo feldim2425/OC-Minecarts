@@ -1,12 +1,9 @@
 package mods.ocminecart.common.container.slots;
 
-import org.apache.logging.log4j.Level;
-
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.common.Tier;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.client.SlotIcons;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
