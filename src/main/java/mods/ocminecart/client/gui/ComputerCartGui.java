@@ -12,7 +12,10 @@ import mods.ocminecart.client.gui.widget.ImageButton;
 import mods.ocminecart.common.container.ComputerCartContainer;
 import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.network.ModNetwork;
+import mods.ocminecart.network.message.GuiEntityButtonClick;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -48,7 +51,8 @@ public class ComputerCartGui extends GuiContainer {
 	private int bufferY = (int)(8 + (this.maxBufferHeight - this.bufferRenderHeight) /2);
 	private TextBuffer textbuffer;
 	
-
+	private ImageButton btPower;
+	
 	public ComputerCartGui(InventoryPlayer inventory, ComputerCart entity) {
 		super(new ComputerCartContainer(inventory,entity));
 		this.container=(ComputerCartContainer) this.inventorySlots;
@@ -79,7 +83,9 @@ public class ComputerCartGui extends GuiContainer {
 		
 		BufferRenderer.compileBackground((int)this.bufferRenderWidth, (int)this.bufferRenderHeight, true);
 		
-		this.buttonList.add(new ImageButton(0, this.guiLeft+5, 5+this.guiTop+offset, 18, 18, null, textureOnOffButton, true));
+		this.btPower = new ImageButton(0, this.guiLeft+5, 5+this.guiTop+offset, 18, 18, null, textureOnOffButton, true);
+		
+		this.buttonList.add(this.btPower);
 	}
 	
 
@@ -158,5 +164,17 @@ public class ComputerCartGui extends GuiContainer {
 				if(typeicon!=null) this.drawTexturedModelRectFromIcon(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
 			}
 		}
+	}
+	
+	protected void actionPerformed(GuiButton button) {
+		switch(button.id){
+		case 0:
+			ModNetwork.channel.sendToServer(new GuiEntityButtonClick(this.container.getEntity(),0));
+			break;
+		}
+	}
+	
+	public void updateScreen(){
+		if(this.container.getEntity().getRunning() != btPower.getToggle()) btPower.setToggle(this.container.getEntity().getRunning());
 	}
 }

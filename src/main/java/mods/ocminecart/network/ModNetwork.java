@@ -8,6 +8,7 @@ import mods.ocminecart.network.message.EntitySyncData;
 import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.GuiButtonClick;
 import mods.ocminecart.network.message.GuiEntityButtonClick;
+import mods.ocminecart.network.message.UpdateRunning;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
@@ -30,6 +31,7 @@ public class ModNetwork {
 		channel.registerMessage(ComputercartInventory.Handler.class, ComputercartInventory.class, 2, Side.CLIENT);
 		channel.registerMessage(EntitySyncRequest.Handler.class, EntitySyncRequest.class, 3, Side.SERVER);
 		channel.registerMessage(EntitySyncData.Handler.class, EntitySyncData.class, 4, Side.CLIENT);
+		channel.registerMessage(UpdateRunning.Handler.class, UpdateRunning.class, 5, Side.CLIENT);
 	}
 	
 	public static void sendToNearPlayers(IMessage msg, TileEntity entity){

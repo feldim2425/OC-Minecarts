@@ -1,6 +1,7 @@
 package mods.ocminecart.network.message;
 
 import io.netty.buffer.ByteBuf;
+import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.Entity;
 import net.minecraftforge.common.DimensionManager;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -43,7 +44,7 @@ public class GuiEntityButtonClick implements IMessage {
 		public IMessage onMessage(GuiEntityButtonClick message, MessageContext ctx) {
 			Entity entity = DimensionManager.getWorld(message.dimId).getEntityByID(message.enID);
 			if(entity!=null){
-				//if(tile instanceof NetworkRailBaseTile) ((NetworkRailBaseTile) tile).onButtonPress(message.buttonid);
+				if(entity instanceof ComputerCart && message.buttonid == 0) ((ComputerCart) entity).setRunning(!((ComputerCart) entity).getRunning());
 			}
 			return null;
 		}

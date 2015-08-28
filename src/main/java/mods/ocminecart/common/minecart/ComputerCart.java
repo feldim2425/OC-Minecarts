@@ -8,18 +8,16 @@ import li.cil.oc.api.API;
 import li.cil.oc.api.Manual;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
-import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Analyzable;
-import li.cil.oc.api.network.Component;
 import li.cil.oc.api.network.Connector;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
-import li.cil.oc.integration.opencomputers.DriverCPU;
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.Settings;
 import mods.ocminecart.common.ISyncEntity;
 import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
@@ -27,14 +25,13 @@ import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventory;
 import mods.ocminecart.network.message.EntitySyncRequest;
+import mods.ocminecart.network.message.UpdateRunning;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -43,7 +40,6 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.Level;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 
@@ -54,6 +50,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	private Machine machine;
 	private boolean firstupdate = true;
 	private boolean chDim = false;
+	private boolean isRun = false;
 	
 	public ComponetInventory compinv = new ComponetInventory(this){
 
@@ -66,13 +63,13 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		@Override
 		protected void onItemAdded(int slot, ItemStack stack){
 			super.onItemAdded(slot, stack);
-			ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.xPosition(), this.host.xPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.xPosition(), this.host.xPosition(), this.host.world());
 		}
 		
 		@Override
 		protected void onItemRemoved(int slot, ItemStack stack){
 			super.onItemRemoved(slot, stack);
-			ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.xPosition(), this.host.xPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.xPosition(), this.host.xPosition(), this.host.world());
 		}
 		
 	};
@@ -101,7 +98,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		super.entityInit();
 		this.machine = li.cil.oc.api.Machine.create(this);
 		if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
-			this.machine.setCostPerTick(1.0);
+			this.machine.setCostPerTick(Settings.ComputerCartEnergyUse);
+			((Connector) this.machine.node()).setLocalBufferSize(Settings.ComputerCartEnergyCap);
 		}
 		
 	}
@@ -138,11 +136,13 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	public void writeSyncData(NBTTagCompound nbt) {
 		this.compinv.saveComponents();
 		nbt.setTag("components", this.compinv.writeNTB());
+		nbt.setBoolean("isRunning", this.isRun);
 	}
 
 	@Override
 	public void readSyncData(NBTTagCompound nbt) {
 		this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
+		this.isRun = nbt.getBoolean("isRunning");
 		this.compinv.connectComponents();
 	}
 	
@@ -166,6 +166,12 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		if(!this.worldObj.isRemote){
 			this.machine.update();
 			this.compinv.updateComponents();
+			
+			if(this.isRun != this.machine.isRunning()){
+				this.isRun=this.machine.isRunning();
+				ModNetwork.sendToNearPlayers(new UpdateRunning(this,this.isRun), this.posX, this.posY, this.posZ, this.worldObj);
+			}
+			
 			((Connector)this.machine.node()).changeBuffer(50); //Just for testing (Infinite Energy)
 		}
 		
@@ -196,7 +202,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			Manual.openFor(p);
 		}
 		else if(!this.worldObj.isRemote && !openwiki){
-			this.machine.start();
+			//this.machine.start();
 			p.openGui(OCMinecart.instance, 1, this.worldObj, this.getEntityId(), -10, 0);
 		}
 		return true;
@@ -275,10 +281,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 
 	@Override
-	public void markChanged() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void markChanged() {}
 
 	@Override
 	public Machine machine() {
@@ -305,62 +308,46 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 
 	@Override
-	public void onMachineConnect(Node node) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onMachineConnect(Node node) {}
 
 	@Override
-	public void onMachineDisconnect(Node node) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onMachineDisconnect(Node node) {}
 
 	@Override
 	public IInventory equipmentInventory() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public IInventory mainInventory() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public MultiTank tank() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int selectedSlot() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void setSelectedSlot(int index) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public int selectedTank() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public void setSelectedTank(int index) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public EntityPlayer player() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -408,27 +395,17 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 
 	@Override
 	public Node node() {
-		// TODO Auto-generated method stub
 		return this.machine.node();
 	}
 
 	@Override
-	public void onConnect(Node node) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onConnect(Node node) {}
 
 	@Override
-	public void onDisconnect(Node node) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onDisconnect(Node node) {}
 
 	@Override
-	public void onMessage(Message message) {
-		// TODO Auto-generated method stub
-		
-	}
+	public void onMessage(Message message) {}
 
 	@Override
 	public int tier() {
@@ -575,8 +552,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 
 	@Override
 	public void synchronizeSlot(int slot) {
-		// TODO Auto-generated method stub
-		
+		if(!this.worldObj.isRemote)
+			ModNetwork.sendToNearPlayers(new ComputercartInventory(this, slot, this.getStackInSlot(slot)), this.posX, this.posY, this.posZ, this.worldObj);
 	}
 	
 	/*----------------------------*/
@@ -591,6 +568,17 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	public ComponetInventory getCompinv() {
 		return this.compinv;
 	}
+
+	public void setRunning(boolean newVal) {
+		if(this.worldObj.isRemote) this.isRun=newVal;
+		else{
+			if(newVal) this.machine.start();
+			else this.machine.stop();
+		}
+	}
 	
+	public boolean getRunning() {
+		return this.isRun;
+	}
 	
 }

@@ -54,5 +54,13 @@ public class ImageButton extends GuiButton{
         }
     }
 	
+	public void setToggle(boolean toggle){
+		this.toggle=toggle;
+	}
+	
+	public boolean getToggle(){
+		return this.toggle;
+	}
+	
 
 }
