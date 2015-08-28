@@ -12,6 +12,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
 public class EntitySyncData implements IMessage{
+	
 	protected int enID;
 	protected int dimId;
 	protected NBTTagCompound nbt;
@@ -47,7 +48,7 @@ public class EntitySyncData implements IMessage{
 		@Override
 		public IMessage onMessage(EntitySyncData message, MessageContext ctx) {
 			if(message.nbt != null){	//If the nbt is null then the entity is not syncable and we dosn't need to handle this
-				World world = Minecraft.getMinecraft().theWorld;
+				World world = Minecraft.getMinecraft().thePlayer.worldObj;
 				if(world != null && world.provider.dimensionId == message.dimId){ // just to make sure that the player has not moved to an other dimension
 					Entity entity = world.getEntityByID(message.enID);
 					if(entity != null && (entity instanceof ISyncEntity)){
