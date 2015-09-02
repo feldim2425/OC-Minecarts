@@ -1,21 +1,28 @@
 package mods.ocminecart.client.gui;
 
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
+import li.cil.oc.client.KeyBindings;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
 import li.cil.oc.client.renderer.gui.BufferRenderer;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.ImageButton;
 import mods.ocminecart.common.container.ComputerCartContainer;
 import mods.ocminecart.common.container.slots.ContainerSlot;
+import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.GuiEntityButtonClick;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -24,6 +31,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 public class ComputerCartGui extends GuiContainer {
@@ -50,6 +58,9 @@ public class ComputerCartGui extends GuiContainer {
 	private int bufferX = (int)(8 + (this.maxBufferWidth - this.bufferRenderWidth) /2);
 	private int bufferY = (int)(8 + (this.maxBufferHeight - this.bufferRenderHeight) /2);
 	private TextBuffer textbuffer;
+	private li.cil.oc.server.component.Keyboard keyboard;
+	
+	private Map<Integer, Character> pressedKeys = new HashMap<Integer, Character>();
 	
 	private ImageButton btPower;
 	
@@ -57,17 +68,18 @@ public class ComputerCartGui extends GuiContainer {
 		super(new ComputerCartContainer(inventory,entity));
 		this.container=(ComputerCartContainer) this.inventorySlots;
 		
-		this.initComponents(entity.compinv.getComponents());
+		this.initComponents(entity.compinv);
 		
 		this.ySize= (container.getHasScreen()) ? ComputerCartContainer.YSIZE_SCR : ComputerCartContainer.YSIZE_NOSCR;
 		this.xSize= ComputerCartContainer.XSIZE;
 	}
 	
-	private void initComponents(Iterable<ManagedEnvironment> iterable){
-		Iterator<ManagedEnvironment> list = iterable.iterator();
+	private void initComponents(ComponetInventory compinv){
+		Iterator<ManagedEnvironment> list = compinv.getComponents().iterator();
 		while(list.hasNext()){
 			ManagedEnvironment env = list.next();
 			if(env instanceof TextBuffer) this.textbuffer = (TextBuffer) env;
+			else if(env instanceof li.cil.oc.server.component.Keyboard)this.keyboard = ((li.cil.oc.server.component.Keyboard) env);
 		}
 	}
 	
@@ -86,6 +98,8 @@ public class ComputerCartGui extends GuiContainer {
 		this.btPower = new ImageButton(0, this.guiLeft+5, 5+this.guiTop+offset, 18, 18, null, textureOnOffButton, true);
 		
 		this.buttonList.add(this.btPower);
+		
+		Keyboard.enableRepeatEvents(true);
 	}
 	
 
@@ -177,4 +191,65 @@ public class ComputerCartGui extends GuiContainer {
 	public void updateScreen(){
 		if(this.container.getEntity().getRunning() != btPower.getToggle()) btPower.setToggle(this.container.getEntity().getRunning());
 	}
+	
+	protected void mouseClicked(int x, int y, int button) {
+	    super.mouseClicked(x, y, button);
+	    boolean isMiddleMouseButton = button == 2;
+	    boolean isBoundMouseButton = KeyBindings.isPastingClipboard();
+	    if (this.textbuffer != null && (isMiddleMouseButton || isBoundMouseButton)) {
+	      if (this.keyboard!=null) {
+	    	  this.textbuffer.clipboard(GuiScreen.getClipboardString(), null);
+	      }
+	    }
+	 }
+	
+	 public void handleKeyboardInput() {
+
+		    //if (NEI.isInputFocused()) return;
+
+		    int code = Keyboard.getEventKey();
+		    
+		    if (this.textbuffer != null && code != Keyboard.KEY_ESCAPE && code != Keyboard.KEY_F11) {
+		      if (this.keyboard!=null) {
+		        if (Keyboard.getEventKeyState()) {
+		          char ch = Keyboard.getEventCharacter();
+		          if (!pressedKeys.containsKey(code) || !ignoreRepeat(ch, code)) {
+		            this.textbuffer.keyDown(ch, code, null);
+		            pressedKeys.put(code, ch);
+		          }
+		        }
+		        else{
+		        	if(pressedKeys.containsKey(code)){
+		        		this.textbuffer.keyUp(pressedKeys.remove(code), code, null);
+		        	}
+		        }
+		        
+		        if (KeyBindings.isPastingClipboard()) {
+			          this.textbuffer.clipboard(GuiScreen.getClipboardString(), null);
+			    }
+			  }
+		        	
+		  }
+		    else super.handleKeyboardInput();
+	 }
+	 
+	 public void onGuiClosed()  {
+		super.onGuiClosed();
+		if (this.textbuffer != null) 
+			 for(Entry<Integer, Character> e : pressedKeys.entrySet()) {
+				 this.textbuffer.keyUp(e.getValue(), e.getKey(), null);
+			 }
+		Keyboard.enableRepeatEvents(false);
+	 }
+	
+	private boolean ignoreRepeat(char ch, int code) {
+	    return code == Keyboard.KEY_LCONTROL ||
+	      code == Keyboard.KEY_RCONTROL ||
+	      code == Keyboard.KEY_LMENU ||
+	      code == Keyboard.KEY_RMENU ||
+	      code == Keyboard.KEY_LSHIFT ||
+	      code == Keyboard.KEY_RSHIFT ||
+	      code == Keyboard.KEY_LMETA ||
+	      code == Keyboard.KEY_RMETA;
+	  }
 }

@@ -21,7 +21,6 @@ public class ComputerCartContainer extends Container {
 	
 	private ComputerCart entity;
 	private boolean hasScreen=false;
-	public TextBuffer textbuffer;
 	
 	
 	public ComputerCartContainer(InventoryPlayer inventory,ComputerCart entity) {

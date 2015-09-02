@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.Manual;
+import li.cil.oc.api.component.Keyboard;
+import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
 import li.cil.oc.api.machine.Machine;
@@ -19,6 +21,7 @@ import li.cil.oc.api.network.Node;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.ISyncEntity;
+import mods.ocminecart.common.component.ComputerCartController;
 import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
@@ -51,6 +54,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	private boolean firstupdate = true;
 	private boolean chDim = false;
 	private boolean isRun = false;
+	private ComputerCartController controller = new ComputerCartController(this);
 	
 	public ComponetInventory compinv = new ComponetInventory(this){
 
@@ -70,6 +74,25 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		protected void onItemRemoved(int slot, ItemStack stack){
 			super.onItemRemoved(slot, stack);
 			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.xPosition(), this.host.xPosition(), this.host.world());
+		}
+		
+		@Override
+		public void connectItemNode(Node node){
+			super.connectItemNode(node);
+			if(node!=null){
+				if(node.host() instanceof TextBuffer){
+					for(int i=0;i<this.getSizeInventory();i+=1){
+						if((this.getSlotComponent(i) instanceof Keyboard) && this.getSlotComponent(i).node()!=null)
+							node.connect(this.getSlotComponent(i).node());
+					}
+				}
+				else if(node.host() instanceof Keyboard){
+					for(int i=0;i<this.getSizeInventory();i+=1){
+						if((this.getSlotComponent(i) instanceof TextBuffer) && this.getSlotComponent(i).node()!=null)
+							node.connect(this.getSlotComponent(i).node());
+					}
+				}
+			}
 		}
 		
 	};
@@ -111,6 +134,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		
 		if(nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
 		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier");
+		if(nbt.hasKey("controller")) this.controller.load(nbt.getCompoundTag("controller"));
 		
 		this.machine.onHostChanged();
 		if(nbt.hasKey("machine"))this.machine.load(nbt.getCompoundTag("machine"));
@@ -126,6 +150,10 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		
 		nbt.setTag("components", this.compinv.writeNTB());
 		nbt.setInteger("tier", this.tier);
+		
+		NBTTagCompound controller = new NBTTagCompound();
+		this.controller.save(controller);
+		nbt.setTag("controller", controller);
 		
 		NBTTagCompound machine = new NBTTagCompound();
 		this.machine.save(machine);
@@ -180,6 +208,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	private void connectNetwork(){
 		API.network.joinNewNetwork(machine.node());
 		this.compinv.connectComponents();
+		this.machine.node().connect(this.controller.node());
 	}
 	
 	@Override
@@ -189,20 +218,21 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			this.machine.stop();
 			this.machine.node().remove();
 			this.compinv.disconnectComponents();
+			this.controller.node().remove();
 			this.compinv.saveComponents();
 		}
 	}
 	
 	@Override
 	public boolean interactFirst(EntityPlayer p){
-		boolean openwiki = p.getHeldItem()!=null && p.isSneaking() && p.getHeldItem().getItem() == API.items.get("manual").item();
-
+		ItemStack refMan = API.items.get("manual").createItemStack(1);
+		boolean openwiki = p.getHeldItem()!=null && p.isSneaking() && p.getHeldItem().getItem() == refMan.getItem() && p.getHeldItem().getItemDamage() == refMan.getItemDamage();
+		
 		if(this.worldObj.isRemote && openwiki){
 			Manual.navigate(OCMinecart.MODID+"/%LANGUAGE%/item/cart.md");
 			Manual.openFor(p);
 		}
 		else if(!this.worldObj.isRemote && !openwiki){
-			//this.machine.start();
 			p.openGui(OCMinecart.instance, 1, this.worldObj, this.getEntityId(), -10, 0);
 		}
 		return true;
@@ -503,8 +533,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 
 	@Override
-	public FluidStack drain(ForgeDirection from, FluidStack resource,
-			boolean doDrain) {
+	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
 		// TODO Auto-generated method stub
 		return null;
 	}

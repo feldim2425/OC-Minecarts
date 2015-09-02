@@ -170,7 +170,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 				if(drv!=null){
 					ManagedEnvironment env = drv.createEnvironment(stack, host);
 					if(env!=null){
-						try{	
+						try{
 							env.load(dataTag(drv,stack));
 						}
 						catch(Throwable e){
