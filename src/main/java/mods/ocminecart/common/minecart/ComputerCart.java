@@ -110,7 +110,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		while(list.hasNext()){
 			Pair<Integer, ItemStack> pair = list.next();
 			if(pair.getKey() < this.compinv.getSizeInventory() && pair.getValue() != null){
-				compinv.setInventorySlotContents(pair.getKey(), pair.getValue());
+				compinv.updateSlot(pair.getKey(), pair.getValue());
 			}
 		}
 		

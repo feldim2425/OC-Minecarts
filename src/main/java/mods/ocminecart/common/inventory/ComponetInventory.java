@@ -113,7 +113,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 		return true;
 	}
 	
-	private void updateSlot(int slot, ItemStack stack){
+	public void updateSlot(int slot, ItemStack stack){
 		slots[slot] = stack;
 	}
 
