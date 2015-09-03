@@ -9,6 +9,7 @@ import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -52,6 +53,10 @@ public class OCMinecart {
 	
 	@EventHandler
 	public void Init(FMLInitializationEvent event){
+		
+		if(Loader.isModLoaded("appliedenergistics2")) OCMinecart.logger.info("Found Mod: AE2");
+		if(Loader.isModLoaded("NotEnoughItems")) OCMinecart.logger.info("Found Mod: NEI");
+		
 		proxy.init();
 	}
 	
