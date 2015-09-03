@@ -62,4 +62,8 @@ public class ContainerSlot extends Slot{
 		return type != li.cil.oc.api.driver.item.Slot.None && tier != Tier.None();
 	}
 
+	public int getTier() {
+		return this.tier;
+	}
+
 }

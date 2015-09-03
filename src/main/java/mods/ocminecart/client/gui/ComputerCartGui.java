@@ -10,7 +10,6 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.client.KeyBindings;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
 import li.cil.oc.client.renderer.gui.BufferRenderer;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.ImageButton;
@@ -18,6 +17,7 @@ import mods.ocminecart.common.container.ComputerCartContainer;
 import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.interaction.NEI;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.GuiEntityButtonClick;
 import net.minecraft.client.Minecraft;
@@ -28,11 +28,18 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+
+import codechicken.lib.vec.Rectangle4i;
+import codechicken.nei.ItemPanel;
+import codechicken.nei.LayoutManager;
 
 public class ComputerCartGui extends GuiContainer {
 	
@@ -58,11 +65,14 @@ public class ComputerCartGui extends GuiContainer {
 	private int bufferX = (int)(8 + (this.maxBufferWidth - this.bufferRenderWidth) /2);
 	private int bufferY = (int)(8 + (this.maxBufferHeight - this.bufferRenderHeight) /2);
 	private TextBuffer textbuffer;
-	private li.cil.oc.server.component.Keyboard keyboard;
+	private boolean hasKeyboard=false;
 	
 	private Map<Integer, Character> pressedKeys = new HashMap<Integer, Character>();
 	
 	private ImageButton btPower;
+	
+	private Slot hoveredSlot = null;
+	private ItemStack hoveredNEI = null;
 	
 	public ComputerCartGui(InventoryPlayer inventory, ComputerCart entity) {
 		super(new ComputerCartContainer(inventory,entity));
@@ -79,7 +89,7 @@ public class ComputerCartGui extends GuiContainer {
 		while(list.hasNext()){
 			ManagedEnvironment env = list.next();
 			if(env instanceof TextBuffer) this.textbuffer = (TextBuffer) env;
-			else if(env instanceof li.cil.oc.server.component.Keyboard)this.keyboard = ((li.cil.oc.server.component.Keyboard) env);
+			else if(env instanceof li.cil.oc.server.component.Keyboard) this.hasKeyboard = true;
 		}
 	}
 	
@@ -125,6 +135,7 @@ public class ComputerCartGui extends GuiContainer {
 		this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
         this.drawTexturedModelRectFromIcon(170, 84+offset, non, 16, 16);
         
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         if(this.container.getHasScreen() && this.textbuffer!=null){
             this.drawBufferLayer();
 
@@ -134,6 +145,32 @@ public class ComputerCartGui extends GuiContainer {
         	double scaleY = Math.min(this.bufferRenderHeight / bh , 1);
         	this.bufferscale = Math.min(scaleX, scaleY);
         }
+        
+        
+        Iterator<Slot> list = this.container.inventorySlots.iterator();
+        while(list.hasNext()) this.drawSlotHighlight(list.next());
+        GL11.glPopAttrib();
+	}
+	
+	public void drawScreen(int mx, int my, float dt){
+		this.hoveredSlot=null;
+		Iterator<Slot> list = this.container.inventorySlots.iterator();
+		while(list.hasNext()){
+			Slot slot = list.next();
+			if(slot!=null){
+				if(this.func_146978_c(slot.xDisplayPosition, slot.yDisplayPosition, 16, 16, mx, my))
+					this.hoveredSlot = slot;
+			}
+		}
+		this.hoveredNEI = NEI.hoveredStack(this, mx, my);
+		
+		super.drawScreen(mx, my, dt);
+		
+		if (Loader.isModLoaded("NotEnoughItems")) {
+		      GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+		      this.drawNEIHighlight();
+		      GL11.glPopAttrib();
+		}
 	}
 	
 	private void drawBufferLayer(){
@@ -197,20 +234,19 @@ public class ComputerCartGui extends GuiContainer {
 	    boolean isMiddleMouseButton = button == 2;
 	    boolean isBoundMouseButton = KeyBindings.isPastingClipboard();
 	    if (this.textbuffer != null && (isMiddleMouseButton || isBoundMouseButton)) {
-	      if (this.keyboard!=null) {
+	      if (this.hasKeyboard) {
 	    	  this.textbuffer.clipboard(GuiScreen.getClipboardString(), null);
 	      }
 	    }
 	 }
 	
 	 public void handleKeyboardInput() {
-
-		    //if (NEI.isInputFocused()) return;
+		    if (NEI.isInputFocused()) return;
 
 		    int code = Keyboard.getEventKey();
 		    
 		    if (this.textbuffer != null && code != Keyboard.KEY_ESCAPE && code != Keyboard.KEY_F11) {
-		      if (this.keyboard!=null) {
+		      if (this.hasKeyboard) {
 		        if (Keyboard.getEventKeyState()) {
 		          char ch = Keyboard.getEventCharacter();
 		          if (!pressedKeys.containsKey(code) || !ignoreRepeat(ch, code)) {
@@ -252,4 +288,46 @@ public class ComputerCartGui extends GuiContainer {
 	      code == Keyboard.KEY_LMETA ||
 	      code == Keyboard.KEY_RMETA;
 	  }
+	
+	protected void drawSlotHighlight(Slot slot) {
+		if(Minecraft.getMinecraft().thePlayer.inventory.getItemStack() == null){
+			boolean highlight = false;
+			if(!(slot instanceof ContainerSlot) || (((ContainerSlot)slot).getSlotType() != "none" && ((ContainerSlot)slot).getTier() != -1)){
+				boolean inPlayerInv = slot.inventory == Minecraft.getMinecraft().thePlayer.inventory;
+				if(this.hoveredSlot!=null){
+					if(this.hoveredSlot.getHasStack() && (slot instanceof ContainerSlot) && slot.isItemValid(this.hoveredSlot.getStack())) highlight=true;
+					else if(slot.getHasStack() && (this.hoveredSlot instanceof ContainerSlot) && this.hoveredSlot.isItemValid(slot.getStack()))
+						highlight=true;
+				}
+				else{
+					if(this.hoveredNEI!=null && (slot instanceof ContainerSlot) && slot.isItemValid(this.hoveredNEI)){
+						highlight=true;
+					}
+				}
+			}
+			
+			if(highlight){
+				this.zLevel += 100;
+				this.drawGradientRect(slot.xDisplayPosition, slot.yDisplayPosition, slot.xDisplayPosition + 16, slot.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
+				this.zLevel -= 100;
+			}
+		}
+	}
+	
+	@Optional.Method(modid = "NotEnoughItems")
+	private void drawNEIHighlight(){
+		ItemPanel panel = LayoutManager.itemPanel;
+		if(panel == null) return;
+		this.zLevel += 350;
+		for(int i=0;i<ItemPanel.items.size();i+=1){
+			Rectangle4i rect = panel.getSlotRect(i);
+			ItemStack slot = panel.getStackMouseOver(rect.x, rect.y);
+			if(slot!=null && this.hoveredSlot!=null){
+				if((this.hoveredSlot.inventory != Minecraft.getMinecraft().thePlayer.inventory) && (this.hoveredSlot instanceof ContainerSlot) && this.hoveredSlot.isItemValid(slot)){
+					 drawGradientRect( rect.x1() + 1, rect.y1() + 1, rect.x2(), rect.y2(), 0x40FFFFFF, 0x40FFFFFF);
+				}
+			}
+		}
+		this.zLevel -= 350;
+	}
 }
