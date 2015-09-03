@@ -2,6 +2,7 @@ package mods.ocminecart.network.message;
 
 import io.netty.buffer.ByteBuf;
 import mods.ocminecart.common.minecart.ComputerCart;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -47,8 +48,8 @@ public class ComputercartInventory implements IMessage{
 
 		@Override
 		public IMessage onMessage(ComputercartInventory message, MessageContext ctx) {
-			World w = DimensionManager.getWorld(message.dimid);
-			if(w != null){
+			World w = Minecraft.getMinecraft().thePlayer.worldObj;
+			if(w != null && w.provider.dimensionId == message.dimid){
 				Entity e = w.getEntityByID(message.entityid);
 				if(e != null && (e instanceof ComputerCart)){
 					((ComputerCart)e).compinv.setInventorySlotContents(message.slot, message.stack);

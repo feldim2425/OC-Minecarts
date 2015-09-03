@@ -67,13 +67,13 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		@Override
 		protected void onItemAdded(int slot, ItemStack stack){
 			super.onItemAdded(slot, stack);
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.xPosition(), this.host.xPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
 		}
 		
 		@Override
 		protected void onItemRemoved(int slot, ItemStack stack){
 			super.onItemRemoved(slot, stack);
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.xPosition(), this.host.xPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
 		}
 		
 		@Override
