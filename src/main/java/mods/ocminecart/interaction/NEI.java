@@ -1,10 +1,9 @@
 package mods.ocminecart.interaction;
 
-import li.cil.oc.integration.Mods;
-import codechicken.nei.LayoutManager;
-import cpw.mods.fml.common.Loader;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.item.ItemStack;
+import codechicken.nei.LayoutManager;
+import cpw.mods.fml.common.Loader;
 
 public class NEI {
 	public static ItemStack hoveredStack(GuiContainer container , int mx, int my){

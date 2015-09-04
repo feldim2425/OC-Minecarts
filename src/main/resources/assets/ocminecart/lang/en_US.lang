@@ -1,17 +1,26 @@
 itemGroup.ocminecart.modtab=OC-Minecarts
 
+#Item Names
 item.ocminecart.itemcomputercart.name=Computer Cart
 item.ocminecart.computercartcase_0.name=Computercart Case (Tier 1)
 item.ocminecart.computercartcase_1.name=Computercart Case (Tier 2)
 item.ocminecart.computercartcase_2.name=Computercart Case (Tier 3)
 item.ocminecart.computercartcase_3.name=Computercart Case (Creative)
 
+#Tile Entity Names
 tile.ocminecart.networkrail.name=Network Rail
 tile.ocminecart.networkrailbase.name=Network Rail Controller
 
+#GUI Text
 gui.ocminecart.networkrailbase.title=Network Rail Controller
 gui.ocminecart.networkrailbase.info=Connection Type
 gui.ocminecart.manual=OC-Minecarts
 
+#Tooltip for Items
 tooltip.ocminecart.instcomponents=Installed Components
 tooltip.ocminecart.viewcomponents=Hold %s to view installed components.
+
+#Tooltip for GUIs
+tooltip.ocminecart.gui.turnon=Turn on
+tooltip.ocminecart.gui.turnoff=Turn off
+tooltip.ocminecart.gui.useanalyzer=Use an Analyzer to troubleshoot errors.

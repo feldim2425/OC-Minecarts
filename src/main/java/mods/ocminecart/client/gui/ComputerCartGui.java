@@ -1,7 +1,9 @@
 package mods.ocminecart.client.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -10,8 +12,10 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.client.KeyBindings;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
 import li.cil.oc.client.renderer.gui.BufferRenderer;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
+import mods.ocminecart.client.gui.widget.EnergyBar;
 import mods.ocminecart.client.gui.widget.ImageButton;
 import mods.ocminecart.common.container.ComputerCartContainer;
 import mods.ocminecart.common.container.slots.ContainerSlot;
@@ -21,6 +25,7 @@ import mods.ocminecart.interaction.NEI;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.GuiEntityButtonClick;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -29,24 +34,27 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
+import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 
 import codechicken.lib.vec.Rectangle4i;
 import codechicken.nei.ItemPanel;
 import codechicken.nei.LayoutManager;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 
 public class ComputerCartGui extends GuiContainer {
 	
 	private ResourceLocation textureNoScreen = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/robot_noscreen.png");
 	private ResourceLocation textureScreen = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/robot.png");
-	
 	private ResourceLocation textureOnOffButton = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/button_power.png");
+	private ResourceLocation ebar = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/bar.png");
 	
 	private ComputerCartContainer container;
 	
@@ -74,6 +82,8 @@ public class ComputerCartGui extends GuiContainer {
 	private Slot hoveredSlot = null;
 	private ItemStack hoveredNEI = null;
 	
+//-------Init functions-------//
+	
 	public ComputerCartGui(InventoryPlayer inventory, ComputerCart entity) {
 		super(new ComputerCartContainer(inventory,entity));
 		this.container=(ComputerCartContainer) this.inventorySlots;
@@ -84,6 +94,7 @@ public class ComputerCartGui extends GuiContainer {
 		this.xSize= ComputerCartContainer.XSIZE;
 	}
 	
+	//Initialize components. get Screen and check if there is a Keyboard
 	private void initComponents(ComponetInventory compinv){
 		Iterator<ManagedEnvironment> list = compinv.getComponents().iterator();
 		while(list.hasNext()){
@@ -112,11 +123,12 @@ public class ComputerCartGui extends GuiContainer {
 		Keyboard.enableRepeatEvents(true);
 	}
 	
-
 	@Override
 	public boolean doesGuiPauseGame(){
 		return false;
 	}
+
+//-------Override render functions-------//
 	
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float p_146976_1_, int p_146976_2_, int p_146976_3_) {
@@ -126,8 +138,8 @@ public class ComputerCartGui extends GuiContainer {
 		this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 		
 		this.renderGuiSlots();
-		
 	}
+	
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		int offset = (this.container.getHasScreen()) ? ComputerCartContainer.DELTA : 0;
@@ -146,9 +158,29 @@ public class ComputerCartGui extends GuiContainer {
         	this.bufferscale = Math.min(scaleX, scaleY);
         }
         
+        EnergyBar.drawBar(26, 156-((this.textbuffer!=null)? 0 : ComputerCartContainer.DELTA), 12, 140, 150, 0.6, ebar);
+        
         
         Iterator<Slot> list = this.container.inventorySlots.iterator();
         while(list.hasNext()) this.drawSlotHighlight(list.next());
+        
+        if(this.func_146978_c(this.btPower.xPosition, this.btPower.yPosition, 18, 18, mouseX+this.guiLeft, mouseY+this.guiTop)){
+        	List<String> ls = new ArrayList<String>();
+        	if(this.container.getEntity().getRunning()){
+        		 ls.add(StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.turnoff"));
+        	}
+        	else{
+        		ls.add(StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.turnon"));
+        		ls.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.useanalyzer"));
+        	}
+            this.drawHoverText(ls, mouseX - this.guiLeft, mouseY - this.guiTop, Minecraft.getMinecraft().fontRenderer);
+        }
+        if(this.func_146978_c(26+this.guiLeft, 156+this.guiTop-((this.textbuffer!=null)? 0 : ComputerCartContainer.DELTA), 140, 12, mouseX+this.guiLeft, mouseY+this.guiTop)){
+        	List<String> ls = new ArrayList<String>();
+        	ls.add("Energy is not implemented yet!");
+        	this.drawHoverText(ls, mouseX - this.guiLeft, mouseY - this.guiTop, Minecraft.getMinecraft().fontRenderer);
+        }
+        
         GL11.glPopAttrib();
 	}
 	
@@ -172,50 +204,8 @@ public class ComputerCartGui extends GuiContainer {
 		      GL11.glPopAttrib();
 		}
 	}
-	
-	private void drawBufferLayer(){
-		GL11.glPushMatrix();
-		GL11.glTranslatef(bufferX, bufferY, 0);
-			Minecraft.getMinecraft().entityRenderer.disableLightmap(0);
-			RenderHelper.disableStandardItemLighting();
-			GL11.glPushMatrix();
-			GL11.glTranslatef(-3, -3, 0);
-			GL11.glColor4f(1, 1, 1, 1);
-			BufferRenderer.drawBackground();
-			GL11.glPopMatrix();
-			GL11.glEnable(GL11.GL_BLEND);
-		    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-			double scaleX = bufferRenderWidth / this.textbuffer.renderWidth();
-	      	double scaleY = bufferRenderHeight / this.textbuffer.renderHeight();
-	      	double scale = Math.min(scaleX, scaleY);
-	      	if (scaleX > scale) {
-	      		GL11.glTranslated(this.textbuffer.renderWidth() * (scaleX - scale) / 2, 0, 0);
-	      	}
-	      	else if (scaleY > scale) {
-	      		GL11.glTranslated(0,this.textbuffer.renderHeight() * (scaleY - scale) / 2, 0);
-	      	}
-	      	GL11.glScaled(scale, scale, scale);
-	      	GL11.glScaled(this.bufferscale, this.bufferscale, 1);
-	      	BufferRenderer.drawText(this.textbuffer);
-	      	RenderHelper.enableStandardItemLighting();
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glPopMatrix();
-	}
-	
-	private void renderGuiSlots(){
-		Iterator<Slot> list = this.container.inventorySlots.iterator();
-		this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
-		GL11.glEnable(GL11.GL_BLEND);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-	    GL11.glDisable(GL11.GL_LIGHTING);
-		while(list.hasNext()){
-			Slot slot = list.next();
-			if(slot instanceof ContainerSlot){
-				IIcon typeicon = SlotIcons.fromSlot(((ContainerSlot) slot).getSlotType());
-				if(typeicon!=null) this.drawTexturedModelRectFromIcon(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
-			}
-		}
-	}
+
+//-------Events-------//
 	
 	protected void actionPerformed(GuiButton button) {
 		switch(button.id){
@@ -269,7 +259,7 @@ public class ComputerCartGui extends GuiContainer {
 		    else super.handleKeyboardInput();
 	 }
 	 
-	 public void onGuiClosed()  {
+	 public void onGuiClosed(){
 		super.onGuiClosed();
 		if (this.textbuffer != null) 
 			 for(Entry<Integer, Character> e : pressedKeys.entrySet()) {
@@ -278,6 +268,9 @@ public class ComputerCartGui extends GuiContainer {
 		Keyboard.enableRepeatEvents(false);
 	 }
 	
+//-------Render functions----------//
+	 
+	//Fuction from OC. used in handleKeyboardInput()
 	private boolean ignoreRepeat(char ch, int code) {
 	    return code == Keyboard.KEY_LCONTROL ||
 	      code == Keyboard.KEY_RCONTROL ||
@@ -289,6 +282,7 @@ public class ComputerCartGui extends GuiContainer {
 	      code == Keyboard.KEY_RMETA;
 	  }
 	
+	//Render the "fake" Highlight for Components
 	protected void drawSlotHighlight(Slot slot) {
 		if(Minecraft.getMinecraft().thePlayer.inventory.getItemStack() == null){
 			boolean highlight = false;
@@ -314,6 +308,7 @@ public class ComputerCartGui extends GuiContainer {
 		}
 	}
 	
+	//Render the Highlight for NEI Slots
 	@Optional.Method(modid = "NotEnoughItems")
 	private void drawNEIHighlight(){
 		ItemPanel panel = LayoutManager.itemPanel;
@@ -329,5 +324,110 @@ public class ComputerCartGui extends GuiContainer {
 			}
 		}
 		this.zLevel -= 350;
+	}
+	
+	//Render Tooltips
+	private void drawHoverText(List<String> text, int x, int y, FontRenderer font){
+		if(!text.isEmpty()){
+		      GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+		      RenderHelper.disableStandardItemLighting();
+		      GL11.glDisable(GL11.GL_LIGHTING);
+		      GL11.glDisable(GL11.GL_DEPTH_TEST);
+		      
+		      int textWidth = -1;
+		      for(int i=0;i<text.size();i+=1){
+		    	  if(font.getStringWidth(text.get(i)) > textWidth)
+		    		  textWidth = font.getStringWidth(text.get(i));
+		      }
+		      
+		      int posX = x + 12;
+		      int posY = y - 12;
+		      int textHeight = 8;
+		      
+		      if (text.size() > 1) {
+		          textHeight += 2 + (text.size() - 1) * 10;
+		      }
+		      if (posX + textWidth > this.width - this.guiLeft) {
+		    	  
+		          posX -= 28 + textWidth;
+		      }
+		      if (posY + textHeight + 6 > this.height) {
+		          posY = this.height - textHeight - 6;
+		      }
+		      
+		      this.zLevel = 300;
+		      int bg = 0xF0100010;
+		      this.drawGradientRect(posX - 3, posY - 4, posX + textWidth + 3, posY - 3, bg, bg);
+		      this.drawGradientRect(posX - 3, posY + textHeight + 3, posX + textWidth + 3, posY + textHeight + 4, bg, bg);
+		      this.drawGradientRect(posX - 3, posY - 3, posX + textWidth + 3, posY + textHeight + 3, bg, bg);
+		      this.drawGradientRect(posX - 4, posY - 3, posX - 3, posY + textHeight + 3, bg, bg);
+		      this.drawGradientRect(posX + textWidth + 3, posY - 3, posX + textWidth + 4, posY + textHeight + 3, bg, bg);
+		      int color1 = 0x505000FF;
+		      int color2 = 0x505000FE;
+		      this.drawGradientRect(posX - 3, posY - 3 + 1, posX - 3 + 1, posY + textHeight + 3 - 1, color1, color2);
+		      this.drawGradientRect(posX + textWidth + 2, posY - 3 + 1, posX + textWidth + 3, posY + textHeight + 3 - 1, color1, color2);
+		      this.drawGradientRect(posX - 3, posY - 3, posX + textWidth + 3, posY - 3 + 1, color1, color1);
+		      this.drawGradientRect(posX - 3, posY + textHeight + 2, posX + textWidth + 3, posY + textHeight + 3, color2, color2);
+		      
+		      for(int i=0;i<text.size();i+=1){
+		    	  font.drawStringWithShadow(text.get(i), posX, posY, -1);
+		    	  if (i == 0) {
+		              posY += 2;
+		          }
+		    	  posY += 10;
+		      }
+		      this.zLevel = 0;
+		      
+		      GL11.glEnable(GL11.GL_LIGHTING);
+		      GL11.glEnable(GL11.GL_DEPTH_TEST);
+		      RenderHelper.enableStandardItemLighting();
+		      GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+		}
+	}
+	
+	//Draw Screen if there is one
+	private void drawBufferLayer(){
+		GL11.glPushMatrix();
+		GL11.glTranslatef(bufferX, bufferY, 0);
+			Minecraft.getMinecraft().entityRenderer.disableLightmap(0);
+			RenderHelper.disableStandardItemLighting();
+			GL11.glPushMatrix();
+			GL11.glTranslatef(-3, -3, 0);
+			GL11.glColor4f(1, 1, 1, 1);
+			BufferRenderer.drawBackground();
+			GL11.glPopMatrix();
+			GL11.glEnable(GL11.GL_BLEND);
+		    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			double scaleX = bufferRenderWidth / this.textbuffer.renderWidth();
+	      	double scaleY = bufferRenderHeight / this.textbuffer.renderHeight();
+	      	double scale = Math.min(scaleX, scaleY);
+	      	if (scaleX > scale) {
+	      		GL11.glTranslated(this.textbuffer.renderWidth() * (scaleX - scale) / 2, 0, 0);
+	      	}
+	      	else if (scaleY > scale) {
+	      		GL11.glTranslated(0,this.textbuffer.renderHeight() * (scaleY - scale) / 2, 0);
+	      	}
+	      	GL11.glScaled(scale, scale, scale);
+	      	GL11.glScaled(this.bufferscale, this.bufferscale, 1);
+	      	BufferRenderer.drawText(this.textbuffer);
+	      	RenderHelper.enableStandardItemLighting();
+            GL11.glDisable(GL11.GL_BLEND);
+            GL11.glPopMatrix();
+	}
+
+	//Render the Background Icon for Container Slots
+	private void renderGuiSlots(){
+		Iterator<Slot> list = this.container.inventorySlots.iterator();
+		this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glDisable(GL11.GL_LIGHTING);
+		while(list.hasNext()){
+			Slot slot = list.next();
+			if(slot instanceof ContainerSlot){
+				IIcon typeicon = SlotIcons.fromSlot(((ContainerSlot) slot).getSlotType());
+				if(typeicon!=null) this.drawTexturedModelRectFromIcon(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
+			}
+		}
 	}
 }

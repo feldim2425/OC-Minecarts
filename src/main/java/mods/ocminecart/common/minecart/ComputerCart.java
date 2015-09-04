@@ -522,7 +522,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 
 	@Override
 	public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
