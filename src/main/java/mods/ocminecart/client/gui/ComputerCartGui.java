@@ -158,7 +158,7 @@ public class ComputerCartGui extends GuiContainer {
         	this.bufferscale = Math.min(scaleX, scaleY);
         }
         
-        EnergyBar.drawBar(26, 156-((this.textbuffer!=null)? 0 : ComputerCartContainer.DELTA), 12, 140, 150, 0.6, ebar);
+        EnergyBar.drawBar(26, 156-((this.textbuffer!=null)? 0 : ComputerCartContainer.DELTA), 12, 140, 150, (double)this.container.sEnergy / (double)this.container.smaxEnergy, ebar);
         
         
         Iterator<Slot> list = this.container.inventorySlots.iterator();
@@ -177,7 +177,8 @@ public class ComputerCartGui extends GuiContainer {
         }
         if(this.func_146978_c(26+this.guiLeft, 156+this.guiTop-((this.textbuffer!=null)? 0 : ComputerCartContainer.DELTA), 140, 12, mouseX+this.guiLeft, mouseY+this.guiTop)){
         	List<String> ls = new ArrayList<String>();
-        	ls.add("Energy is not implemented yet!");
+        	int per = (int)(((double)this.container.sEnergy / (double)this.container.smaxEnergy)*100);
+        	ls.add("Energy: "+per+"% ("+this.container.sEnergy+" / "+this.container.smaxEnergy+")");
         	this.drawHoverText(ls, mouseX - this.guiLeft, mouseY - this.guiTop, Minecraft.getMinecraft().fontRenderer);
         }
         

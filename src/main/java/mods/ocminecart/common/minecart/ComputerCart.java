@@ -8,6 +8,7 @@ import li.cil.oc.api.API;
 import li.cil.oc.api.Manual;
 import li.cil.oc.api.component.Keyboard;
 import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
 import li.cil.oc.api.machine.Machine;
@@ -21,6 +22,7 @@ import li.cil.oc.api.network.Node;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.ISyncEntity;
+import mods.ocminecart.common.Sound;
 import mods.ocminecart.common.component.ComputerCartController;
 import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
@@ -66,14 +68,20 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		
 		@Override
 		protected void onItemAdded(int slot, ItemStack stack){
-			super.onItemAdded(slot, stack);
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
+				super.onItemAdded(slot, stack);
+				ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+			}
+			
+			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_insert");
 		}
 		
 		@Override
 		protected void onItemRemoved(int slot, ItemStack stack){
 			super.onItemRemoved(slot, stack);
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,null), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+			
+			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_eject");
 		}
 		
 		@Override
@@ -94,7 +102,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 				}
 			}
 		}
-		
 	};
 	
 	
@@ -607,6 +614,16 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	
 	public boolean getRunning() {
 		return this.isRun;
+	}
+
+	public double getEnergy() {
+		if(!this.worldObj.isRemote) return ((Connector)this.machine.node()).globalBuffer();
+		return -1;
+	}
+	
+	public double getMaxEnergy() {
+		if(!this.worldObj.isRemote) return ((Connector)this.machine.node()).globalBufferSize();
+		return -1;
 	}
 	
 }

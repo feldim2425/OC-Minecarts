@@ -137,10 +137,24 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	}
 	
 	public String getSlotType(int slot){
+		if(slot>=20 && slot<=22){
+			Item drv = Driver.driverFor(this.getContainer(slot-20));
+			if(drv instanceof Container){
+				return ((Container)drv).providedSlot(this.getContainer(slot-20));
+			}
+			else return Slot.None;
+		}
 		return Slot.Any;
 	}
 	
 	public int getSlotTier(int slot){
+		if(slot>=20 && slot<=22){
+			Item drv = Driver.driverFor(this.getContainer(slot-20));
+			if(drv instanceof Container){
+				return ((Container)drv).providedTier(this.getContainer(slot-20));
+			}
+			else return Tier.None();
+		}
 		return Tier.Any();
 	}
 	

@@ -5,7 +5,7 @@ public class Settings {
 	
 	public static final String OC_ResLoc = "opencomputers"; // Resource domain for OpenComputers
 	public static final String OC_Namespace = "oc:"; // Namespace for OpenComputers NBT Data
-	
+	public static final float OC_SoundVolume = li.cil.oc.Settings.get().soundVolume();
 	
 	public static int ComputerCartBaseCost; //Config Value -> basecost
 	public static int ComputerCartComplexityCost; //Config Value -> costmultiplier

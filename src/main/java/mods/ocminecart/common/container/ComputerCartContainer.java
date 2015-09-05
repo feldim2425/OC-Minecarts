@@ -9,8 +9,11 @@ import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ComputerCartContainer extends Container {
 	
@@ -21,6 +24,9 @@ public class ComputerCartContainer extends Container {
 	
 	private ComputerCart entity;
 	private boolean hasScreen=false;
+	
+	public int smaxEnergy = -1;
+	public int sEnergy = -1;
 	
 	
 	public ComputerCartContainer(InventoryPlayer inventory,ComputerCart entity) {
@@ -71,5 +77,43 @@ public class ComputerCartContainer extends Container {
 	
 	public boolean getHasScreen(){
 		return this.hasScreen;
+	}
+	
+	public void addCraftigToICrafters(ICrafting craft){
+		super.addCraftingToCrafters(craft);
+		
+		craft.sendProgressBarUpdate(this, 0, (int) this.entity.getEnergy());
+		craft.sendProgressBarUpdate(this, 1, (int) this.entity.getMaxEnergy());
+	}
+	
+	public void detectAndSendChanges(){
+		super.detectAndSendChanges();
+		
+		for(int i=0;i<this.crafters.size();i+=1){
+        	ICrafting craft = (ICrafting) this.crafters.get(i);
+        	
+        	if(this.entity.getEnergy() != this.sEnergy){
+        		craft.sendProgressBarUpdate(this, 0, (int) (this.entity.getEnergy()*10));
+        	}
+        	
+        	if(this.entity.getMaxEnergy() != this.smaxEnergy){
+        		craft.sendProgressBarUpdate(this, 1, (int) (this.entity.getMaxEnergy()*10));
+        	}
+        }
+		
+		this.smaxEnergy=(int) this.entity.getMaxEnergy();
+		this.sEnergy=(int) this.entity.getEnergy();
+	}
+	
+	@SideOnly(Side.CLIENT)
+    public void updateProgressBar(int updateid, int value){
+		switch(updateid){
+		case 0:
+			this.sEnergy = value;
+			break;
+		case 1:
+			this.smaxEnergy = value;
+			break;
+		}
 	}
 }
