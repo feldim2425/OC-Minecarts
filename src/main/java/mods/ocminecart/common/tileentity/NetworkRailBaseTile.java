@@ -132,6 +132,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 		if (!this.worldObj.isRemote && !this.moving) {
 			if(firstupdate){
 				Network.joinOrCreateNetwork(this);
+				Network.joinNewNetwork(this.rail.node());
 				firstupdate=false;
 			}
 			
@@ -328,6 +329,16 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	
 	@SideOnly(Side.CLIENT)
 	public IIcon getTopIcon(){ return this.camoTop; }
+	
+	public boolean checkRailNode(Node node){
+		if(node!=null && !node.canBeReachedFrom(this.rail.node())){
+			OCMinecart.logger.info("Connected");
+			node.connect(this.rail.node());
+			return true;
+		}
+		else if(node!=null && node.network()!=null && node.canBeReachedFrom(this.rail.node())) return true;
+		else return false;
+	}
 
 	public Node[] onAnalyze(EntityPlayer player, int side, float hitX, float hitY, float hitZ) { return null; }
 
@@ -345,5 +356,6 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	}
 	
 	/*-------END-AE2-Spatial-Storage-Handler------*/
+	
 
 }
