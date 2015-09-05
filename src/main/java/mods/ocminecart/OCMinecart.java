@@ -53,7 +53,6 @@ public class OCMinecart {
 	
 	@EventHandler
 	public void Init(FMLInitializationEvent event){
-		
 		if(Loader.isModLoaded("appliedenergistics2")) OCMinecart.logger.info("Found Mod: AE2");
 		if(Loader.isModLoaded("NotEnoughItems")) OCMinecart.logger.info("Found Mod: NEI");
 		
