@@ -23,6 +23,7 @@ import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.ISyncEntity;
 import mods.ocminecart.common.Sound;
+import mods.ocminecart.common.blocks.INetRail;
 import mods.ocminecart.common.component.ComputerCartController;
 import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
@@ -37,8 +38,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
@@ -57,6 +60,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	private boolean chDim = false;
 	private boolean isRun = false;
 	private ComputerCartController controller = new ComputerCartController(this);
+	
+	private int cRailX = 0;	// Position of the connected Network Rail
+	private int cRailY = 0;
+	private int cRailZ = 0;
+	private int cRailDim = 0;
+	private boolean cRailCon = false;
+	private Node cRailNode = null; // This node will not get saved in NBT because it should automatic disconnect after restart; 
+	
 	
 	public ComponetInventory compinv = new ComponetInventory(this){
 
@@ -142,6 +153,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		if(nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
 		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier");
 		if(nbt.hasKey("controller")) this.controller.load(nbt.getCompoundTag("controller"));
+		if(nbt.hasKey("netrail")){
+			NBTTagCompound netrail = nbt.getCompoundTag("netrail");
+			this.cRailCon=true;
+			this.cRailX = netrail.getInteger("posX");
+			this.cRailY = netrail.getInteger("posY");
+			this.cRailZ = netrail.getInteger("posZ");
+			this.cRailDim = netrail.getInteger("posDim");
+		}
 		
 		this.machine.onHostChanged();
 		if(nbt.hasKey("machine"))this.machine.load(nbt.getCompoundTag("machine"));
@@ -161,6 +180,17 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		NBTTagCompound controller = new NBTTagCompound();
 		this.controller.save(controller);
 		nbt.setTag("controller", controller);
+		
+		if(this.cRailCon){
+			NBTTagCompound netrail = new NBTTagCompound();
+			netrail.setInteger("posX", this.cRailX);
+			netrail.setInteger("posY", this.cRailY);
+			netrail.setInteger("posZ", this.cRailZ);
+			netrail.setInteger("posDim", this.cRailDim);
+			nbt.setTag("netrail", netrail);
+		}
+		else if(nbt.hasKey("netrail")) nbt.removeTag("netrail");
+		
 		
 		NBTTagCompound machine = new NBTTagCompound();
 		this.machine.save(machine);
@@ -207,9 +237,51 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 				ModNetwork.sendToNearPlayers(new UpdateRunning(this,this.isRun), this.posX, this.posY, this.posZ, this.worldObj);
 			}
 			
-			((Connector)this.machine.node()).changeBuffer(50); //Just for testing (Infinite Energy)
+			if(this.tier==3)((Connector)this.machine.node()).changeBuffer(Integer.MAX_VALUE); //Just for Creative (Infinite Energy)
+			
+			if(!this.cRailCon && this.onRail() && (this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) instanceof INetRail)){
+				int x = MathHelper.floor_double(this.posX);
+				int y = MathHelper.floor_double(this.posY);
+				int z = MathHelper.floor_double(this.posZ);
+				INetRail netrail = (INetRail) this.worldObj.getBlock(x,y,z);
+				if(netrail.isValid(this.worldObj, x, y, z, this) && netrail.getResponseEnvironment(this.worldObj, x, y, z) != null){
+					this.cRailX = MathHelper.floor_double(this.posX);
+					this.cRailY = MathHelper.floor_double(this.posY);
+					this.cRailZ = MathHelper.floor_double(this.posZ);
+					this.cRailDim = this.worldObj.provider.dimensionId;
+					this.cRailCon = true;
+				}
+			}
+			
+			if(this.cRailCon){
+				World w = DimensionManager.getWorld(this.cRailDim);
+				if( w.getBlock(this.cRailX,this.cRailY,this.cRailZ) instanceof INetRail){
+					INetRail netrail = (INetRail) w.getBlock(this.cRailX,this.cRailY,this.cRailZ);
+					if(netrail.isValid(w, this.cRailX, this.cRailY, this.cRailZ, this) && netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
+						Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
+						if(!this.machine.node().canBeReachedFrom(railnode)){
+							this.machine.node().connect(railnode);
+							this.cRailNode = railnode;
+						}
+					}
+					else if(netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
+						Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
+						if(this.machine.node().canBeReachedFrom(railnode)){
+							this.machine.node().disconnect(railnode);
+							this.cRailCon=false;
+							this.cRailNode = null;
+						}
+					}
+				}
+				else{
+					if(this.cRailNode!=null && this.machine.node().canBeReachedFrom(this.cRailNode)){
+						this.machine.node().disconnect(this.cRailNode);
+						this.cRailCon=false;
+						this.cRailNode = null;
+					}
+				}	
+			}
 		}
-		
 	}
 	
 	private void connectNetwork(){

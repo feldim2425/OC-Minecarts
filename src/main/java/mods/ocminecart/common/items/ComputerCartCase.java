@@ -33,7 +33,7 @@ public class ComputerCartCase extends Item{
         case 0: return t1case;
         case 1: return t2case;
         case 2: return t3case;
-        case 3: return t4case; //reserved for creative case
+        case 3: return t4case;
         default: return null;
         }
     }
@@ -70,7 +70,7 @@ public class ComputerCartCase extends Item{
 		case 2:  //Tier 3
 			color = EnumChatFormatting.AQUA;
 			break;
-		case 3://Creative (NOT IMPLEMENTED YET)
+		case 3: //Creative
 			color = EnumChatFormatting.LIGHT_PURPLE;
 		}
         return color + super.getItemStackDisplayName(stack);

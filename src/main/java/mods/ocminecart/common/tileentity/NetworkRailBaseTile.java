@@ -3,6 +3,7 @@ package mods.ocminecart.common.tileentity;
 import li.cil.oc.api.Network;
 import li.cil.oc.api.network.Analyzable;
 import li.cil.oc.api.network.Connector;
+import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.SidedEnvironment;
@@ -310,6 +311,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 
 	@Override
 	public void onPlugDisconnect(Plug plug, Node node) {
+		if(plug == this.rail && rail.node().network()==null) Network.joinNewNetwork(this.rail.node());
 	}
 
 	public int getMode() {
@@ -329,18 +331,12 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	
 	@SideOnly(Side.CLIENT)
 	public IIcon getTopIcon(){ return this.camoTop; }
-	
-	public boolean checkRailNode(Node node){
-		if(node!=null && !node.canBeReachedFrom(this.rail.node())){
-			OCMinecart.logger.info("Connected");
-			node.connect(this.rail.node());
-			return true;
-		}
-		else if(node!=null && node.network()!=null && node.canBeReachedFrom(this.rail.node())) return true;
-		else return false;
-	}
 
 	public Node[] onAnalyze(EntityPlayer player, int side, float hitX, float hitY, float hitZ) { return null; }
+	
+	public Environment getRailPlug(){
+		return this.rail;
+	}
 
 	/*-------AE2-Spatial-Storage-Handler------*/
 

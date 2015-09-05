@@ -8,7 +8,7 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class NetworkRail extends BlockRailBase{
+public class NetworkRail extends BlockRailBase implements INetRail{
 
 	protected NetworkRail() {
 		super(false);
@@ -24,12 +24,15 @@ public class NetworkRail extends BlockRailBase{
 	public boolean canMakeSlopes(IBlockAccess world, int x, int y, int z){
 		return false;
 	}
-	
-	public void onMinecartPass(World world, EntityMinecart cart, int x, int y, int z)
-    {
-		if((world.getTileEntity(x, y-1, z) instanceof NetworkRailBaseTile) && (cart instanceof Environment)){
-			NetworkRailBaseTile tile = (NetworkRailBaseTile) world.getTileEntity(x, y-1, z);
-			tile.checkRailNode(((Environment) cart).node());
-		}
-    }
+
+	@Override
+	public Environment getResponseEnvironment(World world, int x, int y, int z) {
+		if(world.getTileEntity(x, y-1, z) instanceof NetworkRailBaseTile) return ((NetworkRailBaseTile) world.getTileEntity(x, y-1, z)).getRailPlug();
+		return null;
+	}
+
+	@Override
+	public boolean isValid(World world, int x, int y, int z, EntityMinecart cart) {
+		return (cart instanceof Environment) && cart.getDistance(x+0.5, y+0.5, z+0.5)<0.5 && cart.worldObj == world;
+	}
 }
