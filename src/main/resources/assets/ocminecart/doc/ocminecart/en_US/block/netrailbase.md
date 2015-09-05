@@ -11,8 +11,9 @@ In the GUI you can set the connection type and a camouflage block for the top si
 - Network:             Act like a switch.
 - Power:               Charge cart.
 - Network + Power:  Do both.
+- None:                Do nothing.
 
-The connectiontype only effects the connection to the Networkrail.
+The connectiontype only effects the connection to the networkrail.
 
 You can only put normal rendered, opaque blocks in the camoslot.
 

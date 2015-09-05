@@ -15,6 +15,8 @@ import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
@@ -69,8 +71,13 @@ public class NetworkRailBaseGui extends GuiContainer{
 		case 2:
 			buttonTxt="Power";
 			break;
+		case 3:
+			buttonTxt="None";
+			break;
 		default:
-			buttonTxt="Deprecated Mode";
+			buttonTxt=EnumChatFormatting.DARK_RED+""+EnumChatFormatting.BOLD +"ERROR! no Mode";
+			Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.RED+"This Mode is not valid. Press the Mode Button to fix it"));
+			Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.RED+"Please report this issue, if this doesn't work, "));
 			break;
 		}
 		return buttonTxt;

@@ -4,4 +4,4 @@
 
 This rail act like a normal rail.
 
-But if you place them on top of a [Network Rail Controller](netrailbase.md), Computercarts on the rail can connect with the Network Rail Controller.
+But if you place them on top of a [network rail controller](netrailbase.md), computer carts on the rail can connect with the network rail controller.

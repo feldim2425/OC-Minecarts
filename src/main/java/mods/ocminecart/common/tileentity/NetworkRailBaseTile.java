@@ -323,7 +323,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	public void onButtonPress(int buttonID) {
 		if(buttonID==0){
 			this.Mode += 1;
-			if(this.Mode > 2) this.Mode = 0;
+			if(this.Mode > 3) this.Mode = 0;
 		}
 	}
 	
