@@ -34,7 +34,7 @@ public class ComputerCartT3Template {
 		}
 		
 		ItemStack stack = new  ItemStack(ModItems.item_ComputerCart,1);
-		ItemComputerCart.setTags(stack, comp ,2);
+		ItemComputerCart.setTags(stack, comp ,2, 0.0);
 		return new Object[]{stack, Settings.ComputerCartBaseCost+Settings.ComputerCartComplexityCost * Complexity.calculate(inventory)};
 	}
 	

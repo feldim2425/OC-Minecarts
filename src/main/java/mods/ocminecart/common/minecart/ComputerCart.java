@@ -2,6 +2,7 @@ package mods.ocminecart.common.minecart;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import li.cil.oc.api.API;
@@ -32,12 +33,14 @@ import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventory;
 import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.UpdateRunning;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
@@ -60,6 +63,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	private boolean chDim = false;
 	private boolean isRun = false;
 	private ComputerCartController controller = new ComputerCartController(this);
+	private double startEnergy = -1;
 	
 	private int cRailX = 0;	// Position of the connected Network Rail
 	private int cRailY = 0;
@@ -120,9 +124,10 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		super(p_i1712_1_);
 	}
 
-	public ComputerCart(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier) {
+	public ComputerCart(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier, double energy) {
 		super(w,x,y,z);
 		this.tier=tier;
+		this.startEnergy=energy;
 		
 		Iterator<Pair<Integer, ItemStack>> list = components.iterator();
 		while(list.hasNext()){
@@ -222,6 +227,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			this.firstupdate=false;
 			if(this.worldObj.isRemote) ModNetwork.channel.sendToServer(new EntitySyncRequest(this));
 			else{
+				if(this.startEnergy > 0) ((Connector)this.machine.node()).changeBuffer(this.startEnergy);
 				if(this.machine.node().network()==null){
 					this.connectNetwork();
 				}
@@ -305,6 +311,21 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 	
 	@Override
+	public void killMinecart(DamageSource dms){
+		super.killMinecart(dms);
+		List<ItemStack> drop = new ArrayList<ItemStack>();
+		for(int i=20;i<23;i+=1){
+			if(compinv.getStackInSlot(i)!=null) drop.add(compinv.getStackInSlot(i));
+		}
+		//add drops for main inventory
+		for(int i=0;i<drop.size();i+=1){
+			EntityItem entityitem = new EntityItem(this.worldObj, this.posX, this.posY , this.posZ, drop.get(i));
+			entityitem.delayBeforeCanPickup = 10;
+			this.worldObj.spawnEntityInWorld(entityitem);
+		}
+	}
+	
+	@Override
 	public boolean interactFirst(EntityPlayer p){
 		ItemStack refMan = API.items.get("manual").createItemStack(1);
 		boolean openwiki = p.getHeldItem()!=null && p.isSneaking() && p.getHeldItem().getItem() == refMan.getItem() && p.getHeldItem().getItemDamage() == refMan.getItemDamage();
@@ -333,8 +354,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return -1;
 	}
 
-	public static EntityMinecart create(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier) {
-		return new ComputerCart(w, x, y, z, components, tier);
+	public static EntityMinecart create(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier, double energy) {
+		return new ComputerCart(w, x, y, z, components, tier, energy);
 	}
 	
 	@Override
@@ -343,12 +364,12 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		
 		
 		ArrayList<Pair<Integer,ItemStack>> components = new ArrayList<Pair<Integer,ItemStack>>();
-		for(int i=0;i<compinv.getSizeInventory();i+=1){
+		for(int i=0;i<20;i+=1){
 			if(compinv.getStackInSlot(i)!=null)
 				components.add(Pair.of(i, compinv.getStackInSlot(i)));
 		}
 		
-		return ItemComputerCart.setTags(stack, components, tier);
+		return ItemComputerCart.setTags(stack, components, tier, ((Connector)this.machine().node()).localBuffer());
 	}
 	
 	@Override

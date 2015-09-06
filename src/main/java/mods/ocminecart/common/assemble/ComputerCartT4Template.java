@@ -32,7 +32,7 @@ public class ComputerCartT4Template {
 		}
 		
 		ItemStack stack = new  ItemStack(ModItems.item_ComputerCart,1);
-		ItemComputerCart.setTags(stack, comp , 3);
+		ItemComputerCart.setTags(stack, comp , 3, 0.0);
 		return new Object[]{stack};
 	}
 	

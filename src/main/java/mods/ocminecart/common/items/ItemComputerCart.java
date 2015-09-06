@@ -39,17 +39,17 @@ public class ItemComputerCart extends MinecartItem{
     }
     
     public EntityMinecart create(World w, double x,double y,double z,ItemStack stack){
-		return ComputerCart.create(w, x, y, z, ItemComputerCart.getComponents(stack),ItemComputerCart.getTier(stack));
+		return ComputerCart.create(w, x, y, z, ItemComputerCart.getComponents(stack),ItemComputerCart.getTier(stack), ItemComputerCart.getEnergy(stack));
     }
     
     @Override
 	public void getSubItems(Item item, CreativeTabs tab, List list){
 		ItemStack stack = new ItemStack(item);
-		ItemComputerCart.setTags(stack, null, 3);
+		ItemComputerCart.setTags(stack, null, 3, 0.0);
     	list.add(stack);
 	}
     
-    public static ItemStack setTags(ItemStack stack, Iterable<Pair<Integer,ItemStack>> components, int tier){
+    public static ItemStack setTags(ItemStack stack, Iterable<Pair<Integer,ItemStack>> components, int tier, double energy){
     	if(stack.getItem() == ModItems.item_ComputerCart){
     		NBTTagCompound tag = new NBTTagCompound();
     		NBTTagList itemlist = new NBTTagList();
@@ -69,6 +69,7 @@ public class ItemComputerCart extends MinecartItem{
     		}
     		tag.setTag("componentinv", itemlist);
     		tag.setInteger("Tier", tier);
+    		tag.setDouble("energy", energy);
     		stack.setTagCompound(tag);
     		
     		return stack;
@@ -102,6 +103,16 @@ public class ItemComputerCart extends MinecartItem{
     	return Tier.None();
     }
     
+    public static double getEnergy(ItemStack stack){
+    	if(stack.getItem() == ModItems.item_ComputerCart){
+    		NBTTagCompound tag = stack.getTagCompound();
+    		if(tag!=null && tag.hasKey("energy")){
+    			return tag.getDouble("energy");
+    		}
+    	}
+    	return 0.0D;
+    }
+    
     public String getItemStackDisplayName(ItemStack stack){
     	EnumChatFormatting color;
     	String tier;
@@ -133,6 +144,7 @@ public class ItemComputerCart extends MinecartItem{
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean adv) {
     	super.addInformation(stack, player, list, adv);
+    	list.add(EnumChatFormatting.WHITE+"Energy: "+EnumChatFormatting.GREEN+ItemComputerCart.getEnergy(stack));
     	if(!Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode())){
     		String key = GameSettings.getKeyDisplayString(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
     		String formkey = "[" + EnumChatFormatting.WHITE + key + EnumChatFormatting.GRAY + "]";
