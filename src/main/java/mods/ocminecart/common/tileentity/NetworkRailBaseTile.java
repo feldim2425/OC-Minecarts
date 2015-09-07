@@ -9,6 +9,7 @@ import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.SidedEnvironment;
 import li.cil.oc.api.network.Visibility;
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.Settings;
 import mods.ocminecart.common.util.IPlugable;
 import mods.ocminecart.common.util.Plug;
 import net.minecraft.block.Block;
@@ -144,7 +145,7 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 					double need = con2.globalBufferSize() - con2.globalBuffer();
 					double provide = 0.0;
 					
-					if(need > 100) need = 100;
+					if(need > Settings.NetRailPowerTransfer) need = Settings.NetRailPowerTransfer;
 					
 					provide = need + con1.changeBuffer(-need);
 					con2.changeBuffer(provide);
