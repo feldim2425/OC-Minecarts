@@ -5,6 +5,7 @@ import java.util.List;
 import mods.ocminecart.OCMinecart;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
@@ -59,6 +60,10 @@ public class ComputerCartCase extends Item{
 	
 	public String getItemStackDisplayName(ItemStack stack)
     {
+        return super.getItemStackDisplayName(stack);
+    }
+	
+	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean adv) {
 		EnumChatFormatting color = EnumChatFormatting.RESET;
 		switch(stack.getItemDamage()){
 		case 0:	//Tier 1
@@ -73,6 +78,7 @@ public class ComputerCartCase extends Item{
 		case 3: //Creative
 			color = EnumChatFormatting.LIGHT_PURPLE;
 		}
-        return color + super.getItemStackDisplayName(stack);
-    }
+		list.clear();
+		list.add(color+this.getItemStackDisplayName(stack));
+	}
 }

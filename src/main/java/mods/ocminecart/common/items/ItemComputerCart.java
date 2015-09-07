@@ -76,6 +76,10 @@ public class ItemComputerCart extends MinecartItem{
     }
     
     public String getItemStackDisplayName(ItemStack stack){
+    	return this.getDisplayString(stack, false);
+    }
+    
+    public String getDisplayString(ItemStack stack,boolean hasColor){
     	EnumChatFormatting color;
     	String tier;
     	ComputerCartData data = getData(stack);
@@ -101,12 +105,16 @@ public class ItemComputerCart extends MinecartItem{
     		tier = "ERROR!";
     		break;
     	}
+    	if(!hasColor) color = EnumChatFormatting.RESET;
     	return color+super.getItemStackDisplayName(stack)+" "+tier;
     }
     
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean adv) {
     	super.addInformation(stack, player, list, adv);
+    	
+    	list.clear();
+    	list.add(this.getDisplayString(stack, true));
     	
     	ComputerCartData data = getData(stack);
     	
