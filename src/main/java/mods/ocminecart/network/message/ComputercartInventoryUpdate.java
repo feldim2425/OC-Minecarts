@@ -11,22 +11,22 @@ import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 
-public class ComputercartInventory implements IMessage{
+public class ComputercartInventoryUpdate implements IMessage{
 	
 	int entityid;
 	int dimid;
 	int slot;
 	ItemStack stack;
 	
-	public ComputercartInventory(){}
+	public ComputercartInventoryUpdate(){}
 	
-	public ComputercartInventory(ComputerCart cart, int slot, ItemStack stack){
+	public ComputercartInventoryUpdate(ComputerCart cart, int slot, ItemStack stack){
 		this.entityid = cart.getEntityId();
 		this.dimid = cart.worldObj.provider.dimensionId;
 		this.slot = slot;
 		this.stack = stack;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf) {
 		this.entityid = buf.readInt();
@@ -43,10 +43,10 @@ public class ComputercartInventory implements IMessage{
 		ByteBufUtils.writeItemStack(buf, stack);
 	}
 	
-	public static class Handler implements IMessageHandler<ComputercartInventory, IMessage>{
+	public static class Handler implements IMessageHandler<ComputercartInventoryUpdate, IMessage>{
 
 		@Override
-		public IMessage onMessage(ComputercartInventory message, MessageContext ctx) {
+		public IMessage onMessage(ComputercartInventoryUpdate message, MessageContext ctx) {
 			World w = Minecraft.getMinecraft().thePlayer.worldObj;
 			if(w != null && w.provider.dimensionId == message.dimid){
 				Entity e = w.getEntityByID(message.entityid);

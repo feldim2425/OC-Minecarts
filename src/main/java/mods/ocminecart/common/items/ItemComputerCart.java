@@ -3,10 +3,12 @@ package mods.ocminecart.common.items;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 import li.cil.oc.common.Tier;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.common.util.ComputerCartData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.creativetab.CreativeTabs;
@@ -39,84 +41,45 @@ public class ItemComputerCart extends MinecartItem{
     }
     
     public EntityMinecart create(World w, double x,double y,double z,ItemStack stack){
-		return ComputerCart.create(w, x, y, z, ItemComputerCart.getComponents(stack),ItemComputerCart.getTier(stack), ItemComputerCart.getEnergy(stack));
+		return ComputerCart.create(w, x, y, z, ItemComputerCart.getData(stack));
     }
     
     @Override
 	public void getSubItems(Item item, CreativeTabs tab, List list){
-		ItemStack stack = new ItemStack(item);
-		ItemComputerCart.setTags(stack, null, 3, 0.0);
-    	list.add(stack);
+		//ItemStack stack = new ItemStack(item);
+		//ItemComputerCart.setTags(stack, null, 3, 0.0);
+    	//list.add(stack);
 	}
     
-    public static ItemStack setTags(ItemStack stack, Iterable<Pair<Integer,ItemStack>> components, int tier, double energy){
-    	if(stack.getItem() == ModItems.item_ComputerCart){
-    		NBTTagCompound tag = new NBTTagCompound();
-    		NBTTagList itemlist = new NBTTagList();
-    		Iterator<Pair<Integer,ItemStack>> list = (components!=null) ? components.iterator() : new ArrayList<Pair<Integer,ItemStack>>().iterator();
-    		
-    		while(list.hasNext()){
-    			Pair<Integer,ItemStack> p = list.next();
-    			NBTTagCompound invslot = new NBTTagCompound();
-    			NBTTagCompound item = new NBTTagCompound();
-    			ItemStack buf = p.getRight();
-    			invslot.setInteger("slot", p.getLeft());
-    			if(buf!=null){
-    				buf.writeToNBT(item);
-    				invslot.setTag("item", item);
-    			}
-    			itemlist.appendTag(invslot);
+    public static ComputerCartData getData(ItemStack stack){
+    	if(stack.getItem() instanceof ItemComputerCart){
+    		ComputerCartData data = new ComputerCartData();
+    		NBTTagCompound nbt = stack.getTagCompound();
+    		if(nbt.hasKey("cartdata")){
+    			data.loadItemData(nbt.getCompoundTag("cartdata"));
     		}
-    		tag.setTag("componentinv", itemlist);
-    		tag.setInteger("Tier", tier);
-    		tag.setDouble("energy", energy);
-    		stack.setTagCompound(tag);
-    		
-    		return stack;
+    		return data;
     	}
-    	
     	return null;
     }
     
-    public static Iterable<Pair<Integer,ItemStack>> getComponents(ItemStack stack){
-    	ArrayList<Pair<Integer,ItemStack>> components = new ArrayList<Pair<Integer,ItemStack>>();
-    	if(stack.getItem() == ModItems.item_ComputerCart){
-    		NBTTagCompound tag = stack.getTagCompound();
-    		if(tag!=null && tag.hasKey("componentinv")){
-    			NBTTagList list=(NBTTagList) tag.getTag("componentinv");
-    			for(int i=0;i<list.tagCount();i+=1){
-    				NBTTagCompound invslot = list.getCompoundTagAt(i);
-    				components.add(Pair.of(invslot.getInteger("slot"), ItemStack.loadItemStackFromNBT(invslot.getCompoundTag("item"))));
-    			}
+    public static void setData(ItemStack stack,ComputerCartData data){
+    	if(stack.getItem() instanceof ItemComputerCart){
+    		NBTTagCompound nbt = (stack.hasTagCompound()) ? stack.getTagCompound() : new NBTTagCompound();
+    		if(data !=null){
+    			NBTTagCompound tag = new NBTTagCompound();
+    			data.saveItemData(tag);
+    			nbt.setTag("cartdata", tag);
     		}
+    		if(!stack.hasTagCompound())stack.setTagCompound(nbt);
     	}
-    	return components;
-    }
-    
-    public static int getTier(ItemStack stack){
-    	if(stack.getItem() == ModItems.item_ComputerCart){
-    		NBTTagCompound tag = stack.getTagCompound();
-    		if(tag!=null && tag.hasKey("Tier")){
-    			return tag.getInteger("Tier");
-    		}
-    	}
-    	return Tier.None();
-    }
-    
-    public static double getEnergy(ItemStack stack){
-    	if(stack.getItem() == ModItems.item_ComputerCart){
-    		NBTTagCompound tag = stack.getTagCompound();
-    		if(tag!=null && tag.hasKey("energy")){
-    			return tag.getDouble("energy");
-    		}
-    	}
-    	return 0.0D;
     }
     
     public String getItemStackDisplayName(ItemStack stack){
     	EnumChatFormatting color;
     	String tier;
-    	switch(ItemComputerCart.getTier(stack)){
+    	ComputerCartData data = getData(stack);
+    	switch(data.getTier()){
     	case 0:
     		color = EnumChatFormatting.WHITE;
     		tier = "(Tier 1)";
@@ -134,8 +97,8 @@ public class ItemComputerCart extends MinecartItem{
     		tier = "(Creative)";
     		break;
     	default:
-    		color = EnumChatFormatting.WHITE;
-    		tier = "";
+    		color = EnumChatFormatting.DARK_RED;
+    		tier = "ERROR!";
     		break;
     	}
     	return color+super.getItemStackDisplayName(stack)+" "+tier;
@@ -144,7 +107,11 @@ public class ItemComputerCart extends MinecartItem{
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean adv) {
     	super.addInformation(stack, player, list, adv);
-    	list.add(EnumChatFormatting.WHITE+"Energy: "+EnumChatFormatting.GREEN+ItemComputerCart.getEnergy(stack));
+    	
+    	ComputerCartData data = getData(stack);
+    	
+    	list.add(EnumChatFormatting.WHITE+"Energy: "+EnumChatFormatting.GREEN+data.getEnergy());
+    	
     	if(!Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode())){
     		String key = GameSettings.getKeyDisplayString(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
     		String formkey = "[" + EnumChatFormatting.WHITE + key + EnumChatFormatting.GRAY + "]";
@@ -152,9 +119,9 @@ public class ItemComputerCart extends MinecartItem{
     	}
     	else{
     		list.add(StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".instcomponents")+":");
-    		Iterator<Pair<Integer,ItemStack>> components = ItemComputerCart.getComponents(stack).iterator();
+    		Iterator<Entry<Integer, ItemStack>> components = data.getComponents().entrySet().iterator();
     		while(components.hasNext()){
-    			list.add("- "+components.next().getRight().getDisplayName());
+    			list.add("- "+components.next().getValue().getDisplayName());
     		}
     	}
     }

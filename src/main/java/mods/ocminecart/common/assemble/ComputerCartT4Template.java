@@ -1,6 +1,7 @@
 package mods.ocminecart.common.assemble;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.common.Tier;
@@ -25,15 +26,7 @@ public class ComputerCartT4Template {
 	}
 	
 	public static Object[] assemble(IInventory inventory){
-		ArrayList<Pair<Integer, ItemStack>> comp = new ArrayList<Pair<Integer, ItemStack>>();
-		int size = inventory.getSizeInventory();
-		for(int i=1;i<size;i+=1){
-			if(inventory.getStackInSlot(i)!=null) comp.add(Pair.of(i-1,inventory.getStackInSlot(i)));
-		}
-		
-		ItemStack stack = new  ItemStack(ModItems.item_ComputerCart,1);
-		ItemComputerCart.setTags(stack, comp , 3, 0.0);
-		return new Object[]{stack};
+		return General.assemble(inventory, 3);
 	}
 	
 	public static int[] getContainerTier(){

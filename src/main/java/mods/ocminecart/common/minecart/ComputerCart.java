@@ -1,8 +1,12 @@
 package mods.ocminecart.common.minecart;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 import li.cil.oc.api.API;
@@ -27,10 +31,12 @@ import mods.ocminecart.common.Sound;
 import mods.ocminecart.common.blocks.INetRail;
 import mods.ocminecart.common.component.ComputerCartController;
 import mods.ocminecart.common.inventory.ComponetInventory;
+import mods.ocminecart.common.inventory.ComputercartInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
+import mods.ocminecart.common.util.ComputerCartData;
 import mods.ocminecart.network.ModNetwork;
-import mods.ocminecart.network.message.ComputercartInventory;
+import mods.ocminecart.network.message.ComputercartInventoryUpdate;
 import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.UpdateRunning;
 import net.minecraft.entity.item.EntityItem;
@@ -54,7 +60,14 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import cpw.mods.fml.common.FMLCommonHandler;
 
+//The internal.Robot interface will get replaced by a custom Interface later.
+//But I will do that later because I have to create custom dirvers for some internal components. (and I'am lazy) ;)
+//I hope this will work and I can override the Drivers for this Host.
 
+/*
+ * Items that need new Dirvers:
+ * - Crafting Upgrade
+ */
 public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot, ISyncEntity{
 	
 	private int tier = -1;
@@ -85,7 +98,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		protected void onItemAdded(int slot, ItemStack stack){
 			if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
 				super.onItemAdded(slot, stack);
-				ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+				ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
 			}
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_insert");
@@ -94,7 +107,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		@Override
 		protected void onItemRemoved(int slot, ItemStack stack){
 			super.onItemRemoved(slot, stack);
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventory((ComputerCart) this.host,slot,null), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate((ComputerCart) this.host,slot,null), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_eject");
 		}
@@ -119,24 +132,25 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		}
 	};
 	
+	public ComputercartInventory maininv = new ComputercartInventory(this);
+	
 	
 	public ComputerCart(World p_i1712_1_) {
 		super(p_i1712_1_);
 	}
 
-	public ComputerCart(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier, double energy) {
+	public ComputerCart(World w, double x, double y, double z, ComputerCartData data) {
 		super(w,x,y,z);
-		this.tier=tier;
-		this.startEnergy=energy;
+		this.tier=data.getTier();
+		this.startEnergy=data.getEnergy();
 		
-		Iterator<Pair<Integer, ItemStack>> list = components.iterator();
+		Iterator<Entry<Integer, ItemStack>> list = data.getComponents().entrySet().iterator();
 		while(list.hasNext()){
-			Pair<Integer, ItemStack> pair = list.next();
-			if(pair.getKey() < this.compinv.getSizeInventory() && pair.getValue() != null){
-				compinv.updateSlot(pair.getKey(), pair.getValue());
+			Entry<Integer, ItemStack> e = list.next();
+			if(e.getKey() < this.compinv.getSizeInventory() && e.getValue() != null){
+				compinv.updateSlot(e.getKey(), e.getValue());
 			}
 		}
-		
 	}
 	
 	@Override
@@ -354,8 +368,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return -1;
 	}
 
-	public static EntityMinecart create(World w, double x, double y, double z, Iterable<Pair<Integer, ItemStack>> components, int tier, double energy) {
-		return new ComputerCart(w, x, y, z, components, tier, energy);
+	public static EntityMinecart create(World w, double x, double y, double z, ComputerCartData data) {
+		return new ComputerCart(w, x, y, z, data);
 	}
 	
 	@Override
@@ -363,13 +377,19 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		ItemStack stack = new ItemStack(ModItems.item_ComputerCart);
 		
 		
-		ArrayList<Pair<Integer,ItemStack>> components = new ArrayList<Pair<Integer,ItemStack>>();
+		Map<Integer,ItemStack> components = new HashMap<Integer,ItemStack>();
 		for(int i=0;i<20;i+=1){
 			if(compinv.getStackInSlot(i)!=null)
-				components.add(Pair.of(i, compinv.getStackInSlot(i)));
+				components.put(i, compinv.getStackInSlot(i));
 		}
 		
-		return ItemComputerCart.setTags(stack, components, tier, ((Connector)this.machine().node()).localBuffer());
+		ComputerCartData data = new ComputerCartData();
+		data.setEnergy(((Connector)this.machine().node()).localBuffer());
+		data.setTier(this.tier);
+		data.setComponents(components);
+		ItemComputerCart.setData(stack, data);
+		
+		return stack;
 	}
 	
 	@Override
@@ -452,7 +472,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 
 	@Override
 	public IInventory mainInventory() {
-		return null;
+		return this.maininv;
 	}
 
 	@Override
@@ -683,7 +703,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	@Override
 	public void synchronizeSlot(int slot) {
 		if(!this.worldObj.isRemote)
-			ModNetwork.sendToNearPlayers(new ComputercartInventory(this, slot, this.getStackInSlot(slot)), this.posX, this.posY, this.posZ, this.worldObj);
+			ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate(this, slot, this.getStackInSlot(slot)), this.posX, this.posY, this.posZ, this.worldObj);
 	}
 	
 	/*----------------------------*/
@@ -693,7 +713,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 
 	public ComponetInventory getCompinv() {
 		return this.compinv;
