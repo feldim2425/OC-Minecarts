@@ -318,9 +318,10 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		if (!this.worldObj.isRemote && !this.chDim) {
 			this.machine.stop();
 			this.machine.node().remove();
-			this.compinv.disconnectComponents();
 			this.controller.node().remove();
+			this.compinv.disconnectComponents();
 			this.compinv.saveComponents();
+			this.compinv.removeTagsForDrop();
 		}
 	}
 	

@@ -6,6 +6,7 @@ import java.util.Set;
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
+import li.cil.oc.api.driver.EnvironmentAware;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.api.driver.item.Slot;
@@ -15,6 +16,8 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.common.Tier;
+import li.cil.oc.common.component.Screen;
+import li.cil.oc.integration.opencomputers.DriverScreen;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import net.minecraft.entity.player.EntityPlayer;
@@ -216,6 +219,24 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	public void connectItemNode(Node node){
 		if(this.node()!=null && node!=null && this.node().network()!=null){
 			this.node().connect(node);
+		}
+	}
+	
+	public void removeTagsForDrop(){
+		for(int i=0;i<this.getSizeInventory();i+=1){
+			if(this.getStackInSlot(i)!=null){
+				Item drv = Driver.driverFor(this.getStackInSlot(i), this.host.getClass());
+				//Unfortunately it's not possible to make a 'instanceof' with a Scala classes and I'am lazy. So I check the Environment class.
+				if((drv instanceof EnvironmentAware) && ((EnvironmentAware)drv).providedEnvironment(this.getStackInSlot(i)) == Screen.class){
+					NBTTagCompound tag = this.dataTag(drv, this.getStackInSlot(i));
+					
+					Set<String> tags = tag.func_150296_c();
+					String[] list = tags.toArray(new String[tags.size()]);
+					for(int j=0; j<list.length; j+=1){
+						tag.removeTag(list[j]);
+					}
+				}
+			}
 		}
 	}
 	
