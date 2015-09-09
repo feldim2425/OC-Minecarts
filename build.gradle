@@ -31,7 +31,7 @@ file "build.properties" withReader {
 }
 
 version = "${config.ocmc.version}"
-group= "com.feldim.ocmincart" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group= "mods.ocminecart"
 archivesBaseName = "ocminecart"
 
 minecraft {
@@ -41,10 +41,10 @@ minecraft {
 
 repositories {
     maven { url = "http://maven.cil.li/" }
-    maven { url = "http://dl.tsr.me/artifactory/libs-release-local" }
+    //maven { url = "http://dl.tsr.me/artifactory/libs-release-local" }
     maven {
 	    name = "chickenbones"
-	    url = "http://chickenbones.net/maven/"
+	    url = "http://chickenbones.net/maven"
     	}
 }
 
@@ -54,14 +54,7 @@ dependencies {
     //compile "some.group:artifact:version:classifier"
     //compile "some.group:artifact:version"
      compile "li.cil.oc:OpenComputers:MC${config.minecraft.version}-${config.oc.version}:dev"
-     compile("appeng:appliedenergistics2:${config.ae2.version}:dev") {
-        exclude group: 'api'
-        exclude group: 'dev'
-        exclude group: 'junit'
-        exclude group: 'codechicken'
-        exclude group: 'mcp.mobius.waila'
-        exclude group: 'buildcraft'
-     }
+    // compile "appeng:appliedenergistics2:${config.ae2.version}:dev"
     
       compile "codechicken:CodeChickenCore:${config.minecraft.version}-${config.ccc.version}:dev"
       compile "codechicken:CodeChickenLib:${config.minecraft.version}-${config.ccl.version}:dev"
@@ -96,13 +89,4 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-}
-
-runClient {
-	args "--username=test123"
-
-}
-
-debugClient {
-	args "--username=test123"
 }
