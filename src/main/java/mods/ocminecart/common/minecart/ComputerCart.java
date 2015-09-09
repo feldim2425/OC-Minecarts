@@ -39,6 +39,7 @@ import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventoryUpdate;
 import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.UpdateRunning;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -69,6 +70,8 @@ import cpw.mods.fml.common.FMLCommonHandler;
  * - Crafting Upgrade
  */
 public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot, ISyncEntity{
+	
+	private final boolean isServer = FMLCommonHandler.instance().getEffectiveSide().isServer();
 	
 	private int tier = -1;
 	private Machine machine;
@@ -189,6 +192,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	
 	@Override
 	public void writeEntityToNBT(NBTTagCompound nbt){
+		if(!this.isServer) return;
+		
 		super.writeEntityToNBT(nbt);
 		
 		this.compinv.saveComponents();
@@ -351,6 +356,9 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		}
 		else if(!this.worldObj.isRemote && !openwiki){
 			p.openGui(OCMinecart.instance, 1, this.worldObj, this.getEntityId(), -10, 0);
+		}
+		else if(this.worldObj.isRemote && !openwiki){
+			p.swingItem();
 		}
 		return true;
 	}
@@ -632,9 +640,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer p_70300_1_) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isUseableByPlayer(EntityPlayer player) {
+		return player.getDistanceSqToEntity(this)<=64 && !this.isDead;
 	}
 
 	@Override

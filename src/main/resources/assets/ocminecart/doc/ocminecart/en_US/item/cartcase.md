@@ -1,5 +1,5 @@
 # Computer Cart Case
-![You can't place it :P](item:ocminecart:itemcomputercartcase@0)
+![Step one!](item:ocminecart:itemcomputercartcase@0)
 Put this item into an [assembler](/%LANGUAGE%/block/assembler.md) to make a [computer cart](cart.md).
 
 #### There are 3 Tiers:

@@ -46,9 +46,7 @@ public class ItemComputerCart extends MinecartItem{
     
     @Override
 	public void getSubItems(Item item, CreativeTabs tab, List list){
-		//ItemStack stack = new ItemStack(item);
-		//ItemComputerCart.setTags(stack, null, 3, 0.0);
-    	//list.add(stack);
+		//I will add a prebuild creative cart, but not yet. :P
 	}
     
     public static ComputerCartData getData(ItemStack stack){

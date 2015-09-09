@@ -226,7 +226,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 		for(int i=0;i<this.getSizeInventory();i+=1){
 			if(this.getStackInSlot(i)!=null){
 				Item drv = Driver.driverFor(this.getStackInSlot(i), this.host.getClass());
-				//Unfortunately it's not possible to make a 'instanceof' with a Scala classes and I'am lazy. So I check the Environment class.
+				//Unfortunately it's not possible to make 'instanceof' with a Scala class and I'am lazy. So I check the Environment class.
 				if((drv instanceof EnvironmentAware) && ((EnvironmentAware)drv).providedEnvironment(this.getStackInSlot(i)) == Screen.class){
 					NBTTagCompound tag = this.dataTag(drv, this.getStackInSlot(i));
 					

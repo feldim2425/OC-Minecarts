@@ -1,5 +1,5 @@
 # Computer Cart
-![You can't sit in it :(](item:ocminecart:itemcomputercart@0)
+![I like trains!](item:ocminecart:itemcomputercart@0)
 You create a computer cart by placing a [computer cart case](cartcase.md). in an [assembler](/%LANGUAGE%/block/assembler.md).
 
 Like normal minecarts, computer carts can only be placed on rails.

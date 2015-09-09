@@ -6,6 +6,7 @@ import mods.ocminecart.common.blocks.ModBlocks;
 import mods.ocminecart.common.disassemble.DisassembleRegister;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.interaction.waila.ModWaila;
 import mods.ocminecart.network.ModNetwork;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
@@ -22,6 +23,8 @@ public class CommonProxy {
 		DisassembleRegister.register();
 		AssembleRegister.register();
 		Recipes.init();
+		
+		ModWaila.initWailaModule();
 	}
 
 	public void preInit() {

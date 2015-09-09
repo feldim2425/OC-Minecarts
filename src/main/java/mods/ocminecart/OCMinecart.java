@@ -18,7 +18,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = OCMinecart.MODID, name=OCMinecart.NAME, version=OCMinecart.VERSION, dependencies = "required-after:OpenComputers@[1.5.13,)")
+@Mod(modid = OCMinecart.MODID, name=OCMinecart.NAME, version=OCMinecart.VERSION, dependencies = "required-after:OpenComputers@[1.5.13,); after:Waile@[1.5.8a,)")
 public class OCMinecart {
 	public static final String MODID = "ocminecart";
 	public static final String VERSION = "0.3a";
@@ -53,8 +53,7 @@ public class OCMinecart {
 	
 	@EventHandler
 	public void Init(FMLInitializationEvent event){
-		if(Loader.isModLoaded("appliedenergistics2")) OCMinecart.logger.info("Found Mod: AE2");
-		if(Loader.isModLoaded("NotEnoughItems")) OCMinecart.logger.info("Found Mod: NEI");
+		logModApis();
 		
 		proxy.init();
 	}
@@ -62,5 +61,11 @@ public class OCMinecart {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event){
 		proxy.postInit();
+	}
+	
+	private void logModApis(){
+		if(Loader.isModLoaded("appliedenergistics2")) OCMinecart.logger.info("Found Mod: AE2");
+		if(Loader.isModLoaded("NotEnoughItems")) OCMinecart.logger.info("Found Mod: NEI");
+		if(Loader.isModLoaded("Waila")) OCMinecart.logger.info("Found Mod: WAILA");
 	}
 }
