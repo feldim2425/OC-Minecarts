@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
@@ -35,12 +36,16 @@ public class ComputerCartDataProvider implements IWailaEntityProvider {
 	public List<String> getWailaBody(Entity entity, List<String> currenttip,
 			IWailaEntityAccessor accessor, IWailaConfigHandler config) {
 		NBTTagCompound tag = accessor.getNBTData();
-		if(config.getConfig("oc.address") && tag.hasKey("address")) 
-			currenttip.add(EnumChatFormatting.GOLD+"Address: "+EnumChatFormatting.WHITE+tag.getString("address"));
+		if(config.getConfig("oc.address") && tag.hasKey("address")){
+			String loc = StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".address");
+			currenttip.add(EnumChatFormatting.GOLD+loc+": "+EnumChatFormatting.WHITE+tag.getString("address"));
+		}
 		
-		if(config.getConfig("oc.energy") && tag.hasKey("energy") && tag.hasKey("maxenergy")) 
-			currenttip.add(EnumChatFormatting.GOLD+"Stored Energy: "+EnumChatFormatting.WHITE+tag.getInteger("energy")
+		if(config.getConfig("oc.energy") && tag.hasKey("energy") && tag.hasKey("maxenergy")){
+			String loc = StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".storedenergy");
+			currenttip.add(EnumChatFormatting.GOLD+loc+": "+EnumChatFormatting.WHITE+tag.getInteger("energy")
 					+"/"+tag.getInteger("maxenergy"));
+		}
 		
 		return currenttip;
 	}

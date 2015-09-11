@@ -11,6 +11,9 @@ item.ocminecart.computercartcase_3.name=Computercart Case (Creative)
 tile.ocminecart.networkrail.name=Network Rail
 tile.ocminecart.networkrailbase.name=Network Rail Controller
 
+#Entity Names
+entity.ocminecart.computercart.name=Computer Cart
+
 #GUI Text
 gui.ocminecart.networkrailbase.title=Network Rail Controller
 gui.ocminecart.networkrailbase.info=Connection Type
@@ -24,3 +27,5 @@ tooltip.ocminecart.viewcomponents=Hold %s to view installed components.
 tooltip.ocminecart.gui.turnon=Turn on
 tooltip.ocminecart.gui.turnoff=Turn off
 tooltip.ocminecart.gui.useanalyzer=Use an Analyzer to troubleshoot errors.
+tooltip.ocminecart.storedenergy=Stored Energy
+tooltip.ocminecart.address=Address
