@@ -17,6 +17,7 @@ import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.EnergyBar;
 import mods.ocminecart.client.gui.widget.ImageButton;
+import mods.ocminecart.client.gui.widget.SliderButton;
 import mods.ocminecart.common.container.ComputerCartContainer;
 import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.inventory.ComponetInventory;
@@ -51,36 +52,38 @@ import cpw.mods.fml.common.Optional;
 
 public class ComputerCartGui extends GuiContainer {
 	
+	//Resources
 	private ResourceLocation textureNoScreen = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/robot_noscreen.png");
 	private ResourceLocation textureScreen = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/robot.png");
 	private ResourceLocation textureOnOffButton = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/button_power.png");
 	private ResourceLocation ebar = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/bar.png");
 	
+	//Container (as instance of ComputerCartContainer)
 	private ComputerCartContainer container;
 	
-	private boolean guiSizeChange = false;
-	
+	//Textbuffer and keyboard
 	private int txtWidth, txtHeight;
 	
 	private double maxBufferWidth = 240.0;
 	private double maxBufferHeight = 140.0;
-	
 	private double bufferscale = 0.0;
-
 	private double bufferRenderWidth = Math.min(maxBufferWidth, TextBufferRenderCache.renderer().charRenderWidth() * 50);
 	private double bufferRenderHeight = Math.min(maxBufferHeight, TextBufferRenderCache.renderer().charRenderHeight() * 16);
-	
 	private int bufferX = (int)(8 + (this.maxBufferWidth - this.bufferRenderWidth) /2);
 	private int bufferY = (int)(8 + (this.maxBufferHeight - this.bufferRenderHeight) /2);
 	private TextBuffer textbuffer;
 	private boolean hasKeyboard=false;
-	
 	private Map<Integer, Character> pressedKeys = new HashMap<Integer, Character>();
 	
+	//Other stuff
 	private ImageButton btPower;
 	
 	private Slot hoveredSlot = null;
 	private ItemStack hoveredNEI = null;
+	private SliderButton invslider = null;
+	
+	private boolean guiSizeChange = false;
+	private int offset = 0;
 	
 //-------Init functions-------//
 	
@@ -92,6 +95,8 @@ public class ComputerCartGui extends GuiContainer {
 		
 		this.ySize= (container.getHasScreen()) ? ComputerCartContainer.YSIZE_SCR : ComputerCartContainer.YSIZE_NOSCR;
 		this.xSize= ComputerCartContainer.XSIZE;
+		this.offset = (this.textbuffer!=null) ? ComputerCartContainer.DELTA : 0;
+		this.invslider= new SliderButton(244,8 + offset, 6, 13, 94);
 	}
 	
 	//Initialize components. get Screen and check if there is a Keyboard
@@ -106,7 +111,8 @@ public class ComputerCartGui extends GuiContainer {
 	
 	public void initGui(){
 		super.initGui();
-		int offset = (this.container.getHasScreen()) ? ComputerCartContainer.DELTA : 0;
+		
+		this.invslider.setMaxsteps(10);
 		
 		BufferRenderer.init(Minecraft.getMinecraft().renderEngine);
 		this.guiSizeChange=true;
@@ -141,8 +147,7 @@ public class ComputerCartGui extends GuiContainer {
 	}
 	
 	@Override
-	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-		int offset = (this.container.getHasScreen()) ? ComputerCartContainer.DELTA : 0;
+	protected void drawGuiContainerForegroundLayer(int mx, int my) {
 		IIcon non = SlotIcons.fromTier(-1);
 		this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
         this.drawTexturedModelRectFromIcon(170, 84+offset, non, 16, 16);
@@ -158,13 +163,16 @@ public class ComputerCartGui extends GuiContainer {
         	this.bufferscale = Math.min(scaleX, scaleY);
         }
         
-        EnergyBar.drawBar(26, 156-((this.textbuffer!=null)? 0 : ComputerCartContainer.DELTA), 12, 140, 150, (double)this.container.sEnergy / (double)this.container.smaxEnergy, ebar);
+        //Widgets
+        EnergyBar.drawBar(26, 8 + offset, 12, 140, 150, (double)this.container.sEnergy / (double)this.container.smaxEnergy, ebar);
+        this.invslider.drawSlider(this.zLevel, this.invslider.getAktive() || this.invslider.isMouseHoverButton(mx - this.guiLeft, my - this.guiTop));
         
-        
+        //Highlight
         Iterator<Slot> list = this.container.inventorySlots.iterator();
         while(list.hasNext()) this.drawSlotHighlight(list.next());
         
-        if(this.func_146978_c(this.btPower.xPosition, this.btPower.yPosition, 18, 18, mouseX+this.guiLeft, mouseY+this.guiTop)){
+        //Tooltips
+        if(this.func_146978_c(this.btPower.xPosition, this.btPower.yPosition, 18, 18, mx+this.guiLeft, my+this.guiTop)){
         	List<String> ls = new ArrayList<String>();
         	if(this.container.getEntity().getRunning()){
         		 ls.add(StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.turnoff"));
@@ -173,13 +181,13 @@ public class ComputerCartGui extends GuiContainer {
         		ls.add(StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.turnon"));
         		ls.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.useanalyzer"));
         	}
-            this.drawHoverText(ls, mouseX - this.guiLeft, mouseY - this.guiTop, Minecraft.getMinecraft().fontRenderer);
+            this.drawHoverText(ls, mx - this.guiLeft, my - this.guiTop, Minecraft.getMinecraft().fontRenderer);
         }
-        if(this.func_146978_c(26+this.guiLeft, 156+this.guiTop-((this.textbuffer!=null)? 0 : ComputerCartContainer.DELTA), 140, 12, mouseX+this.guiLeft, mouseY+this.guiTop)){
+        if(this.func_146978_c(26+this.guiLeft, 8+this.guiTop+offset, 140, 12, mx+this.guiLeft, my+this.guiTop)){
         	List<String> ls = new ArrayList<String>();
         	int per = (int)(((double)this.container.sEnergy / (double)this.container.smaxEnergy)*100);
         	ls.add("Energy: "+per+"% ("+this.container.sEnergy+" / "+this.container.smaxEnergy+")");
-        	this.drawHoverText(ls, mouseX - this.guiLeft, mouseY - this.guiTop, Minecraft.getMinecraft().fontRenderer);
+        	this.drawHoverText(ls, mx - this.guiLeft, my - this.guiTop, Minecraft.getMinecraft().fontRenderer);
         }
         
         GL11.glPopAttrib();
@@ -229,7 +237,25 @@ public class ComputerCartGui extends GuiContainer {
 	    	  this.textbuffer.clipboard(GuiScreen.getClipboardString(), null);
 	      }
 	    }
+	    else if(button==0){
+	    	if(this.invslider.isMouseHoverBox(x - this.guiLeft, y - this.guiTop))
+	    		this.invslider.setAktive(true);
+	    }
 	 }
+	
+	protected void mouseMovedOrUp(int x, int y, int button){
+		super.mouseMovedOrUp(x, y, button);
+		if(button == 0 && this.invslider.getAktive()){
+			this.invslider.setAktive(false);
+		}
+	}
+	
+	protected void mouseClickMove(int x, int y, int button, long time){
+		super.mouseClickMove(x, y, button, time);
+		if(this.invslider.getAktive()){
+			this.invslider.scrollMouse(y - this.guiTop);
+		}
+	}
 	
 	 public void handleKeyboardInput() {
 		    if (NEI.isInputFocused()) return;
