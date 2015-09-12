@@ -83,6 +83,7 @@ public class ComputerCartGui extends GuiContainer {
 	private ItemStack hoveredNEI = null;
 	private SliderButton invslider = null;
 	
+	private boolean[] disSlot = new boolean[16];
 	private boolean guiSizeChange = false;
 	private int offset = 0;
 	
@@ -113,7 +114,7 @@ public class ComputerCartGui extends GuiContainer {
 	public void initGui(){
 		super.initGui();
 		
-		this.invslider.setMaxsteps(10);
+		this.updateSlots();
 		
 		BufferRenderer.init(Minecraft.getMinecraft().renderEngine);
 		this.guiSizeChange=true;
@@ -324,18 +325,19 @@ public class ComputerCartGui extends GuiContainer {
 	 
 	 private void updateSlots(){
 		 Iterator<Slot> slots = this.container.inventorySlots.iterator();
-		 OCMinecart.logger.info(""+this.invslider.getScroll());
 		 while(slots.hasNext()){
 			 Slot s = slots.next();
 			 int index = s.getSlotIndex() - this.invslider.getScroll() * 4;
 			 if(s.inventory.equals(this.container.getEntity().maininv)){
-				 if(index>=0 && index < 16){
+				 if(index>=0 && index < 16 && s.getSlotIndex() < this.container.sizeinv){
 					 s.xDisplayPosition = 170 + (index % 4) * 18;
 					 s.yDisplayPosition = 8 + offset + (index / 4) * 18;
+					 this.disSlot[index] = false;
 				 }
 				 else{
 					 s.xDisplayPosition = -10000;
 					 s.yDisplayPosition = -10000;
+					 if(index>=0 && index < 16) this.disSlot[index] = true;
 				 }
 			 }
 		 }
@@ -488,18 +490,30 @@ public class ComputerCartGui extends GuiContainer {
             GL11.glPopMatrix();
 	}
 
-	//Render the Background Icon for Container Slots
+	//Render the Background Icons
 	private void renderGuiSlots(){
 		Iterator<Slot> list = this.container.inventorySlots.iterator();
 		this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_LIGHTING);
+		
+		//Render the Icons for Container Slots
 		while(list.hasNext()){
 			Slot slot = list.next();
 			if(slot instanceof ContainerSlot){
 				IIcon typeicon = SlotIcons.fromSlot(((ContainerSlot) slot).getSlotType());
 				if(typeicon!=null) this.drawTexturedModelRectFromIcon(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
+			}
+		}
+		//Render Icons for disabled Inventory Slots
+		for(int i=0;i<4;i+=1){
+			for(int j=0;j<4;j+=1){
+				int xpos = this.guiLeft + 170 + i * 18;
+				int ypos = this.guiTop + 8 + offset + j * 18;
+				if(this.disSlot[i*j]){
+					this.drawTexturedModelRectFromIcon(xpos,ypos, SlotIcons.fromTier(-1), 16, 16);
+				}
 			}
 		}
 	}

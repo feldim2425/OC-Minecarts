@@ -100,7 +100,7 @@ public class SliderButton {
 	}
 
 	public void setMaxsteps(int maxsteps) {
-		if(maxsteps<1) maxsteps = 1;
+		if(maxsteps<0) maxsteps = 0;
 		this.maxsteps = maxsteps;
 	}
 	
