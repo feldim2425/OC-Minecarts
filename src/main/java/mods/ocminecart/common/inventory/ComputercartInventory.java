@@ -1,7 +1,12 @@
 package mods.ocminecart.common.inventory;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 
 public class ComputercartInventory extends Inventory {
 	
@@ -24,6 +29,18 @@ public class ComputercartInventory extends Inventory {
 	@Override
 	protected void slotChanged(int slot) {
 		if(!this.cart.worldObj.isRemote) this.cart.machine().signal("inventory_changed",slot);
+	}
+	
+	public Iterable<ItemStack> removeOverflowItems(int size){
+		List<ItemStack> list = new ArrayList<ItemStack>();
+		for(int i=size;i<this.getSizeInventory();i+=1){
+			if(this.getStackInSlot(i) != null){
+				OCMinecart.logger.info("DROP: "+i);
+				list.add(this.getStackInSlot(i));
+				this.setInventorySlotContents(i, null);
+			}
+		}
+		return list;
 	}
 
 }

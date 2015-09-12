@@ -41,6 +41,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -226,6 +227,15 @@ public class ComputerCartGui extends GuiContainer {
 	
 	public void updateScreen(){
 		if(this.container.getEntity().getRunning() != btPower.getToggle()) btPower.setToggle(this.container.getEntity().getRunning());
+		if(this.container.updatesize){
+			this.invslider.scrollTo(0);
+			this.invslider.setMaxsteps(this.container.sizeinv / 4 - 4);
+			this.container.updatesize=false;
+		}
+		if(this.invslider.hasUpdate()){
+			this.invslider.doneUpdate();
+			this.updateSlots();
+		}
 	}
 	
 	protected void mouseClicked(int x, int y, int button) {
@@ -249,6 +259,19 @@ public class ComputerCartGui extends GuiContainer {
 			this.invslider.setAktive(false);
 		}
 	}
+	
+	public void handleMouseInput() {
+	    super.handleMouseInput();
+	    if (Mouse.hasWheel() && Mouse.getEventDWheel() != 0) {
+	      int mouseX = Mouse.getEventX() * width / mc.displayWidth - guiLeft;
+	      int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1 - guiTop;
+	      if (isCoordinateOverInventory(mouseX, mouseY) || 
+	    		  invslider.isMouseHoverBox(mouseX, mouseY)) {
+	        if (Math.signum(Mouse.getEventDWheel()) < 0) invslider.scrollDown();
+	        else invslider.scrollUp();
+	      }
+	    }
+	  }
 	
 	protected void mouseClickMove(int x, int y, int button, long time){
 		super.mouseClickMove(x, y, button, time);
@@ -293,6 +316,29 @@ public class ComputerCartGui extends GuiContainer {
 				 this.textbuffer.keyUp(e.getValue(), e.getKey(), null);
 			 }
 		Keyboard.enableRepeatEvents(false);
+	 }
+	 
+	 private boolean isCoordinateOverInventory(int x, int y){
+		 return x >= 170 && x < 240 && y >= 8 + offset && y < 78 + offset;      
+	 }
+	 
+	 private void updateSlots(){
+		 Iterator<Slot> slots = this.container.inventorySlots.iterator();
+		 OCMinecart.logger.info(""+this.invslider.getScroll());
+		 while(slots.hasNext()){
+			 Slot s = slots.next();
+			 int index = s.getSlotIndex() - this.invslider.getScroll() * 4;
+			 if(s.inventory.equals(this.container.getEntity().maininv)){
+				 if(index>=0 && index < 16){
+					 s.xDisplayPosition = 170 + (index % 4) * 18;
+					 s.yDisplayPosition = 8 + offset + (index / 4) * 18;
+				 }
+				 else{
+					 s.xDisplayPosition = -10000;
+					 s.yDisplayPosition = -10000;
+				 }
+			 }
+		 }
 	 }
 	
 //-------Render functions----------//

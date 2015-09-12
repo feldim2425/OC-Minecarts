@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,6 +28,8 @@ public class ComputerCartContainer extends Container {
 	
 	public int smaxEnergy = -1;
 	public int sEnergy = -1;
+	public int sizeinv = -1;
+	public boolean updatesize = false;
 	
 	
 	public ComputerCartContainer(InventoryPlayer inventory,ComputerCart entity) {
@@ -37,6 +40,10 @@ public class ComputerCartContainer extends Container {
 		this.addSlotToContainer(new ContainerSlot(entity.compinv, 20 , 188,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(0)));
 		this.addSlotToContainer(new ContainerSlot(entity.compinv, 21 , 206,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(1)));
 		this.addSlotToContainer(new ContainerSlot(entity.compinv, 22 , 224,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(2)));
+		
+		for(int i=0;i<entity.maininv.getSizeInventory();i+=1){
+			this.addSlotToContainer(new Slot(entity.maininv, i, -10000, -10000));
+		}
 		
 		this.addPlayerInv(6, 174 -((this.hasScreen) ? 0 : DELTA), inventory);
 	}
@@ -84,6 +91,7 @@ public class ComputerCartContainer extends Container {
 		
 		craft.sendProgressBarUpdate(this, 0, (int) this.entity.getEnergy());
 		craft.sendProgressBarUpdate(this, 1, (int) this.entity.getMaxEnergy());
+		craft.sendProgressBarUpdate(this, 2, this.entity.getInventorySpace());
 	}
 	
 	public void detectAndSendChanges(){
@@ -99,10 +107,15 @@ public class ComputerCartContainer extends Container {
         	if(this.entity.getMaxEnergy() != this.smaxEnergy){
         		craft.sendProgressBarUpdate(this, 1, (int) (this.entity.getMaxEnergy()*10));
         	}
+        	
+        	if(this.entity.getInventorySpace() != this.sizeinv){
+        		craft.sendProgressBarUpdate(this, 2, this.entity.getInventorySpace());
+        	}
         }
 		
 		this.smaxEnergy=(int) this.entity.getMaxEnergy();
 		this.sEnergy=(int) this.entity.getEnergy();
+		this.sizeinv=this.entity.getInventorySpace();
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -114,6 +127,11 @@ public class ComputerCartContainer extends Container {
 		case 1:
 			this.smaxEnergy = value;
 			break;
+		case 2:
+			this.updatesize = true;
+			this.sizeinv = value;
+			break;
+			
 		}
 	}
 }

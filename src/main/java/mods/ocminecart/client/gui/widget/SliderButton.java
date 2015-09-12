@@ -20,6 +20,7 @@ public class SliderButton {
 	
 	private int maxsteps = 0;
 	private int scroll;
+	private boolean update = false;
 	
 	public SliderButton(int posx, int posy ,int w, int h, int maxh){
 		this.texture = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/button_scroll.png");;
@@ -65,16 +66,24 @@ public class SliderButton {
 	
 	public void scrollTo(int pos){
 		if(pos<0) this.scroll = 0;
-		else if(pos>this.maxsteps-1) this.scroll = this.maxsteps-1;
+		else if(pos>this.maxsteps) this.scroll = this.maxsteps;
 		else this.scroll = pos;
 		
-		this.slidery = (this.maxsteps<2) ? 0 : (this.maxh - this.h - 2) * this.scroll / (this.maxsteps-1);
+		this.slidery = this.maxsteps<1 ? 0 : (this.maxh - this.h - 2) * this.scroll / this.maxsteps;
+		this.update=true;
 	}
 	
 	public int getScroll(){
 		return this.scroll;
 	}
 	
+	public void scrollDown() {
+		this.scrollTo(this.scroll + 1);
+	}
+	
+	public void scrollUp() {
+		this.scrollTo(this.scroll - 1);
+	}
 	
 	/*----------Setter/Getter---------*/
 	
@@ -93,5 +102,13 @@ public class SliderButton {
 	public void setMaxsteps(int maxsteps) {
 		if(maxsteps<1) maxsteps = 1;
 		this.maxsteps = maxsteps;
+	}
+	
+	public boolean hasUpdate(){
+		return this.update;
+	}
+	
+	public void doneUpdate(){
+		this.update = false;
 	}
 }

@@ -10,9 +10,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import li.cil.oc.api.API;
+import li.cil.oc.api.Driver;
 import li.cil.oc.api.Manual;
 import li.cil.oc.api.component.Keyboard;
 import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.driver.Item;
+import li.cil.oc.api.driver.item.Inventory;
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
@@ -35,6 +38,7 @@ import mods.ocminecart.common.inventory.ComputercartInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ComputerCartData;
+import mods.ocminecart.common.util.ItemUtil;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventoryUpdate;
 import mods.ocminecart.network.message.EntitySyncRequest;
@@ -80,6 +84,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	private boolean isRun = false;
 	private ComputerCartController controller = new ComputerCartController(this);
 	private double startEnergy = -1;
+	private int invsize = 0;
 	
 	private int cRailX = 0;	// Position of the connected Network Rail
 	private int cRailY = 0;
@@ -105,6 +110,13 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			}
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_insert");
+			else if(this.getSlotType(slot) == Slot.Upgrade && FMLCommonHandler.instance().getEffectiveSide().isServer()){
+				Item drv = Driver.driverFor(stack, this.host.getClass());
+				if(drv instanceof Inventory){
+					((ComputerCart)host).setInventorySpace(0);
+					((ComputerCart)host).checkInventorySpace();
+				}
+			}
 		}
 		
 		@Override
@@ -113,6 +125,13 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate((ComputerCart) this.host,slot,null), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_eject");
+			else if(this.getSlotType(slot) == Slot.Upgrade && FMLCommonHandler.instance().getEffectiveSide().isServer()){
+				Item drv = Driver.driverFor(stack, this.host.getClass());
+				if(drv instanceof Inventory){
+					((ComputerCart)host).setInventorySpace(0);
+					((ComputerCart)host).checkInventorySpace();
+				}
+			}
 		}
 		
 		@Override
@@ -136,7 +155,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	};
 	
 	public ComputercartInventory maininv = new ComputercartInventory(this);
-	
 	
 	public ComputerCart(World p_i1712_1_) {
 		super(p_i1712_1_);
@@ -188,6 +206,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		if(nbt.hasKey("machine"))this.machine.load(nbt.getCompoundTag("machine"));
 		
 		this.connectNetwork();
+		this.checkInventorySpace();
 	}
 	
 	@Override
@@ -239,6 +258,21 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	
 	/*------Interaction-------*/
 	
+	protected void checkInventorySpace(){
+		for(int i=0;i<this.compinv.getSizeInventory();i+=1){
+			if(this.compinv.getStackInSlot(i)!=null){
+				ItemStack stack = this.compinv.getStackInSlot(i);
+				Item drv = Driver.driverFor(stack, this.getClass());
+				if(drv instanceof Inventory && this.invsize<this.maininv.getSizeInventory()){
+					this.invsize = this.invsize+((Inventory)drv).inventoryCapacity(stack);
+					if(this.invsize>this.maininv.getSizeInventory()) this.invsize = this.maininv.getSizeInventory();
+				}
+			}
+		}
+		Iterable<ItemStack> over = this.maininv.removeOverflowItems(this.invsize);
+		ItemUtil.dropItemList(over, this.worldObj, this.posX, this.posY, this.posZ);
+	}
+	
 	@Override
 	public void onUpdate(){
 		super.onUpdate();
@@ -266,6 +300,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			
 			if(this.tier==3)((Connector)this.machine.node()).changeBuffer(Integer.MAX_VALUE); //Just for Creative (Infinite Energy)
 			
+			//Check if the cart is on a NetRail
 			if(!this.cRailCon && this.onRail() && (this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) instanceof INetRail)){
 				int x = MathHelper.floor_double(this.posX);
 				int y = MathHelper.floor_double(this.posY);
@@ -280,7 +315,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 				}
 			}
 			
-			if(this.cRailCon){
+			if(this.cRailCon){	//If the cart is connected to a rail check if the connection is still valid and connect or disconnect
 				World w = DimensionManager.getWorld(this.cRailDim);
 				if( w.getBlock(this.cRailX,this.cRailY,this.cRailZ) instanceof INetRail){
 					INetRail netrail = (INetRail) w.getBlock(this.cRailX,this.cRailY,this.cRailZ);
@@ -337,12 +372,9 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		for(int i=20;i<23;i+=1){
 			if(compinv.getStackInSlot(i)!=null) drop.add(compinv.getStackInSlot(i));
 		}
-		//add drops for main inventory
-		for(int i=0;i<drop.size();i+=1){
-			EntityItem entityitem = new EntityItem(this.worldObj, this.posX, this.posY , this.posZ, drop.get(i));
-			entityitem.delayBeforeCanPickup = 10;
-			this.worldObj.spawnEntityInWorld(entityitem);
-		}
+		//TODO: add drops for main inventory
+		ItemUtil.dropItemList(drop, this.worldObj, this.posX, this.posY, this.posZ);
+		this.setDamage(Float.MAX_VALUE); //Sometimes the cart stay alive this should fix it.
 	}
 	
 	@Override
@@ -373,13 +405,9 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	
 	/*-----Minecart/Entity-Stuff-------*/
 	@Override
-	public int getMinecartType() {
-		return -1;
-	}
+	public int getMinecartType() { return -1; }
 
-	public static EntityMinecart create(World w, double x, double y, double z, ComputerCartData data) {
-		return new ComputerCart(w, x, y, z, data);
-	}
+	public static EntityMinecart create(World w, double x, double y, double z, ComputerCartData data) { return new ComputerCart(w, x, y, z, data); }
 	
 	@Override
 	public ItemStack getCartItem(){
@@ -722,10 +750,11 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return false;
 	}
 
+	/*------Setters & Getters-----*/
 	public ComponetInventory getCompinv() {
 		return this.compinv;
 	}
-
+	
 	public void setRunning(boolean newVal) {
 		if(this.worldObj.isRemote) this.isRun=newVal;
 		else{
@@ -746,6 +775,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	public double getMaxEnergy() {
 		if(!this.worldObj.isRemote) return ((Connector)this.machine.node()).globalBufferSize();
 		return -1;
+	}
+	
+	public void setInventorySpace(int invsize) {
+		this.invsize = invsize;
+	}
+
+	public int getInventorySpace() {
+		return this.invsize;
 	}
 	
 }
