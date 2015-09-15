@@ -1,5 +1,6 @@
 package mods.ocminecart.common.container;
 
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.container.slots.SlotGhost;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
 import net.minecraft.entity.player.EntityPlayer;
@@ -72,6 +73,16 @@ public class NetworkRailBaseContainer extends Container {
 		return null;
 	}
 	
+	public ItemStack slotClick(int slot, int button, int p2, EntityPlayer player){
+		Slot s = this.getSlot(slot);
+		if((s instanceof SlotGhost) && (button == 0 || button == 1)){
+			if(s.getHasStack() && player.inventory.getItemStack() != null &&
+					player.inventory.getItemStack().getItem() != s.getStack().getItem()){
+				s.decrStackSize(0);
+			}
+		}
+		return super.slotClick(slot, button, p2, player);
+	}
 	
 	public NetworkRailBaseTile getTile(){
 		return entity;

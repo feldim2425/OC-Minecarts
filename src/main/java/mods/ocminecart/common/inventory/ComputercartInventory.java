@@ -35,7 +35,6 @@ public class ComputercartInventory extends Inventory {
 		List<ItemStack> list = new ArrayList<ItemStack>();
 		for(int i=size;i<this.getSizeInventory();i+=1){
 			if(this.getStackInSlot(i) != null){
-				OCMinecart.logger.info("DROP: "+i);
 				list.add(this.getStackInSlot(i));
 				this.setInventorySlotContents(i, null);
 			}
