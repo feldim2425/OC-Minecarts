@@ -72,6 +72,8 @@ import cpw.mods.fml.common.FMLCommonHandler;
 /*
  * Items that need new Dirvers:
  * - Crafting Upgrade
+ * - Inventory Controller
+ * - Tank Controller
  */
 public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot, ISyncEntity{
 	
@@ -193,6 +195,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		if(nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
 		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier");
 		if(nbt.hasKey("controller")) this.controller.load(nbt.getCompoundTag("controller"));
+		if(nbt.hasKey("inventory")) this.maininv.readFromNBT((NBTTagList) nbt.getTag("inventory"));
 		if(nbt.hasKey("netrail")){
 			NBTTagCompound netrail = nbt.getCompoundTag("netrail");
 			this.cRailCon=true;
@@ -219,6 +222,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		
 		nbt.setTag("components", this.compinv.writeNTB());
 		nbt.setInteger("tier", this.tier);
+		nbt.setTag("inventory", this.maininv.writeToNBT());
 		
 		NBTTagCompound controller = new NBTTagCompound();
 		this.controller.save(controller);
@@ -300,49 +304,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			
 			if(this.tier==3)((Connector)this.machine.node()).changeBuffer(Integer.MAX_VALUE); //Just for Creative (Infinite Energy)
 			
-			//Check if the cart is on a NetRail
-			if(!this.cRailCon && this.onRail() && (this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) instanceof INetRail)){
-				int x = MathHelper.floor_double(this.posX);
-				int y = MathHelper.floor_double(this.posY);
-				int z = MathHelper.floor_double(this.posZ);
-				INetRail netrail = (INetRail) this.worldObj.getBlock(x,y,z);
-				if(netrail.isValid(this.worldObj, x, y, z, this) && netrail.getResponseEnvironment(this.worldObj, x, y, z) != null){
-					this.cRailX = MathHelper.floor_double(this.posX);
-					this.cRailY = MathHelper.floor_double(this.posY);
-					this.cRailZ = MathHelper.floor_double(this.posZ);
-					this.cRailDim = this.worldObj.provider.dimensionId;
-					this.cRailCon = true;
-				}
-			}
-			
-			if(this.cRailCon){	//If the cart is connected to a rail check if the connection is still valid and connect or disconnect
-				World w = DimensionManager.getWorld(this.cRailDim);
-				if( w.getBlock(this.cRailX,this.cRailY,this.cRailZ) instanceof INetRail){
-					INetRail netrail = (INetRail) w.getBlock(this.cRailX,this.cRailY,this.cRailZ);
-					if(netrail.isValid(w, this.cRailX, this.cRailY, this.cRailZ, this) && netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
-						Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
-						if(!this.machine.node().canBeReachedFrom(railnode)){
-							this.machine.node().connect(railnode);
-							this.cRailNode = railnode;
-						}
-					}
-					else if(netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
-						Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
-						if(this.machine.node().canBeReachedFrom(railnode)){
-							this.machine.node().disconnect(railnode);
-							this.cRailCon=false;
-							this.cRailNode = null;
-						}
-					}
-				}
-				else{
-					if(this.cRailNode!=null && this.machine.node().canBeReachedFrom(this.cRailNode)){
-						this.machine.node().disconnect(this.cRailNode);
-						this.cRailCon=false;
-						this.cRailNode = null;
-					}
-				}	
-			}
+			this.checkRailConnection();
 		}
 	}
 	
@@ -372,7 +334,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		for(int i=20;i<23;i+=1){
 			if(compinv.getStackInSlot(i)!=null) drop.add(compinv.getStackInSlot(i));
 		}
-		//TODO: add drops for main inventory
+		Iterator<ItemStack> minv = this.maininv.removeOverflowItems(0).iterator();
+		while(minv.hasNext()) drop.add(minv.next());
 		ItemUtil.dropItemList(drop, this.worldObj, this.posX, this.posY, this.posZ);
 		this.setDamage(Float.MAX_VALUE); //Sometimes the cart stay alive this should fix it.
 	}
@@ -400,6 +363,50 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return new Node[]{this.machine.node()};
 	}
 	
+	private void checkRailConnection(){
+		if(!this.cRailCon && this.onRail() && (this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) instanceof INetRail)){
+			int x = MathHelper.floor_double(this.posX);
+			int y = MathHelper.floor_double(this.posY);
+			int z = MathHelper.floor_double(this.posZ);
+			INetRail netrail = (INetRail) this.worldObj.getBlock(x,y,z);
+			if(netrail.isValid(this.worldObj, x, y, z, this) && netrail.getResponseEnvironment(this.worldObj, x, y, z) != null){
+				this.cRailX = MathHelper.floor_double(this.posX);
+				this.cRailY = MathHelper.floor_double(this.posY);
+				this.cRailZ = MathHelper.floor_double(this.posZ);
+				this.cRailDim = this.worldObj.provider.dimensionId;
+				this.cRailCon = true;
+			}
+		}
+		
+		if(this.cRailCon){	//If the cart is connected to a rail check if the connection is still valid and connect or disconnect
+			World w = DimensionManager.getWorld(this.cRailDim);
+			if( w.getBlock(this.cRailX,this.cRailY,this.cRailZ) instanceof INetRail){
+				INetRail netrail = (INetRail) w.getBlock(this.cRailX,this.cRailY,this.cRailZ);
+				if(netrail.isValid(w, this.cRailX, this.cRailY, this.cRailZ, this) && netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
+					Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
+					if(!this.machine.node().canBeReachedFrom(railnode)){
+						this.machine.node().connect(railnode);
+						this.cRailNode = railnode;
+					}
+				}
+				else if(netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
+					Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
+					if(this.machine.node().canBeReachedFrom(railnode)){
+						this.machine.node().disconnect(railnode);
+						this.cRailCon=false;
+						this.cRailNode = null;
+					}
+				}
+			}
+			else{
+				if(this.cRailNode!=null && this.machine.node().canBeReachedFrom(this.cRailNode)){
+					this.machine.node().disconnect(this.cRailNode);
+					this.cRailCon=false;
+					this.cRailNode = null;
+				}
+			}	
+		}
+	}
 	
 	/*------------------------*/
 	
@@ -784,5 +791,4 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	public int getInventorySpace() {
 		return this.invsize;
 	}
-	
 }

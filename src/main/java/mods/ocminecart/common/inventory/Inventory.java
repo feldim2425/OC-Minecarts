@@ -3,6 +3,8 @@ package mods.ocminecart.common.inventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 
 public abstract class Inventory implements IInventory{
 	
@@ -49,6 +51,14 @@ public abstract class Inventory implements IInventory{
 			this.slotChanged(slot);
 		}
 	}
+	
+	//This is the same as setInventorySlotContents but will not send a Signal to the machine;
+	private void updateSlotContents(int slot, ItemStack stack){
+		if(stack != null && stack.stackSize < 1) stack = null;
+		if(slot<this.getSizeInventory()){
+			stacks[slot] = stack;
+		}
+	}
 
 	@Override
 	public String getInventoryName() {
@@ -77,6 +87,32 @@ public abstract class Inventory implements IInventory{
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		return true;
+	}
+	
+	public NBTTagList writeToNBT(){
+		NBTTagList tag = new NBTTagList();
+		for(byte i=0;i<this.getSizeInventory();i+=1){
+			NBTTagCompound slot = new NBTTagCompound();
+			ItemStack stack = this.getStackInSlot(i);
+			slot.setByte("slot", i);
+			if(stack!=null){
+				NBTTagCompound item = new NBTTagCompound();
+				stack.writeToNBT(item);
+				slot.setTag("item", item);
+			}
+			tag.appendTag(slot);
+		}
+		return tag;
+	}
+	
+	public void readFromNBT(NBTTagList tag){
+		int tagc = tag.tagCount();
+		for(int i=0;i<tagc;i+=1){
+			NBTTagCompound slot = tag.getCompoundTagAt(i);
+			if(slot.hasKey("item")){
+				this.updateSlotContents(slot.getByte("slot"), ItemStack.loadItemStackFromNBT(slot.getCompoundTag("item")));
+			}
+		}
 	}
 	
 	protected abstract void slotChanged(int slot);
