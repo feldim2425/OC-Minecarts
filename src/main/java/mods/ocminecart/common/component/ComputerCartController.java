@@ -59,9 +59,52 @@ public class ComputerCartController implements ManagedEnvironment{
 	
 	/*--------Component-Functions--------*/
 	
-	@Callback(doc="Testfunction to test Callback")
-	public Object[] test(Context context, Arguments arguments){
-		return new Object[]{"HI"};
+	@Callback(doc="function(set:boolean):boolen, string -- Enable/Disable the break. String for errors")
+	public Object[] setBreak(Context context, Arguments arguments){
+		boolean state = arguments.checkBoolean(0);
+		if(this.cart.getSpeed() > this.cart.getMaxCartSpeedOnRail() && state){
+			return new Object[]{this.cart.getBreakState(), "too fast"};
+		}
+		this.cart.setBreakState(state);
+		return new Object[]{state, null};
 	}
-
+	
+	@Callback(doc="function():boolean -- Get the status of the break.")
+	public Object[] getBreak(Context context, Arguments arguments){
+		return new Object[]{this.cart.getBreakState()};
+	}
+	
+	@Callback(doc="function():boolean -- Set enginespeed")
+	public Object[] getEngineSpeed(Context context, Arguments arguments){
+		return new Object[]{this.cart.getEngineState()};
+	}
+	
+	@Callback(doc="function():number -- Get current speed of the cart. -1 if there is no rail")
+	public Object[] getCartSpeed(Context context, Arguments arguments){
+		double speed = -1;
+		if(this.cart.onRail()){
+			speed = this.cart.getSpeed();
+		}
+		return new Object[]{speed};
+	}
+	
+	@Callback(doc="function():number -- Set the engine speed.")
+	public Object[] setEngineSpeed(Context context, Arguments arguments){
+		double speed = Math.min(arguments.checkDouble(0), this.cart.getMaxCartSpeedOnRail());
+		this.cart.setEngineState(speed);
+		return new Object[]{speed};
+	}
+	
+	@Callback(doc="function():number -- Get the maximal cart speed")
+	public Object[] getMaxSpeed(Context context, Arguments arguments){
+		return new Object[]{this.cart.getMaxCartSpeedOnRail()};
+	}
+	
+	@Callback(doc="function() -- Rotate the cart")
+	public Object[] rotate(Context context, Arguments arguments){
+		float yaw = this.cart.rotationYaw + 180F;
+		if(yaw >= 360F) yaw -= 360F;
+		this.cart.rotationYaw = yaw;
+		return new Object[]{};
+	}
 }

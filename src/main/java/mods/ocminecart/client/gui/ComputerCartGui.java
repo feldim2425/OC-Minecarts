@@ -51,6 +51,8 @@ import codechicken.nei.LayoutManager;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
 
+//I used the code from OpenComputer's Robot GUI to make this class (ImageButton, Buffer renderer, Mouse & Keyboard handler, ...)
+//Credits to Sangar
 public class ComputerCartGui extends GuiContainer {
 	
 	//Resources
@@ -357,7 +359,7 @@ public class ComputerCartGui extends GuiContainer {
 	      code == Keyboard.KEY_RMETA;
 	  }
 	
-	//Render the "fake" Highlight for Components
+	//Render the Highlight for Components
 	protected void drawSlotHighlight(Slot slot) {
 		if(Minecraft.getMinecraft().thePlayer.inventory.getItemStack() == null){
 			boolean highlight = false;

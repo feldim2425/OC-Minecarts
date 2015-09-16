@@ -87,6 +87,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	private ComputerCartController controller = new ComputerCartController(this);
 	private double startEnergy = -1;
 	private int invsize = 0;
+	private boolean onrail = false; // Store onRail from last tick to send a Signal
 	
 	private int cRailX = 0;	// Position of the connected Network Rail
 	private int cRailY = 0;
@@ -174,6 +175,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 				compinv.updateSlot(e.getKey(), e.getValue());
 			}
 		}
+		
+		this.checkInventorySpace();
 	}
 	
 	@Override
@@ -280,30 +283,50 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	@Override
 	public void onUpdate(){
 		super.onUpdate();
+		//Only executed at the first function call
 		if(this.firstupdate){
 			this.firstupdate=false;
+			//Request a entity data sync
 			if(this.worldObj.isRemote) ModNetwork.channel.sendToServer(new EntitySyncRequest(this));
 			else{
-				if(this.startEnergy > 0) ((Connector)this.machine.node()).changeBuffer(this.startEnergy);
+				if(this.startEnergy > 0) ((Connector)this.machine.node()).changeBuffer(this.startEnergy); //Give start energy
 				if(this.machine.node().network()==null){
-					this.connectNetwork();
+					this.connectNetwork(); //Connect all nodes (Components & Controller)
 				}
+				//Update onRail
+				this.onrail = this.onRail();
 			}
 		}
 		
 		if(!this.worldObj.isRemote){
+			//Update the machine and the Components
 			if(this.isRun){
 				this.machine.update();
 				this.compinv.updateComponents();
 			}
-			
+			//Check if the machine state has changed.
 			if(this.isRun != this.machine.isRunning()){
 				this.isRun=this.machine.isRunning();
 				ModNetwork.sendToNearPlayers(new UpdateRunning(this,this.isRun), this.posX, this.posY, this.posZ, this.worldObj);
+				if(!this.isRun) this.engineSpeed = 0;
 			}
-			
-			if(this.tier==3)((Connector)this.machine.node()).changeBuffer(Integer.MAX_VALUE); //Just for Creative (Infinite Energy)
-			
+			//Consume energy for the Engine
+			if(this.engineSpeed != 0 && !this.enableBreak && this.onRail()){
+				if(!((Connector)this.machine.node()).tryChangeBuffer(-1.0 * this.engineSpeed * Settings.ComputerCartEngineUse))
+				{
+					this.machine.signal("engine_failed",this.engineSpeed);
+					this.engineSpeed = 0;
+				}
+			}
+			//Check if the cart is on a Track
+			if(this.onrail != this.onRail())
+			{
+				this.onrail = !this.onrail;
+				this.machine.signal("track_state",this.onrail);
+			}
+			//Give the cart energy if it is a creative cart
+			if(this.tier==3)((Connector)this.machine.node()).changeBuffer(Integer.MAX_VALUE);
+			//Connect / Disconnect a network rail
 			this.checkRailConnection();
 		}
 	}
@@ -364,6 +387,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 	
 	private void checkRailConnection(){
+		//If the cart isn't connected check for a new connection
 		if(!this.cRailCon && this.onRail() && (this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)) instanceof INetRail)){
 			int x = MathHelper.floor_double(this.posX);
 			int y = MathHelper.floor_double(this.posY);
@@ -377,33 +401,39 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 				this.cRailCon = true;
 			}
 		}
-		
-		if(this.cRailCon){	//If the cart is connected to a rail check if the connection is still valid and connect or disconnect
+		//If the cart is connected to a rail check if the connection is still valid and connect or disconnect
+		if(this.cRailCon){
 			World w = DimensionManager.getWorld(this.cRailDim);
 			if( w.getBlock(this.cRailX,this.cRailY,this.cRailZ) instanceof INetRail){
 				INetRail netrail = (INetRail) w.getBlock(this.cRailX,this.cRailY,this.cRailZ);
+				//Connect a new network Rail
 				if(netrail.isValid(w, this.cRailX, this.cRailY, this.cRailZ, this) && netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
 					Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
 					if(!this.machine.node().canBeReachedFrom(railnode)){
 						this.machine.node().connect(railnode);
 						this.cRailNode = railnode;
+						this.machine.signal("network_rail", true);
 					}
 				}
+				//Disconnect when the cart leaves a network rail
 				else if(netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ)!=null){
 					Node railnode = netrail.getResponseEnvironment(w, this.cRailX, this.cRailY, this.cRailZ).node();
 					if(this.machine.node().canBeReachedFrom(railnode)){
 						this.machine.node().disconnect(railnode);
 						this.cRailCon=false;
 						this.cRailNode = null;
+						this.machine.signal("network_rail", false);
 					}
 				}
 			}
+			//Disconnect if the network rail is not there
 			else{
 				if(this.cRailNode!=null && this.machine.node().canBeReachedFrom(this.cRailNode)){
 					this.machine.node().disconnect(this.cRailNode);
-					this.cRailCon=false;
 					this.cRailNode = null;
+					this.machine.signal("network_rail", false);
 				}
+				this.cRailCon=false;
 			}	
 		}
 	}
@@ -784,11 +814,15 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		return -1;
 	}
 	
-	public void setInventorySpace(int invsize) {
-		this.invsize = invsize;
-	}
-
-	public int getInventorySpace() {
-		return this.invsize;
-	}
+	public void setInventorySpace(int invsize) { this.invsize = invsize; }
+	public int getInventorySpace() { return this.invsize; }
+	
+	public boolean getBreakState(){ return this.enableBreak; }
+	public void setBreakState(boolean state){ this.enableBreak = state; }
+	
+	public double getEngineState(){ return this.engineSpeed; }
+	public void setEngineState(double speed){ this.engineSpeed = speed; }
+	
+	
+	
 }
