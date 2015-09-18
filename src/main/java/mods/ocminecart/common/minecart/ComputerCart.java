@@ -6,22 +6,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import li.cil.oc.api.API;
-import li.cil.oc.api.Driver;
 import li.cil.oc.api.Manual;
 import li.cil.oc.api.component.Keyboard;
 import li.cil.oc.api.component.TextBuffer;
-import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Inventory;
 import li.cil.oc.api.driver.item.Slot;
-import li.cil.oc.api.internal.Agent;
 import li.cil.oc.api.internal.MultiTank;
-import li.cil.oc.api.internal.Robot;
-import li.cil.oc.api.internal.Tiered;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Analyzable;
@@ -47,12 +41,9 @@ import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventoryUpdate;
 import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.UpdateRunning;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -65,10 +56,6 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
-import net.minecraftforge.fluids.IFluidHandler;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import cpw.mods.fml.common.FMLCommonHandler;
 
 //The internal.Robot interface will get replaced by a custom Interface later.

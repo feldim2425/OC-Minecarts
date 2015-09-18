@@ -1,14 +1,10 @@
 package mods.ocminecart.common.assemble;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.common.Tier;
-import mods.ocminecart.Settings;
-import mods.ocminecart.common.assemble.util.Complexity;
 import mods.ocminecart.common.assemble.util.General;
-import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;

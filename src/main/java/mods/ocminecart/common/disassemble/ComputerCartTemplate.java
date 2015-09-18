@@ -10,8 +10,6 @@ import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ComputerCartData;
 import net.minecraft.item.ItemStack;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 public class ComputerCartTemplate {
 	
 	public static boolean select(ItemStack stack){

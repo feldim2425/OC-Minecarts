@@ -1,6 +1,5 @@
 package mods.ocminecart.client.gui.widget;
 
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;

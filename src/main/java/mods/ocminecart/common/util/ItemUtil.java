@@ -2,7 +2,6 @@ package mods.ocminecart.common.util;
 
 import java.util.Iterator;
 
-import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;

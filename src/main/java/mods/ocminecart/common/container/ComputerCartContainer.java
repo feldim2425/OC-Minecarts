@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.player.EntityPlayer;

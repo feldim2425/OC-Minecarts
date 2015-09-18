@@ -1,7 +1,5 @@
 package mods.ocminecart.common.minecart;
 
-import mods.ocminecart.OCMinecart;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;

@@ -16,7 +16,6 @@ import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.common.Tier;
 import li.cil.oc.common.component.Screen;
-import li.cil.oc.integration.opencomputers.DriverScreen;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.driver.CustomDriver;
