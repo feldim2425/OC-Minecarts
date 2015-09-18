@@ -14,11 +14,14 @@ import li.cil.oc.api.Driver;
 import li.cil.oc.api.Manual;
 import li.cil.oc.api.component.Keyboard;
 import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Inventory;
 import li.cil.oc.api.driver.item.Slot;
+import li.cil.oc.api.internal.Agent;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.internal.Robot;
+import li.cil.oc.api.internal.Tiered;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Analyzable;
@@ -33,6 +36,7 @@ import mods.ocminecart.common.ISyncEntity;
 import mods.ocminecart.common.Sound;
 import mods.ocminecart.common.blocks.INetRail;
 import mods.ocminecart.common.component.ComputerCartController;
+import mods.ocminecart.common.driver.CustomDriver;
 import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.inventory.ComputercartInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
@@ -48,6 +52,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -60,6 +65,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -75,7 +81,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
  * - Inventory Controller
  * - Tank Controller
  */
-public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Robot, ISyncEntity{
+public class ComputerCart extends AdvCart implements MachineHost, Analyzable, ISyncEntity, IComputerCart{
 	
 	private final boolean isServer = FMLCommonHandler.instance().getEffectiveSide().isServer();
 	
@@ -114,7 +120,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_insert");
 			else if(this.getSlotType(slot) == Slot.Upgrade && FMLCommonHandler.instance().getEffectiveSide().isServer()){
-				Item drv = Driver.driverFor(stack, this.host.getClass());
+				Item drv = CustomDriver.driverFor(stack, this.host.getClass());
 				if(drv instanceof Inventory){
 					((ComputerCart)host).setInventorySpace(0);
 					((ComputerCart)host).checkInventorySpace();
@@ -129,7 +135,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_eject");
 			else if(this.getSlotType(slot) == Slot.Upgrade && FMLCommonHandler.instance().getEffectiveSide().isServer()){
-				Item drv = Driver.driverFor(stack, this.host.getClass());
+				Item drv = CustomDriver.driverFor(stack, this.host.getClass());
 				if(drv instanceof Inventory){
 					((ComputerCart)host).setInventorySpace(0);
 					((ComputerCart)host).checkInventorySpace();
@@ -269,7 +275,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 		for(int i=0;i<this.compinv.getSizeInventory();i+=1){
 			if(this.compinv.getStackInSlot(i)!=null){
 				ItemStack stack = this.compinv.getStackInSlot(i);
-				Item drv = Driver.driverFor(stack, this.getClass());
+				Item drv = CustomDriver.driverFor(stack, this.getClass());
 				if(drv instanceof Inventory && this.invsize<this.maininv.getSizeInventory()){
 					this.invsize = this.invsize+((Inventory)drv).inventoryCapacity(stack);
 					if(this.invsize>this.maininv.getSizeInventory()) this.invsize = this.maininv.getSizeInventory();
@@ -640,22 +646,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	/*-----------------------------*/
 	
 	/*-------Inventory--------*/
-	@Override
-	public int[] getAccessibleSlotsFromSide(int p_94128_1_) {
-		return new int[]{};
-	}
-
-	@Override
-	public boolean canInsertItem(int p_102007_1_, ItemStack p_102007_2_,int p_102007_3_) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean canExtractItem(int p_102008_1_, ItemStack p_102008_2_,int p_102008_3_) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public int getSizeInventory() {
@@ -780,12 +770,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, Ro
 	}
 	
 	/*----------------------------*/
-
-	@Override
-	public boolean shouldAnimate() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	/*------Setters & Getters-----*/
 	public ComponetInventory getCompinv() {

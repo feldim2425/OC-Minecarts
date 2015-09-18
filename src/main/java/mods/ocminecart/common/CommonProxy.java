@@ -4,6 +4,8 @@ import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.assemble.AssembleRegister;
 import mods.ocminecart.common.blocks.ModBlocks;
 import mods.ocminecart.common.disassemble.DisassembleRegister;
+import mods.ocminecart.common.driver.CustomDriver;
+import mods.ocminecart.common.driver.DriverInventoryController;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.interaction.waila.ModWaila;
@@ -22,6 +24,7 @@ public class CommonProxy {
 		
 		DisassembleRegister.register();
 		AssembleRegister.register();
+		CustomDriver.init();
 		Recipes.init();
 		
 		ModWaila.initWailaModule();

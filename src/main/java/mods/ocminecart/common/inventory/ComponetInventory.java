@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 import li.cil.oc.api.API;
-import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.EnvironmentAware;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Container;
@@ -20,6 +19,7 @@ import li.cil.oc.common.component.Screen;
 import li.cil.oc.integration.opencomputers.DriverScreen;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
+import mods.ocminecart.common.driver.CustomDriver;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -128,7 +128,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 
 	@Override
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
-		Item driver = Driver.driverFor(stack,host.getClass());
+		Item driver = CustomDriver.driverFor(stack,host.getClass());
 		if(driver!=null && (driver.slot(stack)==this.getSlotType(slot) || this.getSlotType(slot) == Slot.Any) && driver.tier(stack) <= this.getSlotTier(slot))
 			return true;
 		return false;
@@ -141,7 +141,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	
 	public String getSlotType(int slot){
 		if(slot>=20 && slot<=22){
-			Item drv = Driver.driverFor(this.getContainer(slot-20));
+			Item drv = CustomDriver.driverFor(this.getContainer(slot-20));
 			if(drv instanceof Container){
 				return ((Container)drv).providedSlot(this.getContainer(slot-20));
 			}
@@ -152,7 +152,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	
 	public int getSlotTier(int slot){
 		if(slot>=20 && slot<=22){
-			Item drv = Driver.driverFor(this.getContainer(slot-20));
+			Item drv = CustomDriver.driverFor(this.getContainer(slot-20));
 			if(drv instanceof Container){
 				return ((Container)drv).providedTier(this.getContainer(slot-20));
 			}
@@ -183,7 +183,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 		for(int slot=0;slot<this.getSizeInventory();slot+=1){
 			ItemStack stack = this.getStackInSlot(slot);
 			if(stack!=null && this.components[slot]==null && this.isComponentSlot(slot, stack)){
-				Item drv = Driver.driverFor(stack,host.getClass());
+				Item drv = CustomDriver.driverFor(stack,host.getClass());
 				if(drv!=null){
 					ManagedEnvironment env = drv.createEnvironment(stack, host);
 					if(env!=null){
@@ -225,7 +225,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	public void removeTagsForDrop(){
 		for(int i=0;i<this.getSizeInventory();i+=1){
 			if(this.getStackInSlot(i)!=null){
-				Item drv = Driver.driverFor(this.getStackInSlot(i), this.host.getClass());
+				Item drv = CustomDriver.driverFor(this.getStackInSlot(i), this.host.getClass());
 				//Unfortunately it's not possible to make 'instanceof' with a Scala class and I'am lazy. So I check the Environment class.
 				if((drv instanceof EnvironmentAware) && ((EnvironmentAware)drv).providedEnvironment(this.getStackInSlot(i)) == Screen.class){
 					NBTTagCompound tag = this.dataTag(drv, this.getStackInSlot(i));
@@ -241,7 +241,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	}
 	
 	synchronized protected void onItemAdded(int slot, ItemStack stack){
-		Item drv = Driver.driverFor(stack,host.getClass());
+		Item drv = CustomDriver.driverFor(stack,host.getClass());
 		if(drv!=null){
 			ManagedEnvironment env = drv.createEnvironment(stack, host);
 			if(env!=null){
@@ -268,7 +268,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 			this.components[slot]=null;
 			if(this.updatingCompoents!=null && this.updatingCompoents.contains(component)) this.updatingCompoents.remove(component);
 			component.node().remove();
-			this.save(component, Driver.driverFor(stack), stack);
+			this.save(component, CustomDriver.driverFor(stack), stack);
 			component.node().remove();
 		}
 	}
@@ -345,14 +345,14 @@ public abstract class ComponetInventory implements IInventory, Environment{
 	    for (int slot=0; slot< this.getSizeInventory(); slot+=1) {
 	    	ItemStack stack = this.getStackInSlot(slot);
 	    	if (stack != null && this.components[slot]!=null) {
-	    		this.save(this.components[slot], Driver.driverFor(stack,host.getClass()), stack);
+	    		this.save(this.components[slot], CustomDriver.driverFor(stack,host.getClass()), stack);
 	    	}
 	     }
 	}
 	
 	public ItemStack getContainer(int index){
 		if(index >= 0 && index <= 2 && this.getStackInSlot(index)!=null){
-			Item it = Driver.driverFor(this.getStackInSlot(index));
+			Item it = CustomDriver.driverFor(this.getStackInSlot(index));
 			if(it instanceof Container) return this.getStackInSlot(index);
 		}
 		return null;
