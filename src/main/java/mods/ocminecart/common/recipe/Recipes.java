@@ -1,20 +1,28 @@
-package mods.ocminecart.common;
+package mods.ocminecart.common.recipe;
 
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.detail.ItemAPI;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.blocks.ModBlocks;
+import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
+import mods.ocminecart.common.recipe.event.ComputerCartRomCrafting;
+import mods.ocminecart.common.recipe.event.CraftingHandler;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.oredict.RecipeSorter.Category;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class Recipes {
 	
 	public static void init(){
 		ItemAPI items  = API.items;
+		
+		RecipeSorter.register(OCMinecart.MODID + ":romcrafting", RomCrafting.class , Category.SHAPELESS, "after:minecraft:shaped");
 		
 		GameRegistry.addShapedRecipe(new ItemStack(Item.getItemFromBlock(ModBlocks.block_NetworkRailBase),1), 
 		"CSC",
@@ -28,5 +36,9 @@ public class Recipes {
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_ComputerCartCase,1,0),"X","Y","Z",'X',Item.getItemFromBlock(items.get("case1").block()), 'Y', Items.minecart, 'Z', Item.getItemFromBlock(items.get("cable").block()));
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_ComputerCartCase,1,1),"X","Y","Z",'X',Item.getItemFromBlock(items.get("case2").block()), 'Y', Items.minecart, 'Z', Item.getItemFromBlock(items.get("cable").block()));
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_ComputerCartCase,1,2),"X","Y","Z",'X',Item.getItemFromBlock(items.get("case3").block()), 'Y', Items.minecart, 'Z', Item.getItemFromBlock(items.get("cable").block()));
+		
+		GameRegistry.addRecipe(new RomCrafting(new ItemStack(ModItems.item_ComputerCart) , ItemComputerCart.SLOT_ROM));
+		
+		CraftingHandler.registerNewHandler(new ComputerCartRomCrafting());
 	}
 }

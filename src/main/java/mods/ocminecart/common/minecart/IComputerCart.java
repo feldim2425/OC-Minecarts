@@ -15,7 +15,7 @@ public interface IComputerCart extends EnvironmentHost, Environment, Agent, Tier
 	//Returns Component in Slot
 	Environment getComponentInSlot(int index);
 	
-	//Synchronize Slot with all near Players
-	void synchronizeSlot(int slot);
+	//Synchronize Component Slot with all near Players
+	void synchronizeComponentSlot(int slot);
 
 }

@@ -1,22 +1,15 @@
 package mods.ocminecart.common.driver;
 
-import li.cil.oc.api.API;
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import li.cil.oc.api.Driver;
-import li.cil.oc.api.IMC;
-import li.cil.oc.api.Items;
 import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.HostAware;
-import li.cil.oc.server.component.UpgradeInventoryController;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
-import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 /* 
  * This is the best way I found to override the OC Item Drivers for the computer cart
@@ -29,6 +22,7 @@ public class CustomDriver {
 	
 	public static void init(){
 		CustomDriver.registerNewDriver(new DriverInventoryController());
+		CustomDriver.registerNewDriver(new DriverTankController());
 	}
 	
 	//Data tags for OC components

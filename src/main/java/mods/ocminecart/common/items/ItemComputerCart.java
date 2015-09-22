@@ -2,9 +2,11 @@ package mods.ocminecart.common.items;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.common.items.traits.IComponentInventoryItem;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.ComputerCartData;
 import net.minecraft.client.Minecraft;
@@ -24,10 +26,11 @@ import org.lwjgl.input.Keyboard;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemComputerCart extends MinecartItem{
+public class ItemComputerCart extends MinecartItem implements IComponentInventoryItem{
 
     private static final String __OBFID = "CL_00000049";
-
+    public static final int SLOT_ROM = 18;
+    
     public ItemComputerCart()
     {
     	super();
@@ -128,6 +131,24 @@ public class ItemComputerCart extends MinecartItem{
     		}
     	}
     }
+
+	@Override
+	public void setComponentList(ItemStack stack, Map<Integer, ItemStack> components) {
+		ComputerCartData data = ItemComputerCart.getData(stack);
+		if(data!=null){
+			data.setComponents(components);
+			ItemComputerCart.setData(stack, data);
+		}
+	}
+
+	@Override
+	public Map<Integer, ItemStack> getComponentList(ItemStack stack) {
+		ComputerCartData data = ItemComputerCart.getData(stack);
+		if(data!=null){
+			return data.getComponents();
+		}
+		return null;
+	}
 }
 
 

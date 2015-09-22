@@ -1,8 +1,5 @@
 package mods.ocminecart.common.driver;
 
-import mods.ocminecart.common.minecart.IComputerCart;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import li.cil.oc.api.Items;
 import li.cil.oc.api.driver.EnvironmentAware;
 import li.cil.oc.api.driver.EnvironmentHost;
@@ -10,7 +7,9 @@ import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.HostAware;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
-import li.cil.oc.server.component.UpgradeCrafting;;
+import mods.ocminecart.common.minecart.IComputerCart;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class DriverCraftingUpgrade implements Item, HostAware, EnvironmentAware {
 

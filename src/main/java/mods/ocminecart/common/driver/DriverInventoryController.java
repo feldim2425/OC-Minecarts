@@ -1,10 +1,5 @@
 package mods.ocminecart.common.driver;
 
-import mods.ocminecart.OCMinecart;
-import mods.ocminecart.common.minecart.ComputerCart;
-import mods.ocminecart.common.minecart.IComputerCart;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import li.cil.oc.api.Items;
 import li.cil.oc.api.driver.EnvironmentAware;
 import li.cil.oc.api.driver.EnvironmentHost;
@@ -14,12 +9,16 @@ import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.server.component.UpgradeInventoryController;
+import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.common.minecart.IComputerCart;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class DriverInventoryController implements Item, HostAware, EnvironmentAware {
 
 	@Override
 	public boolean worksWith(ItemStack stack, Class<? extends EnvironmentHost> host) {
-		if(host.equals(ComputerCart.class)) return this.worksWith(stack);
+		if(IComputerCart.class.isAssignableFrom(host)) return this.worksWith(stack);
 		return false;
 	}
 
