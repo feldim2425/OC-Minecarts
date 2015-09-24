@@ -116,7 +116,7 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
     	ComputerCartData data = getData(stack);
     	
     	String eloc = StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".storedenergy");
-    	list.add(EnumChatFormatting.WHITE+eloc+": "+EnumChatFormatting.GREEN+data.getEnergy());
+    	list.add(EnumChatFormatting.WHITE+eloc+": "+EnumChatFormatting.GREEN+String.format("%.0f", data.getEnergy()));
     	
     	if(!Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode())){
     		String key = GameSettings.getKeyDisplayString(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
