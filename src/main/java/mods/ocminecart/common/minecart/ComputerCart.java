@@ -35,7 +35,6 @@ import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.inventory.ComputercartInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
-import mods.ocminecart.common.util.ColorUtil;
 import mods.ocminecart.common.util.ComputerCartData;
 import mods.ocminecart.common.util.ItemUtil;
 import mods.ocminecart.network.ModNetwork;
@@ -789,8 +788,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public double getEngineState(){ return this.engineSpeed; }
 	public void setEngineState(double speed){ this.engineSpeed = speed; }
 	
-	public int getStateColor(){ return this.dataWatcher.getWatchableObjectInt(3); }
-	public void setStateColor(int color){ this.dataWatcher.updateObject(3, color);}
+	public int getLightColor(){ return this.dataWatcher.getWatchableObjectInt(3); }
+	public void setLightColor(int color){ this.dataWatcher.updateObject(3, color);}
 	
 	
 }

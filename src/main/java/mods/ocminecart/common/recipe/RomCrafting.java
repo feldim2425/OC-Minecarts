@@ -1,17 +1,11 @@
 package mods.ocminecart.common.recipe;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import li.cil.oc.api.Items;
 import mods.ocminecart.common.items.traits.IComponentInventoryItem;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
 

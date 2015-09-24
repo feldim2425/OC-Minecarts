@@ -5,12 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import li.cil.oc.api.Items;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 public class ComputerCartRomCrafting implements IExtraItemHandler{

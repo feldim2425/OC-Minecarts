@@ -1,11 +1,16 @@
 package mods.ocminecart.client.renderer.entity;
 
+import mods.ocminecart.OCMinecart;
+import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.common.util.ColorUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
 
 import org.lwjgl.opengl.GL11;
+
+import buildcraft.core.utils.ColorUtils;
 
 public class ComputerCartModel extends ModelBase {
 	ModelRenderer Shape1;
@@ -39,14 +44,15 @@ public class ComputerCartModel extends ModelBase {
   {
     Shape1.render(f);
     Shape3.render(f);
-    /*if(((ComputerCart) entity).machine().isRunning()){
+    if(((ComputerCart) entity).getRunning()){
     	ComputerCart cart = (ComputerCart) entity;
+    	byte rgb[] = ColorUtil.colorToRGB(cart.getLightColor());
     	GL11.glDisable(GL11.GL_LIGHTING);
     	Minecraft.getMinecraft().entityRenderer.disableLightmap(0);
     	GL11.glEnable(GL11.GL_BLEND);
-    	GL11.glColor3d(cart.getRGBColor()[0], cart.getRGBColor()[1], cart.getRGBColor()[2]);
-    }*/
-    //else GL11.glColor3d(0,0,0);
+    	GL11.glColor3d((double)(rgb[0] & 0xFF)/255D, (double)(rgb[1] & 0xFF)/255D, (double)(rgb[2] & 0xFF)/255D);
+    }
+    else GL11.glColor3d(0,0,0);
     Shape2.render(f);
     GL11.glEnable(GL11.GL_LIGHTING);
     Minecraft.getMinecraft().entityRenderer.enableLightmap(0);
