@@ -10,8 +10,6 @@ import net.minecraft.entity.Entity;
 
 import org.lwjgl.opengl.GL11;
 
-import buildcraft.core.utils.ColorUtils;
-
 public class ComputerCartModel extends ModelBase {
 	ModelRenderer Shape1;
     ModelRenderer Shape2;
