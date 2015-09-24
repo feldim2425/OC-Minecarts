@@ -35,6 +35,7 @@ import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.inventory.ComputercartInventory;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
+import mods.ocminecart.common.util.ColorUtil;
 import mods.ocminecart.common.util.ComputerCartData;
 import mods.ocminecart.common.util.ItemUtil;
 import mods.ocminecart.network.ModNetwork;
@@ -102,7 +103,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		protected void onItemAdded(int slot, ItemStack stack){
 			if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
 				super.onItemAdded(slot, stack);
-				ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate((ComputerCart) this.host,slot,stack), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+				((ComputerCart) this.host).synchronizeComponentSlot(slot);
 			}
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_insert");
@@ -118,7 +119,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		@Override
 		protected void onItemRemoved(int slot, ItemStack stack){
 			super.onItemRemoved(slot, stack);
-			if(FMLCommonHandler.instance().getEffectiveSide().isServer()) ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate((ComputerCart) this.host,slot,null), this.host.xPosition(), this.host.yPosition(), this.host.zPosition(), this.host.world());
+			if(FMLCommonHandler.instance().getEffectiveSide().isServer())
+				((ComputerCart) this.host).synchronizeComponentSlot(slot);
 			
 			if(this.getSlotType(slot) == Slot.Floppy) Sound.play(this.host, "floppy_eject");
 			else if(this.getSlotType(slot) == Slot.Upgrade && FMLCommonHandler.instance().getEffectiveSide().isServer()){
@@ -175,6 +177,9 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	@Override
 	protected void entityInit(){
 		super.entityInit();
+		
+		this.dataWatcher.addObject(3, 0x0000FF);
+		
 		this.machine = li.cil.oc.api.Machine.create(this);
 		if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
 			this.machine.setCostPerTick(Settings.ComputerCartEnergyUse);
@@ -286,7 +291,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 				if(this.machine.node().network()==null){
 					this.connectNetwork(); //Connect all nodes (Components & Controller)
 				}
-				//Update onRail
+				//Update onRail Value
 				this.onrail = this.onRail();
 			}
 		}
@@ -636,49 +641,41 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public int getSizeInventory() {
-		return 0;
+		return this.maininv.getSizeInventory();
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int p_70301_1_) {
-		// TODO Auto-generated method stub
+	public ItemStack getStackInSlot(int slot) {
+		return this.maininv.getStackInSlot(slot);
+	}
+
+	@Override
+	public ItemStack decrStackSize(int slot, int number) {
+		return this.maininv.decrStackSize(slot, number);
+	}
+
+	@Override
+	public ItemStack getStackInSlotOnClosing(int slot) {
 		return null;
 	}
 
 	@Override
-	public ItemStack decrStackSize(int p_70298_1_, int p_70298_2_) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ItemStack getStackInSlotOnClosing(int p_70304_1_) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void setInventorySlotContents(int p_70299_1_, ItemStack p_70299_2_) {
-		// TODO Auto-generated method stub
-		
+	public void setInventorySlotContents(int slot, ItemStack stack) {
+		this.maininv.setInventorySlotContents(slot, stack);
 	}
 
 	@Override
 	public String getInventoryName() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public int getInventoryStackLimit() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.maininv.getInventoryStackLimit();
 	}
 
 	@Override
 	public void markDirty() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -693,8 +690,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public void closeInventory() {}
 
 	@Override
-	public boolean isItemValidForSlot(int p_94041_1_, ItemStack p_94041_2_) {
-		return false;
+	public boolean isItemValidForSlot(int slot, ItemStack stack) {
+		return this.maininv.isItemValidForSlot(slot, stack);
 	}
 
 	@Override
@@ -717,13 +714,11 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public boolean canFill(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean canDrain(ForgeDirection from, Fluid fluid) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -751,9 +746,9 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	}
 
 	@Override
-	public void synchronizeSlot(int slot) {
+	public void synchronizeComponentSlot(int slot) {
 		if(!this.worldObj.isRemote)
-			ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate(this, slot, this.getStackInSlot(slot)), this.posX, this.posY, this.posZ, this.worldObj);
+			ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate(this, slot, this.compinv.getStackInSlot(slot)), this.posX, this.posY, this.posZ, this.worldObj);
 	}
 	
 	/*----------------------------*/
@@ -794,6 +789,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public double getEngineState(){ return this.engineSpeed; }
 	public void setEngineState(double speed){ this.engineSpeed = speed; }
 	
+	public int getStateColor(){ return this.dataWatcher.getWatchableObjectInt(3); }
+	public void setStateColor(int color){ this.dataWatcher.updateObject(3, color);}
 	
 	
 }
