@@ -31,7 +31,7 @@ public class Settings {
 		
 		OCMinecart.config.addCustomCategoryComment("networkrail", "Some Settings for the network rail");
 		
-		NetRailPowerTransfer= OCMinecart.config.get("networkrail", "transferspeed",100 , "Energy  new a Computer cart has stored [default: 100]").getInt(100);
+		NetRailPowerTransfer= OCMinecart.config.get("networkrail", "transferspeed",100 , "Energy that a network rail can transfer per tick [default: 100]").getInt(100);
 		
 		OCMinecart.config.save();
 	}
