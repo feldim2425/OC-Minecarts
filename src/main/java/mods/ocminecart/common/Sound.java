@@ -12,7 +12,8 @@ public class Sound {
 	public static boolean play(EnvironmentHost host, String sound){
 		if(globalTimeouts.containsKey(host)){
 			Map<String,Float> timer = globalTimeouts.get(host);
-			if(timer.getOrDefault(sound, 0F) <= System.currentTimeMillis()){
+			Float time = (timer.containsKey(sound)) ? timer.get(sound) : 0F;
+			if(time <= System.currentTimeMillis()){
 				host.world().playSoundEffect(host.xPosition(), host.yPosition(), host.zPosition(), Settings.OC_ResLoc+":"+sound, Settings.OC_SoundVolume, 1);
 				timer.put(sound, System.currentTimeMillis()+500F);
 				return true;
