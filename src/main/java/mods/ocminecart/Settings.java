@@ -27,7 +27,7 @@ public class Settings {
 		ComputerCartEnergyCap = OCMinecart.config.get("computercart", "energystore", 20000 , "Energy a Computer cart can store [default: 20000]").getInt(20000);
 		ComputerCartEnergyUse = OCMinecart.config.get("computercart", "energyuse", 0.25 , "Energy a Computer cart consume every tick [default: 0.25]").getDouble(0.25);
 		ComputerCartCreateEnergy= OCMinecart.config.get("computercart", "newenergy", 20000 , "Energy new a Computer cart has stored [default: 20000]").getInt(20000);
-		ComputerCartEngineUse= OCMinecart.config.get("computercart", "newenergy", 2 , "Energy multiplier for the Engine. Speed times Value [default: 2]").getDouble(2);
+		ComputerCartEngineUse= OCMinecart.config.get("computercart", "engineuse", 2 , "Energy multiplier for the Engine. Speed times Value [default: 2]").getDouble(2);
 		
 		OCMinecart.config.addCustomCategoryComment("networkrail", "Some Settings for the network rail");
 		
