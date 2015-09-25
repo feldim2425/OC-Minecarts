@@ -31,6 +31,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Slot;
@@ -60,6 +61,7 @@ public class ComputerCartGui extends GuiContainer {
 	private ResourceLocation textureScreen = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/robot.png");
 	private ResourceLocation textureOnOffButton = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/button_power.png");
 	private ResourceLocation ebar = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/bar.png");
+	private ResourceLocation selection = new ResourceLocation( Settings.OC_ResLoc , "textures/gui/robot_selection.png");
 	
 	//Container (as instance of ComputerCartContainer)
 	private ComputerCartContainer container;
@@ -152,10 +154,6 @@ public class ComputerCartGui extends GuiContainer {
 	
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mx, int my) {
-		IIcon non = SlotIcons.fromTier(-1);
-		this.mc.getTextureManager().bindTexture(TextureMap.locationItemsTexture);
-        this.drawTexturedModelRectFromIcon(170, 84+offset, non, 16, 16);
-        
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         if(this.container.getHasScreen() && this.textbuffer!=null){
             this.drawBufferLayer();
@@ -174,6 +172,10 @@ public class ComputerCartGui extends GuiContainer {
         //Highlight
         Iterator<Slot> list = this.container.inventorySlots.iterator();
         while(list.hasNext()) this.drawSlotHighlight(list.next());
+        
+        //Render selected slot
+        if(this.container.sizeinv > 0)
+        	this.drawSelection();
         
         //Tooltips
         if(this.func_146978_c(this.btPower.xPosition, this.btPower.yPosition, 18, 18, mx+this.guiLeft, my+this.guiTop)){
@@ -500,6 +502,9 @@ public class ComputerCartGui extends GuiContainer {
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		
+		IIcon non = SlotIcons.fromTier(-1);
+		this.drawTexturedModelRectFromIcon(this.guiLeft+170, this.guiTop+84+offset, non, 16, 16);
+		
 		//Render the Icons for Container Slots
 		while(list.hasNext()){
 			Slot slot = list.next();
@@ -519,4 +524,30 @@ public class ComputerCartGui extends GuiContainer {
 			}
 		}
 	}
+	private void drawSelection() {
+	    //int slot = this.container.getEntity().selectedSlot() - this.invslider.getScroll() * 4;
+		int slot = 1 - this.invslider.getScroll() * 4;
+	    if (slot >= 0 && slot < 16) {
+	    	GL11.glEnable(GL11.GL_BLEND);
+	    	GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+	    	RenderHelper.disableStandardItemLighting();
+	    	Minecraft.getMinecraft().renderEngine.bindTexture(selection);
+	    	double now = System.currentTimeMillis() / 1000.0;
+	    	double offsetV = (int)((now % 1) * 17) / 17D;
+	    	int x = guiLeft + 65 + (slot % 4) * (18);
+	    	int y = guiTop + 14 + offset + (slot / 4) * (18);
+	    	
+	    	//OCMinecart.logger.info(x+" : "+y);
+	    	
+	    	Tessellator t = Tessellator.instance;
+	    	t.startDrawingQuads();
+	      	t.addVertexWithUV(x, y, zLevel, 0, offsetV);
+	      	t.addVertexWithUV(x, y + 20, zLevel, 0, offsetV + 1D/17D);
+	      	t.addVertexWithUV(x + 20, y + 20, zLevel, 1, offsetV + 1D/17D);
+	      	t.addVertexWithUV(x + 20, y, zLevel, 1, offsetV);
+	      	t.draw();
+	      	RenderHelper.enableStandardItemLighting();
+	      	GL11.glDisable(GL11.GL_BLEND);
+	    }
+	  }
 }

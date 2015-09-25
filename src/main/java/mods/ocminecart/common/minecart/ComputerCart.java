@@ -24,6 +24,7 @@ import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
+import li.cil.oc.server.agent.Player;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.ISyncEntity;
@@ -56,6 +57,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidTank;
 import cpw.mods.fml.common.FMLCommonHandler;
 
 //The internal.Robot interface will get replaced by a custom Interface later.
@@ -72,21 +74,26 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	
 	private final boolean isServer = FMLCommonHandler.instance().getEffectiveSide().isServer();
 	
-	private int tier = -1;
-	private Machine machine;
-	private boolean firstupdate = true;
-	private boolean chDim = false;
-	private boolean isRun = false;
-	private ComputerCartController controller = new ComputerCartController(this);
-	private double startEnergy = -1;
-	private int invsize = 0;
+	private int tier = -1;	//The tier of the cart
+	private Machine machine; //The machine object
+	private boolean firstupdate = true; //true if the update() function gets called the first time
+	private boolean chDim = false;	//true if the cart changing the dimension (Portal, AE2 Storage,...)
+	private boolean isRun = false; //true if the machine is turned on;
+	private ComputerCartController controller = new ComputerCartController(this); //The computer cart component
+	private double startEnergy = -1; //Only used when placing the cart. Start energy stored in the item
+	private int invsize = 0; //The current inventory size depending on the Inventory Upgrades
 	private boolean onrail = false; // Store onRail from last tick to send a Signal
+	private int selSlot = 0; //The index of the current selected slot
+	private int selTank = 0; //The index of the current selected tank
+	//private Player player = new li.cil.oc.server.agent.Player(this);  //OC's fake player
+	private Player player;
+	private String name; //name of the cart
 	
 	private int cRailX = 0;	// Position of the connected Network Rail
 	private int cRailY = 0;
 	private int cRailZ = 0;
 	private int cRailDim = 0;
-	private boolean cRailCon = false;
+	private boolean cRailCon = false; //True if the card is connected to a network rail
 	private Node cRailNode = null; // This node will not get saved in NBT because it should automatic disconnect after restart; 
 	
 	
@@ -153,6 +160,19 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	
 	public ComputercartInventory maininv = new ComputercartInventory(this);
 	
+	public MultiTank tank = new MultiTank(){
+		@Override
+		public int tankCount() {
+			return 0;
+		}
+
+		@Override
+		public IFluidTank getFluidTank(int index) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	};
+	
 	public ComputerCart(World p_i1712_1_) {
 		super(p_i1712_1_);
 	}
@@ -193,7 +213,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		super.readEntityFromNBT(nbt);
 		
 		if(nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
-		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier");
+		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier"); //TODO: Remove this in the next version.
 		if(nbt.hasKey("controller")) this.controller.load(nbt.getCompoundTag("controller"));
 		if(nbt.hasKey("inventory")) this.maininv.readFromNBT((NBTTagList) nbt.getTag("inventory"));
 		if(nbt.hasKey("netrail")){
@@ -204,6 +224,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 			this.cRailZ = netrail.getInteger("posZ");
 			this.cRailDim = netrail.getInteger("posDim");
 		}
+		if(nbt.hasKey("settings")){
+			NBTTagCompound set = nbt.getCompoundTag("settings");
+			if(set.hasKey("lightcolor")) this.setLightColor(set.getInteger("lightcolor"));
+			if(set.hasKey("selectedslot")) this.selSlot = set.getInteger("selectedslot");
+			if(set.hasKey("selectedtank")) this.selTank = set.getInteger("selectedtank");
+			if(set.hasKey("tier")) this.tier = set.getInteger("tier");
+		}
+		
 		
 		this.machine.onHostChanged();
 		if(nbt.hasKey("machine"))this.machine.load(nbt.getCompoundTag("machine"));
@@ -221,13 +249,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		this.compinv.saveComponents();
 		
 		nbt.setTag("components", this.compinv.writeNTB());
-		nbt.setInteger("tier", this.tier);
 		nbt.setTag("inventory", this.maininv.writeToNBT());
 		
+		//Controller tag
 		NBTTagCompound controller = new NBTTagCompound();
 		this.controller.save(controller);
 		nbt.setTag("controller", controller);
 		
+		//Data about the connected rail
 		if(this.cRailCon){
 			NBTTagCompound netrail = new NBTTagCompound();
 			netrail.setInteger("posX", this.cRailX);
@@ -238,6 +267,13 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		}
 		else if(nbt.hasKey("netrail")) nbt.removeTag("netrail");
 		
+		//Some additional values like light color, selected Slot, ...
+		NBTTagCompound set = new NBTTagCompound();
+		set.setInteger("lightcolor", this.getLightColor());
+		set.setInteger("selectedslot",this.selSlot);
+		set.setInteger("selectedtank",this.selTank);
+		set.setInteger("tier", this.tier);
+		nbt.setTag("settings", set);
 		
 		NBTTagCompound machine = new NBTTagCompound();
 		this.machine.save(machine);
@@ -537,9 +573,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public void onMachineDisconnect(Node node) {}
 
 	@Override
-	public IInventory equipmentInventory() {
-		return null;
-	}
+	public IInventory equipmentInventory() { return null; }
 
 	@Override
 	public IInventory mainInventory() {
@@ -553,25 +587,30 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public int selectedSlot() {
-		return 0;
+		return this.selSlot;
 	}
 
 	@Override
 	public void setSelectedSlot(int index) {
+		if(index<this.maininv.getSizeInventory())
+			this.selSlot=index;
 	}
 
 	@Override
 	public int selectedTank() {
-		return 0;
+		return this.selTank;
 	}
 
 	@Override
 	public void setSelectedTank(int index) {
+		if(index<this.tank().tankCount())
+			this.selTank=index;
 	}
 
 	@Override
 	public EntityPlayer player() {
-		return null;
+		this.player.updatePositionAndRotation(player, this.facing(), this.facing());
+		return this.player;
 	}
 
 	@Override
@@ -588,20 +627,19 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public String ownerName() {
-		// TODO Auto-generated method stub
-		return null;
+		return li.cil.oc.Settings.get().fakePlayerName();
 	}
 
 	@Override
 	public UUID ownerUUID() {
-		// TODO Auto-generated method stub
-		return null;
+		return li.cil.oc.Settings.get().fakePlayerProfile().getId();
 	}
 
 	@Override
+	//http://jabelarminecraft.blogspot.co.at/p/minecraft-forge-172-finding-block.html
 	public ForgeDirection facing() {
-		// TODO Auto-generated method stub
-		return null;
+		int dir = MathHelper.floor_double((double) (this.rotationYaw * 4.0F / 360) + 0.50) & 3;
+		return ForgeDirection.getOrientation(dir);
 	}
 
 	@Override
@@ -665,7 +703,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public String getInventoryName() {
-		return null;
+		return "inventory."+OCMinecart.MODID+".computercart";
 	}
 
 	@Override
@@ -674,8 +712,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	}
 
 	@Override
-	public void markDirty() {
-	}
+	public void markDirty() {}
 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer player) {
@@ -684,7 +721,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public void openInventory() {}
-
 	@Override
 	public void closeInventory() {}
 
