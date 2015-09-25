@@ -525,8 +525,7 @@ public class ComputerCartGui extends GuiContainer {
 		}
 	}
 	private void drawSelection() {
-	    //int slot = this.container.getEntity().selectedSlot() - this.invslider.getScroll() * 4;
-		int slot = 1 - this.invslider.getScroll() * 4;
+		int slot = this.container.selSlot - this.invslider.getScroll() * 4;
 	    if (slot >= 0 && slot < 16) {
 	    	GL11.glEnable(GL11.GL_BLEND);
 	    	GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -534,8 +533,8 @@ public class ComputerCartGui extends GuiContainer {
 	    	Minecraft.getMinecraft().renderEngine.bindTexture(selection);
 	    	double now = System.currentTimeMillis() / 1000.0;
 	    	double offsetV = (int)((now % 1) * 17) / 17D;
-	    	int x = guiLeft + 65 + (slot % 4) * (18);
-	    	int y = guiTop + 14 + offset + (slot / 4) * (18);
+	    	int x = 168 + (slot % 4) * (18);
+	    	int y = 6 + offset + (slot / 4) * (18);
 	    	
 	    	//OCMinecart.logger.info(x+" : "+y);
 	    	

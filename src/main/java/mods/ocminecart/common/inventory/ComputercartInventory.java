@@ -17,7 +17,7 @@ public class ComputercartInventory extends Inventory {
 	
 	@Override
 	public int getSizeInventory() {
-		return 80;
+		return cart.getInventorySpace();
 	}
 
 	@Override
@@ -27,7 +27,9 @@ public class ComputercartInventory extends Inventory {
 
 	@Override
 	protected void slotChanged(int slot) {
-		if(!this.cart.worldObj.isRemote) this.cart.machine().signal("inventory_changed",slot);
+		if(!this.cart.worldObj.isRemote){
+			this.cart.machine().signal("inventory_changed",slot);
+		}
 	}
 	
 	public Iterable<ItemStack> removeOverflowItems(int size){
@@ -39,6 +41,11 @@ public class ComputercartInventory extends Inventory {
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public int getMaxSizeInventory() {
+		return 80;
 	}
 
 }

@@ -7,18 +7,18 @@ import net.minecraft.nbt.NBTTagList;
 
 public abstract class Inventory implements IInventory{
 	
-	private ItemStack[] stacks = new ItemStack[this.getSizeInventory()];
+	private ItemStack[] stacks = new ItemStack[this.getMaxSizeInventory()];
 
 	@Override
 	public ItemStack getStackInSlot(int slot) {
-		if(slot<this.getSizeInventory())
+		if(slot<this.getMaxSizeInventory())
 			return this.stacks[slot];
 		return null;
 	}
 
 	@Override
 	public ItemStack decrStackSize(int slot, int number) {
-		if(slot>=0 && slot<this.getSizeInventory()){
+		if(slot>=0 && slot<this.getMaxSizeInventory()){
 			if(number >= stacks[slot].stackSize){
 				ItemStack get = stacks[slot];
 				stacks[slot]=null;
@@ -45,7 +45,7 @@ public abstract class Inventory implements IInventory{
 	@Override
 	public void setInventorySlotContents(int slot, ItemStack stack) {
 		if(stack != null && stack.stackSize < 1) stack = null;
-		if(slot<this.getSizeInventory()){
+		if(slot<this.getMaxSizeInventory()){
 			stacks[slot] = stack;
 			this.slotChanged(slot);
 		}
@@ -54,7 +54,7 @@ public abstract class Inventory implements IInventory{
 	//This is the same as setInventorySlotContents but will not send a Signal to the machine;
 	private void updateSlotContents(int slot, ItemStack stack){
 		if(stack != null && stack.stackSize < 1) stack = null;
-		if(slot<this.getSizeInventory()){
+		if(slot<this.getMaxSizeInventory()){
 			stacks[slot] = stack;
 		}
 	}
@@ -90,7 +90,7 @@ public abstract class Inventory implements IInventory{
 	
 	public NBTTagList writeToNBT(){
 		NBTTagList tag = new NBTTagList();
-		for(byte i=0;i<this.getSizeInventory();i+=1){
+		for(byte i=0;i<this.getMaxSizeInventory();i+=1){
 			NBTTagCompound slot = new NBTTagCompound();
 			ItemStack stack = this.getStackInSlot(i);
 			slot.setByte("slot", i);
@@ -115,5 +115,7 @@ public abstract class Inventory implements IInventory{
 	}
 	
 	protected abstract void slotChanged(int slot);
+	
+	abstract public int getMaxSizeInventory();
 
 }

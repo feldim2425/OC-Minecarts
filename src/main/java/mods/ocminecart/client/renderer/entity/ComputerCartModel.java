@@ -1,6 +1,5 @@
 package mods.ocminecart.client.renderer.entity;
 
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.ColorUtil;
 import net.minecraft.client.Minecraft;

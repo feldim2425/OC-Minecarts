@@ -303,9 +303,9 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 			if(this.compinv.getStackInSlot(i)!=null){
 				ItemStack stack = this.compinv.getStackInSlot(i);
 				Item drv = CustomDriver.driverFor(stack, this.getClass());
-				if(drv instanceof Inventory && this.invsize<this.maininv.getSizeInventory()){
+				if(drv instanceof Inventory && this.invsize<this.maininv.getMaxSizeInventory()){
 					this.invsize = this.invsize+((Inventory)drv).inventoryCapacity(stack);
-					if(this.invsize>this.maininv.getSizeInventory()) this.invsize = this.maininv.getSizeInventory();
+					if(this.invsize>this.maininv.getMaxSizeInventory()) this.invsize = this.maininv.getMaxSizeInventory();
 				}
 			}
 		}
@@ -815,7 +815,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		return -1;
 	}
 	
-	public void setInventorySpace(int invsize) { this.invsize = invsize; }
+	protected void setInventorySpace(int invsize) { this.invsize = invsize; }
 	public int getInventorySpace() { return this.invsize; }
 	
 	public boolean getBreakState(){ return this.enableBreak; }

@@ -28,6 +28,7 @@ public class ComputerCartContainer extends Container {
 	public int smaxEnergy = -1;
 	public int sEnergy = -1;
 	public int sizeinv = -1;
+	public int selSlot = -1;
 	public boolean updatesize = false;
 	
 	
@@ -40,7 +41,7 @@ public class ComputerCartContainer extends Container {
 		this.addSlotToContainer(new ContainerSlot(entity.compinv, 21 , 206,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(1)));
 		this.addSlotToContainer(new ContainerSlot(entity.compinv, 22 , 224,232 - ((this.hasScreen) ? 0 : DELTA), entity.compinv.getContainer(2)));
 		
-		for(int i=0;i<entity.maininv.getSizeInventory();i+=1){
+		for(int i=0;i<entity.maininv.getMaxSizeInventory();i+=1){
 			this.addSlotToContainer(new Slot(entity.maininv, i, -10000, -10000));
 		}
 		
@@ -91,6 +92,7 @@ public class ComputerCartContainer extends Container {
 		craft.sendProgressBarUpdate(this, 0, (int) this.entity.getEnergy());
 		craft.sendProgressBarUpdate(this, 1, (int) this.entity.getMaxEnergy());
 		craft.sendProgressBarUpdate(this, 2, this.entity.getInventorySpace());
+		craft.sendProgressBarUpdate(this, 3, this.entity.selectedSlot());
 	}
 	
 	public void detectAndSendChanges(){
@@ -109,6 +111,10 @@ public class ComputerCartContainer extends Container {
         	
         	if(this.entity.getInventorySpace() != this.sizeinv){
         		craft.sendProgressBarUpdate(this, 2, this.entity.getInventorySpace());
+        	}
+        	
+        	if(this.entity.selectedSlot() != this.selSlot){
+        		craft.sendProgressBarUpdate(this, 3, this.entity.selectedSlot());
         	}
         }
 		
@@ -130,7 +136,9 @@ public class ComputerCartContainer extends Container {
 			this.updatesize = true;
 			this.sizeinv = value;
 			break;
-			
+		case 3:
+			this.selSlot = value;
+			break;
 		}
 	}
 }
