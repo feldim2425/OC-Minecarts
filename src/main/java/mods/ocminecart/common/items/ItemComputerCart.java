@@ -17,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
@@ -47,6 +48,17 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
 	public void getSubItems(Item item, CreativeTabs tab, List list){
 		//I will add a prebuild creative cart, but not yet. :P
 	}
+    
+    public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int xb, int yb, int zb, int p_77648_7_, float p_77648_8_, float p_77648_9_, float p_77648_10_){
+    	if(!world.isRemote && getData(stack)==null){
+    		player.inventory.setInventorySlotContents(player.inventory.currentItem , null);
+    		player.addChatMessage(new ChatComponentText(EnumChatFormatting.RED+"Sorry! Removed the invalid item"));
+    		return false;
+    	}
+    	else{
+    		return super.onItemUse(stack, player, world, xb, yb, zb, p_77648_7_, p_77648_8_, p_77648_9_, p_77648_10_);
+    	}
+    }
     
     public static ComputerCartData getData(ItemStack stack){
     	if((stack.getItem() instanceof ItemComputerCart) && stack.hasTagCompound()){

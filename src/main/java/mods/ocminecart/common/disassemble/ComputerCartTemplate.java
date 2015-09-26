@@ -21,7 +21,7 @@ public class ComputerCartTemplate {
 		ArrayList<ItemStack> list = new ArrayList<ItemStack>();	
 		
 		ComputerCartData data = ItemComputerCart.getData(stack);
-		
+		if(data==null) return new ItemStack[]{};
 		if(stack.getItem()==ModItems.item_ComputerCart){
 			if(data.getTier() < 3 && data.getTier() !=Tier.None()) 
 				list.add(new ItemStack(ModItems.item_ComputerCartCase,1,data.getTier()));
