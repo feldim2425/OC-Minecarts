@@ -49,7 +49,7 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
 	}
     
     public static ComputerCartData getData(ItemStack stack){
-    	if(stack.getItem() instanceof ItemComputerCart){
+    	if((stack.getItem() instanceof ItemComputerCart) && stack.hasTagCompound()){
     		ComputerCartData data = new ComputerCartData();
     		NBTTagCompound nbt = stack.getTagCompound();
     		if(nbt.hasKey("cartdata")){
@@ -80,7 +80,7 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
     	EnumChatFormatting color;
     	String tier;
     	ComputerCartData data = getData(stack);
-    	switch(data.getTier()){
+    	switch((data!=null) ? data.getTier() : -1){
     	case 0:
     		color = EnumChatFormatting.WHITE;
     		tier = "(Tier 1)";
@@ -114,6 +114,8 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
     	list.add(this.getDisplayString(stack, true));
     	
     	ComputerCartData data = getData(stack);
+    	
+    	if(data==null) return ;
     	
     	String eloc = StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".storedenergy");
     	list.add(EnumChatFormatting.WHITE+eloc+": "+EnumChatFormatting.GREEN+String.format("%.0f", data.getEnergy()));

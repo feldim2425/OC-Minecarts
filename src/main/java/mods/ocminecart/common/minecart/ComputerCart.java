@@ -179,6 +179,10 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	public ComputerCart(World w, double x, double y, double z, ComputerCartData data) {
 		super(w,x,y,z);
+		if(data==null){
+			this.setDead();
+			data=new ComputerCartData();
+		}
 		this.tier=data.getTier();
 		this.startEnergy=data.getEnergy();
 		
