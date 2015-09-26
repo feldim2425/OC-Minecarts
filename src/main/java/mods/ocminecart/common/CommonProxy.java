@@ -10,6 +10,7 @@ import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.recipe.Recipes;
 import mods.ocminecart.interaction.waila.ModWaila;
 import mods.ocminecart.network.ModNetwork;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 
@@ -27,7 +28,7 @@ public class CommonProxy {
 		CustomDriver.init();
 		Recipes.init();
 		
-		ModWaila.initWailaModule();
+		if(Loader.isModLoaded("Waila")) ModWaila.initWailaModule();
 	}
 
 	public void preInit() {

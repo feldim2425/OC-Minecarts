@@ -8,9 +8,7 @@ import cpw.mods.fml.common.event.FMLInterModComms;
 public class ModWaila {
 	
 	public static void initWailaModule(){
-		if(Loader.isModLoaded("Waila")){
-			FMLInterModComms.sendMessage("Waila", "register", "mods.ocminecart.interaction.waila.ModWaila.register");
-		}
+		FMLInterModComms.sendMessage("Waila", "register", "mods.ocminecart.interaction.waila.ModWaila.register");
 	}
 	
 	public static void register(IWailaRegistrar registrar){
