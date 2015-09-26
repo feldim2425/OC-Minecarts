@@ -85,8 +85,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	private boolean onrail = false; // Store onRail from last tick to send a Signal
 	private int selSlot = 0; //The index of the current selected slot
 	private int selTank = 0; //The index of the current selected tank
-	//private Player player = new li.cil.oc.server.agent.Player(this);  //OC's fake player
-	private Player player;
+	private Player player; //OC's fake player
 	private String name; //name of the cart
 	
 	private int cRailX = 0;	// Position of the connected Network Rail
@@ -330,8 +329,9 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 				if(this.machine.node().network()==null){
 					this.connectNetwork(); //Connect all nodes (Components & Controller)
 				}
-				//Update onRail Value
-				this.onrail = this.onRail();
+
+				this.onrail = this.onRail();  //Update onRail Value
+				this.player = new li.cil.oc.server.agent.Player(this);  //Set the fake Player
 			}
 		}
 		
