@@ -52,6 +52,7 @@ public class ComputerCartModel extends ModelBase {
     else GL11.glColor3d(0,0,0);
     Shape2.render(f);
     GL11.glEnable(GL11.GL_LIGHTING);
+    GL11.glDisable(GL11.GL_BLEND);
     Minecraft.getMinecraft().entityRenderer.enableLightmap(0);
     GL11.glColor3d(1,1,1);
   }
