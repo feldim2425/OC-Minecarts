@@ -24,7 +24,7 @@ public class ComputerCartT1Template {
 	}
 	
 	public static Object[] assemble(IInventory inventory){
-		return General.assemble(inventory, 1);
+		return General.assemble(inventory, 0);
 	}
 	
 	public static int[] getContainerTier(){
