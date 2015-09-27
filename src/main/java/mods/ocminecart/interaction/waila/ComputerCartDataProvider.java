@@ -7,8 +7,10 @@ import mcp.mobius.waila.api.IWailaEntityAccessor;
 import mcp.mobius.waila.api.IWailaEntityProvider;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.common.util.ComputerCartData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
@@ -23,7 +25,33 @@ public class ComputerCartDataProvider implements IWailaEntityProvider {
 
 	@Override
 	public List<String> getWailaHead(Entity entity, List<String> currenttip,
-			IWailaEntityAccessor accessor, IWailaConfigHandler config) {	//Unused
+			IWailaEntityAccessor accessor, IWailaConfigHandler config) {
+		NBTTagCompound tag = accessor.getNBTData();
+		String stier;
+		EnumChatFormatting color;
+    	switch(tag.getInteger("tier")){
+    	case 0:
+    		color = EnumChatFormatting.WHITE;
+    		stier = "(Tier 1)";
+    		break;
+    	case 1:
+    		color = EnumChatFormatting.YELLOW;
+    		stier = "(Tier 2)";
+    		break;
+    	case 2:
+    		color = EnumChatFormatting.AQUA;
+    		stier = "(Tier 3)";
+    		break;
+    	case 3:
+    		color = EnumChatFormatting.LIGHT_PURPLE;
+    		stier = "(Creative)";
+    		break;
+    	default:
+    		color = EnumChatFormatting.DARK_RED;
+    		stier = "ERROR!";
+    		break;
+    	}
+    	currenttip.set(0, color+StatCollector.translateToLocal("entity.ocminecart.computercart.name")+" "+stier);
 		return currenttip;
 	}
 
@@ -56,6 +84,7 @@ public class ComputerCartDataProvider implements IWailaEntityProvider {
 		NBTTagCompound newtag = new NBTTagCompound();
 		if(ent instanceof ComputerCart){
 			ComputerCart cart = (ComputerCart) ent;
+			newtag.setInteger("tier", cart.tier());
 			newtag.setInteger("energy", (int)Math.floor(cart.getEnergy()+0.5D));
 			newtag.setInteger("maxenergy", (int)Math.floor(cart.getMaxEnergy()));
 			newtag.setString("address", cart.node().address());

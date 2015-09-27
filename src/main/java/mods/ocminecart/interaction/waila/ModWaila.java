@@ -17,5 +17,6 @@ public class ModWaila {
 		registrar.registerNBTProvider(ccdp, ComputerCart.class);
 		
 		registrar.registerBodyProvider(ccdp, ComputerCart.class);
+		registrar.registerHeadProvider(ccdp, ComputerCart.class);
 	}
 }
