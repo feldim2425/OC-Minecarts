@@ -124,6 +124,16 @@ public class ComputerCartController implements ManagedEnvironment{
 		return new Object[]{};
 	}
 	
+	@Callback(doc="function():boolean -- Check if the cart is on a rail")
+	public Object[] onRail(Context context, Arguments arguments){
+		return new Object[]{this.cart.onRail()};
+	}
+	
+	@Callback(doc="function():boolean -- Check if the cart is connected to a network rail")
+	public Object[] hasNetworkRail(Context context, Arguments arguments){
+		return new Object[]{this.cart.hasNetRail()};
+	}
+	
 	/*--------Component-Functions-Inventory--------*/
 		
 	@Callback(doc = "function():number -- The size of this device's internal inventory.")
@@ -133,9 +143,12 @@ public class ComputerCartController implements ManagedEnvironment{
 	
 	@Callback(doc = "function([slot:number]):number -- Get the currently selected slot; set the selected slot if specified.")
 	public Object[] select(Context context, Arguments args){
-		int slot = args.optInteger(0, -1);
+		int slot = args.optInteger(0, 0);
 		if(slot > 0 && slot <= this.cart.maininv.getMaxSizeInventory()){
 			this.cart.setSelectedSlot(slot-1);
+		}
+		else if(slot!=0 && args.count() > 0){
+			return new Object[]{"invalid slot"};
 		}
 		return new Object[]{this.cart.selectedSlot()+1};
 	}
@@ -144,14 +157,14 @@ public class ComputerCartController implements ManagedEnvironment{
 	public Object[] count(Context context, Arguments args){
 		int slot = args.optInteger(0, -1);
 		int num = 0;
-		slot = (slot != -1) ? slot-1 : this.cart.selectedSlot();
+		slot = (args.count() > 0) ? slot-1 : this.cart.selectedSlot();
 		if(slot > 0 && slot <= this.cart.getInventorySpace()){
 			if(this.cart.mainInventory().getStackInSlot(slot-1)!=null){
 				num = this.cart.mainInventory().getStackInSlot(slot-1).stackSize;
 			}
 		}
 		else{
-			return new Object[]{null};
+			return new Object[]{"invalid slot"};
 		}
 		return new Object[]{num};
 	}
@@ -160,7 +173,7 @@ public class ComputerCartController implements ManagedEnvironment{
 	public Object[] space(Context context, Arguments args){
 		int slot = args.optInteger(0, -1);
 		int num = 0;
-		slot = (slot != -1) ? slot-1 : this.cart.selectedSlot();
+		slot = (args.count() > 0) ? slot-1 : this.cart.selectedSlot();
 		if(slot > 0 && slot <= this.cart.getInventorySpace()){
 			ItemStack stack = this.cart.mainInventory().getStackInSlot(slot-1);
 			if(stack!=null){
@@ -172,7 +185,7 @@ public class ComputerCartController implements ManagedEnvironment{
 			}
 		}
 		else{
-			return new Object[]{null};
+			return new Object[]{"invalid slot"};
 		}
 		return new Object[]{num};
 	}
@@ -185,17 +198,18 @@ public class ComputerCartController implements ManagedEnvironment{
 		if(slotA>=0 && slotA<this.cart.mainInventory().getSizeInventory()){
 			ItemStack stackA = this.cart.mainInventory().getStackInSlot(slotA);
 			ItemStack stackB = this.cart.mainInventory().getStackInSlot(slotB);
-			result = stackA!=null && stackB!=null && stackA.isItemEqual(stackB);
+			result = (stackA==null && stackB==null) || 
+					(stackA!=null && stackB!=null && stackA.isItemEqual(stackB));
 			return new Object[]{result};
 		}
-		return new Object[]{null};
+		return new Object[]{"invalid slot"};
 	}
 	
 	@Callback(doc = "function(toSlot:number[, amount:number]):boolean -- Move up to the specified amount of items from the selected slot into the specified slot.")
 	public Object[] transferTo(Context context, Arguments args){
 		int tslot = args.checkInteger(0) - 1;
 		int number = args.optInteger(1, this.cart.mainInventory().getInventoryStackLimit());
-		if(!(tslot>=0 && tslot<this.cart.mainInventory().getSizeInventory())) return new Object[]{null};
+		if(!(tslot>=0 && tslot<this.cart.mainInventory().getSizeInventory())) return new Object[]{"invalid slot"};
 		
 		ItemStack stackT = this.cart.mainInventory().getStackInSlot(tslot);
 		ItemStack stackS = this.cart.mainInventory().getStackInSlot(this.cart.selectedSlot());

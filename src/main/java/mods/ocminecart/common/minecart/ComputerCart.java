@@ -159,7 +159,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	
 	public ComputercartInventory maininv = new ComputercartInventory(this);
 	
-	public MultiTank tank = new MultiTank(){
+	public MultiTank tanks = new MultiTank(){
 		@Override
 		public int tankCount() {
 			return 0;
@@ -674,7 +674,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public int tier() {
-		return this.tier();
+		return this.tier;
 	}
 	/*-----------------------------*/
 	
@@ -831,5 +831,5 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public int getLightColor(){ return this.dataWatcher.getWatchableObjectInt(3); }
 	public void setLightColor(int color){ this.dataWatcher.updateObject(3, color);}
 	
-	
+	public boolean hasNetRail(){ return this.cRailCon; }
 }
