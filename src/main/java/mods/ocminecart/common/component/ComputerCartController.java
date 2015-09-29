@@ -9,9 +9,13 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.Visibility;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.IFluidTank;
 
 
 public class ComputerCartController implements ManagedEnvironment{
@@ -147,8 +151,8 @@ public class ComputerCartController implements ManagedEnvironment{
 		if(slot > 0 && slot <= this.cart.maininv.getMaxSizeInventory()){
 			this.cart.setSelectedSlot(slot-1);
 		}
-		else if(slot!=0 && args.count() > 0){
-			return new Object[]{"invalid slot"};
+		else if(args.count() > 0){
+			throw new IllegalArgumentException("invalid slot");
 		}
 		return new Object[]{this.cart.selectedSlot()+1};
 	}
@@ -164,7 +168,7 @@ public class ComputerCartController implements ManagedEnvironment{
 			}
 		}
 		else{
-			return new Object[]{"invalid slot"};
+			throw new IllegalArgumentException("invalid slot");
 		}
 		return new Object[]{num};
 	}
@@ -185,7 +189,7 @@ public class ComputerCartController implements ManagedEnvironment{
 			}
 		}
 		else{
-			return new Object[]{"invalid slot"};
+			throw new IllegalArgumentException("invalid slot");
 		}
 		return new Object[]{num};
 	}
@@ -195,21 +199,24 @@ public class ComputerCartController implements ManagedEnvironment{
 		int slotA = args.checkInteger(0) - 1;
 		int slotB = this.cart.selectedSlot();
 		boolean result;
-		if(slotA>=0 && slotA<this.cart.mainInventory().getSizeInventory()){
+		if(slotA>=0 && slotA<this.cart.mainInventory().getSizeInventory() && slotB>=0 && slotB<this.cart.mainInventory().getSizeInventory()){
 			ItemStack stackA = this.cart.mainInventory().getStackInSlot(slotA);
 			ItemStack stackB = this.cart.mainInventory().getStackInSlot(slotB);
 			result = (stackA==null && stackB==null) || 
 					(stackA!=null && stackB!=null && stackA.isItemEqual(stackB));
 			return new Object[]{result};
 		}
-		return new Object[]{"invalid slot"};
+		throw new IllegalArgumentException("invalid slot");
 	}
 	
 	@Callback(doc = "function(toSlot:number[, amount:number]):boolean -- Move up to the specified amount of items from the selected slot into the specified slot.")
 	public Object[] transferTo(Context context, Arguments args){
 		int tslot = args.checkInteger(0) - 1;
 		int number = args.optInteger(1, this.cart.mainInventory().getInventoryStackLimit());
-		if(!(tslot>=0 && tslot<this.cart.mainInventory().getSizeInventory())) return new Object[]{"invalid slot"};
+		if(!(tslot>=0 && tslot<this.cart.mainInventory().getSizeInventory()))
+			throw new IllegalArgumentException("invalid slot");
+		if(!(this.cart.selectedSlot()>=0 && this.cart.selectedSlot()<this.cart.mainInventory().getSizeInventory()))
+			throw new IllegalArgumentException("invalid slot");
 		
 		ItemStack stackT = this.cart.mainInventory().getStackInSlot(tslot);
 		ItemStack stackS = this.cart.mainInventory().getStackInSlot(this.cart.selectedSlot());
@@ -220,7 +227,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		int maxStack = Math.min(this.cart.mainInventory().getInventoryStackLimit(), stackS.getMaxStackSize());
 		items = maxStack - ((stackT!=null) ? stackT.stackSize : 0);
 		items = Math.min(items, number);
-		if(items==0) return new Object[]{items==number};
+		if(items<=0) return new Object[]{false};
 		ItemStack dif = this.cart.mainInventory().decrStackSize(this.cart.selectedSlot(), items);
 		if(stackT!=null){
 			stackT.stackSize+=dif.stackSize;
@@ -230,4 +237,88 @@ public class ComputerCartController implements ManagedEnvironment{
 		}
 		return new Object[]{true};
 	}
+	
+	/*--------Component-Functions-Tank--------*/
+	
+	 @Callback(doc = "function():number -- The number of tanks installed in the device.")
+	 public Object[] tankCount(Context context, Arguments args){
+		 return new Object[]{ this.cart.tankcount() };
+	 }
+	 
+	 @Callback(doc = "function([index:number]):number -- Select a tank and/or get the number of the currently selected tank.")
+	 public Object[] selectTank(Context context, Arguments args){
+		 int index = args.optInteger(0, 0);
+		 if(index > 0 && index <=this.cart.tankcount())
+			 this.cart.setSelectedTank(index);
+		 else if(args.count() > 0)
+			 throw new IllegalArgumentException("invalid tank index");
+		 return new Object[]{this.cart.selectedTank()};
+	 }
+	 
+	 @Callback(direct = true, doc = "function([index:number]):number -- Get the fluid amount in the specified or selected tank.")
+	 public Object[] tankLevel(Context context, Arguments args){
+		 int index = args.optInteger(0, 0);
+		 index = (args.count()>0) ? index : this.cart.selectedTank();
+		 if(!(index>0 && index<=this.cart.tankcount()))
+			 throw new IllegalArgumentException("invalid tank index");
+		 return new Object[]{ this.cart.getTank(index).getFluidAmount() };
+	 }
+	 
+	 @Callback(direct = true, doc = "function([index:number]):number -- Get the remaining fluid capacity in the specified or selected tank.")
+	 public Object[] tankSpace(Context context, Arguments args){
+		 int index = args.optInteger(0, 0);
+		 index = (args.count()>0) ? index : this.cart.selectedTank();
+		 if(!(index>0 && index<=this.cart.tankcount()))
+			 throw new IllegalArgumentException("invalid tank index");
+		 IFluidTank tank = this.cart.getTank(index);
+		 return new Object[]{ tank.getCapacity() - tank.getFluidAmount() };
+	 }
+	 
+	 @Callback(doc = "function(index:number):boolean -- Compares the fluids in the selected and the specified tank. Returns true if equal.")
+	 public Object[] compareFluidTo(Context context, Arguments args){
+		 int tankA = args.checkInteger(0);
+		 int tankB = this.cart.selectedTank();
+		 if(!(tankA>0 && tankA<=this.cart.tankcount()))
+			 throw new IllegalArgumentException("invalid tank index");
+		 if(!(tankB>0 && tankB<=this.cart.tankcount()))
+			 throw new IllegalArgumentException("invalid tank index");
+		 
+		 FluidStack stackA = this.cart.getTank(tankA).getFluid();
+		 FluidStack stackB = this.cart.getTank(tankB).getFluid();
+		 boolean res = (stackA==null && stackB==null);
+		 if(!res && stackA!=null && stackB!=null)
+			 res = stackA.isFluidEqual(stackB);
+		 return new Object[]{ res };
+	 }
+	 
+	 @Callback(doc = "function(index:number[, count:number=1000]):boolean -- Move the specified amount of fluid from the selected tank into the specified tank.")
+	 public Object[] transferFluidTo(Context context, Arguments args){
+		 int tankA = args.checkInteger(0);
+		 int tankB = this.cart.selectedTank();
+		 int count = args.optInteger(1, Integer.MAX_VALUE);
+		 if(!(tankA>0 && tankA<=this.cart.tankcount()))
+			 throw new IllegalArgumentException("invalid tank index");
+		 if(!(tankB>0 && tankB<=this.cart.tankcount()))
+			 throw new IllegalArgumentException("invalid tank index");
+		 IFluidTank tankT = this.cart.getTank(tankA);
+		 IFluidTank tankS = this.cart.getTank(tankB);
+		 
+		 if(tankS.getFluid()==null || (tankT!=null && tankS.getFluid().isFluidEqual(tankT.getFluid())))
+			 return new Object[]{ false };
+		 
+		 FluidStack sim = tankS.drain(count, false);	//Simulate the transfer to get the max. moveable amount.
+		 int move = tankT.fill(sim, false);
+		 
+		 if(move<=0) return new Object[]{ false };
+		 
+		 FluidStack mv = tankS.drain(move, true);
+		 int over = tankT.fill(mv, true);
+		 over-=mv.amount;
+		 if(over>0){	//Just in case we drained too much.
+			 FluidStack ret = mv.copy();
+			 ret.amount = over;
+			 tankS.fill(ret, true);
+		 }
+		 return new Object[]{ true };
+	 }
 }

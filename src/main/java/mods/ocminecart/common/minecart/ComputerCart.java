@@ -38,6 +38,7 @@ import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ComputerCartData;
 import mods.ocminecart.common.util.ItemUtil;
+import mods.ocminecart.common.util.RotationHelper;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventoryUpdate;
 import mods.ocminecart.network.message.EntitySyncRequest;
@@ -84,7 +85,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	private int invsize = 0; //The current inventory size depending on the Inventory Upgrades
 	private boolean onrail = false; // Store onRail from last tick to send a Signal
 	private int selSlot = 0; //The index of the current selected slot
-	private int selTank = 0; //The index of the current selected tank
+	private int selTank = 1; //The index of the current selected tank
 	private Player player; //OC's fake player
 	private String name; //name of the cart
 	
@@ -162,13 +163,12 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public MultiTank tanks = new MultiTank(){
 		@Override
 		public int tankCount() {
-			return 0;
+			return ComputerCart.this.tankcount();
 		}
 
 		@Override
 		public IFluidTank getFluidTank(int index) {
-			// TODO Auto-generated method stub
-			return null;
+			return ComputerCart.this.getTank(index);
 		}
 	};
 	
@@ -586,7 +586,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public MultiTank tank() {
-		return null;
+		return this.tanks;
 	}
 
 	@Override
@@ -607,7 +607,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public void setSelectedTank(int index) {
-		if(index<this.tank().tankCount())
+		if(index<=this.tank().tankCount())
 			this.selTank=index;
 	}
 
@@ -648,14 +648,12 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public ForgeDirection toGlobal(ForgeDirection value) {
-		// TODO Auto-generated method stub
-		return null;
+		return RotationHelper.calcGlobalDirection(value, this.facing());
 	}
 
 	@Override
 	public ForgeDirection toLocal(ForgeDirection value) {
-		// TODO Auto-generated method stub
-		return null;
+		return RotationHelper.calcLocalDirection(value, this.facing());
 	}
 
 	@Override
@@ -732,22 +730,42 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public boolean isItemValidForSlot(int slot, ItemStack stack) {
 		return this.maininv.isItemValidForSlot(slot, stack);
 	}
-
+	
+/*------Tanks-------*/
+	
+	public int tankcount(){
+		int c = 0;
+		for(int i=0;i<this.compinv.getSizeInventory();i+=1){
+			if(this.compinv.getSlotComponent(i) instanceof IFluidTank){
+				c+=1;
+			}
+		}
+		return c;
+	}
+	
+	public IFluidTank getTank(int index){
+		int c = 0;
+		for(int i=0;i<this.compinv.getSizeInventory();i+=1){
+			if(this.compinv.getSlotComponent(i) instanceof IFluidTank){
+				c+=1;
+				if(c==index) return (IFluidTank) this.compinv.getSlotComponent(i);
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public int fill(ForgeDirection from, FluidStack resource, boolean doFill) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, FluidStack resource, boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public FluidStack drain(ForgeDirection from, int maxDrain, boolean doDrain) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -763,10 +781,11 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		// TODO Auto-generated method stub
 		return null;
 	}
+	/*--------------------*/
 
+	/*-----Component-Inv------*/
 	@Override
 	public int componentCount() {
 		int count = 0;
