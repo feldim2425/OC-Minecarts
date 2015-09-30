@@ -21,7 +21,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 @Mod(modid = OCMinecart.MODID, name=OCMinecart.NAME, version=OCMinecart.VERSION, dependencies = "required-after:OpenComputers@[1.5.13,); after:Waile@[1.5.8a,)")
 public class OCMinecart {
 	public static final String MODID = "ocminecart";
-	public static final String VERSION = "0.3-alpha";
+	public static final String VERSION = "0.4-alpha";
 	public static final String NAME = "OC-Minecarts";
 	
 	@Instance(OCMinecart.MODID)
@@ -67,5 +67,6 @@ public class OCMinecart {
 		if(Loader.isModLoaded("appliedenergistics2")) OCMinecart.logger.info("Found Mod: AE2");
 		if(Loader.isModLoaded("NotEnoughItems")) OCMinecart.logger.info("Found Mod: NEI");
 		if(Loader.isModLoaded("Waila")) OCMinecart.logger.info("Found Mod: WAILA");
+		if(Loader.isModLoaded("Railcraft")) OCMinecart.logger.info("Found Mod: Railcraft");
 	}
 }

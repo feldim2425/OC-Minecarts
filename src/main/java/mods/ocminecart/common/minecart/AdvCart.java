@@ -1,5 +1,7 @@
 package mods.ocminecart.common.minecart;
 
+import cpw.mods.fml.common.Loader;
+import mods.ocminecart.Settings;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
@@ -29,7 +31,7 @@ public class AdvCart extends EntityMinecart {
 
 	protected void entityInit() {
 		super.entityInit();
-		// Freie DataWatcher 2-16, 23-32
+		// Free DataWatcher 2-16, 23-32
 	}
 	
 	public void writeEntityToNBT(NBTTagCompound nbt){
@@ -117,6 +119,8 @@ public class AdvCart extends EntityMinecart {
     }
 
 	public AxisAlignedBB getBoundingBox() {
+		if(Loader.isModLoaded("Railcraft") && Settings.GeneralFixCartBox)	//The Railcraft collision handler breaks some things
+			return super.getBoundingBox();
 		return this.getCollisionBox(this);
 	}
 
