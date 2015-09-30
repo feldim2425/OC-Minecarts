@@ -1,7 +1,9 @@
 package mods.ocminecart.common.minecart;
 
 import cpw.mods.fml.common.Loader;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
+import mods.ocminecart.common.util.BitUtil;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
@@ -15,8 +17,8 @@ import net.minecraft.world.World;
 //Later I will add the Railcraft integration here
 public class AdvCart extends EntityMinecart {
 
-	protected boolean enableBreak = false; // enable break
-	protected double engineSpeed = 0.0D;
+	//protected boolean enableBreak = false; // enable break
+	//protected double engineSpeed = 0.0D;
 
 	public AdvCart(World p_i1713_1_, double p_i1713_2_, double p_i1713_4_,
 			double p_i1713_6_) {
@@ -31,14 +33,26 @@ public class AdvCart extends EntityMinecart {
 
 	protected void entityInit() {
 		super.entityInit();
-		// Free DataWatcher 2-16, 23-32
+		
+		this.dataWatcher.addObject(3, (byte)0);
+		this.dataWatcher.addObject(4, 0.0F);
+		// Free DataWatcher 5-16, 23-32
 	}
+	
+	protected final void setBreak(boolean b){ 
+		this.dataWatcher.updateObject(3, BitUtil.setBit(b, this.dataWatcher.getWatchableObjectByte(3), 0));
+	}
+	protected final boolean getBreak(){ return BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0); }
+	protected final void setEngine(double d){ this.dataWatcher.updateObject(4, (float)d); }
+	protected final double getEngine(){ return this.dataWatcher.getWatchableObjectFloat(4); }
+	public final boolean isLocked(){ return BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1); }
+	public final boolean isEngineActive(){ return this.getEngine()!=0 && !this.isLocked() && !this.getBreak() && this.onRail(); }
 	
 	public void writeEntityToNBT(NBTTagCompound nbt){
 		super.writeEntityToNBT(nbt);
 		NBTTagCompound tag = new NBTTagCompound();
-		tag.setDouble("enginespeed", this.engineSpeed);
-		tag.setBoolean("break", this.enableBreak);
+		tag.setDouble("enginespeed", this.dataWatcher.getWatchableObjectFloat(4));
+		tag.setBoolean("break", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0));
 		nbt.setTag("advcart", tag);
 	}
 	
@@ -46,8 +60,9 @@ public class AdvCart extends EntityMinecart {
 		super.readEntityFromNBT(nbt);
 		if(nbt.hasKey("advcart")){
 			NBTTagCompound tag = (NBTTagCompound) nbt.getTag("advcart");
-			if(tag.hasKey("enginespeed")) this.engineSpeed = tag.getDouble("enginespeed");
-			if(tag.hasKey("break")) this.enableBreak = tag.getBoolean("break");
+			if(tag.hasKey("enginespeed")) this.dataWatcher.updateObject(4, (float)tag.getDouble("enginespeed"));
+			if(tag.hasKey("break")) 
+				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("break"), this.dataWatcher.getWatchableObjectByte(3), 0));
 		}
 	}
 
@@ -80,19 +95,19 @@ public class AdvCart extends EntityMinecart {
 	}
 
     protected void applyDrag() {
-        if(!this.enableBreak){
+        if(!(BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0) || BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1))){
 			this.motionX *= 0.9699999785423279D;
 			this.motionY *= 0.0D;
         	this.motionZ *= 0.9699999785423279D;
         	
-        	if(this.engineSpeed!=0){
+        	if(this.dataWatcher.getWatchableObjectFloat(4)!=0){
         		double yaw = this.rotationYaw * Math.PI / 180.0;
         		
         		this.motionX += Math.cos(yaw) * 10;
         		this.motionZ += Math.sin(yaw) * 10;
         		
-        		double nMotionX = Math.min( Math.abs(this.motionX) , this.engineSpeed);
-        		double nMotionZ = Math.min( Math.abs(this.motionZ) , this.engineSpeed);
+        		double nMotionX = Math.min( Math.abs(this.motionX) , this.dataWatcher.getWatchableObjectFloat(4));
+        		double nMotionZ = Math.min( Math.abs(this.motionZ) , this.dataWatcher.getWatchableObjectFloat(4));
         		
         		if(this.motionX < 0) this.motionX = - nMotionX;
         		else this.motionX = nMotionX;
@@ -107,7 +122,7 @@ public class AdvCart extends EntityMinecart {
             	this.motionZ = 0;
         	}
         }
-        else if (this.enableBreak){
+        else if(!BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1)){
         	this.motionX = 0;
         	this.motionZ = 0;
         	this.setPosition(this.lastTickPosX, this.posY, this.lastTickPosZ);  // Fix: Bug on Booster Tracks (Reset Position)
@@ -125,7 +140,13 @@ public class AdvCart extends EntityMinecart {
 	}
 
 	public boolean canBePushed() {
-		return (!this.enableBreak || !onRail());
+		return (!BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3),0) || !onRail());
+	}
+	
+	/*-------Railcraft-------*/
+	
+	public void lockdown(boolean lock){
+		this.dataWatcher.updateObject(3, BitUtil.setBit(lock, this.dataWatcher.getWatchableObjectByte(3), 1));
 	}
 
 

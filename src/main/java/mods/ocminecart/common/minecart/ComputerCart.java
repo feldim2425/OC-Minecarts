@@ -202,7 +202,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	protected void entityInit(){
 		super.entityInit();
 		
-		this.dataWatcher.addObject(3, 0x0000FF);
+		this.dataWatcher.addObject(24, 0x0000FF);
 		
 		this.machine = li.cil.oc.api.Machine.create(this);
 		if(FMLCommonHandler.instance().getEffectiveSide().isServer()){
@@ -347,14 +347,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 			if(this.isRun != this.machine.isRunning()){
 				this.isRun=this.machine.isRunning();
 				ModNetwork.sendToNearPlayers(new UpdateRunning(this,this.isRun), this.posX, this.posY, this.posZ, this.worldObj);
-				if(!this.isRun) this.engineSpeed = 0;
+				if(!this.isRun) this.setEngine(0);
 			}
 			//Consume energy for the Engine
-			if(this.engineSpeed != 0 && !this.enableBreak && this.onRail()){
-				if(!((Connector)this.machine.node()).tryChangeBuffer(-1.0 * this.engineSpeed * Settings.ComputerCartEngineUse))
+			if(this.isEngineActive()){
+				if(!((Connector)this.machine.node()).tryChangeBuffer(-1.0 * this.getEngine() * Settings.ComputerCartEngineUse))
 				{
-					this.machine.signal("engine_failed",this.engineSpeed);
-					this.engineSpeed = 0;
+					this.machine.signal("engine_failed",this.getEngine());
+					this.setEngine(0);
 				}
 			}
 			//Check if the cart is on a Track
@@ -813,7 +813,12 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 			ModNetwork.sendToNearPlayers(new ComputercartInventoryUpdate(this, slot, this.compinv.getStackInSlot(slot)), this.posX, this.posY, this.posZ, this.worldObj);
 	}
 	
-	/*----------------------------*/
+	/*---------Railcraft---------*/
+	
+	public void lockdown(boolean lock){
+		super.lockdown(lock);
+		this.machine.signal("cart_lockdown", lock);
+	}
 
 	/*------Setters & Getters-----*/
 	public ComponetInventory getCompinv() {
@@ -845,14 +850,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	protected void setInventorySpace(int invsize) { this.invsize = invsize; }
 	public int getInventorySpace() { return this.invsize; }
 	
-	public boolean getBreakState(){ return this.enableBreak; }
-	public void setBreakState(boolean state){ this.enableBreak = state; }
+	public boolean getBreakState(){ return this.getBreak(); }
+	public void setBreakState(boolean state){ this.setBreak(state);}
 	
-	public double getEngineState(){ return this.engineSpeed; }
-	public void setEngineState(double speed){ this.engineSpeed = speed; }
+	public double getEngineState(){ return this.getEngine(); }
+	public void setEngineState(double speed){ this.setEngine(speed); }
 	
-	public int getLightColor(){ return this.dataWatcher.getWatchableObjectInt(3); }
-	public void setLightColor(int color){ this.dataWatcher.updateObject(3, color);}
+	public int getLightColor(){ return this.dataWatcher.getWatchableObjectInt(24); }
+	public void setLightColor(int color){ this.dataWatcher.updateObject(24, color);}
 	
 	public boolean hasNetRail(){ return this.cRailCon; }
 }

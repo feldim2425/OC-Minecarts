@@ -66,6 +66,7 @@ dependencies {
           exclude module: "buildcraft"
 	  exclude module: "industrialcraft-2"
           exclude module: "BetterStorage"
+	  exclude module: "RotaryCraft"
       }
       compile "codechicken:CodeChickenCore:${config.minecraft.version}-${config.ccc.version}:dev"
       compile "codechicken:CodeChickenLib:${config.minecraft.version}-${config.ccl.version}:dev"
