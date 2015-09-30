@@ -39,6 +39,7 @@ import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ComputerCartData;
 import mods.ocminecart.common.util.ItemUtil;
 import mods.ocminecart.common.util.RotationHelper;
+import mods.ocminecart.interaction.railcraft.RailcraftUtils;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ComputercartInventoryUpdate;
 import mods.ocminecart.network.message.EntitySyncRequest;
@@ -60,6 +61,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
 import net.minecraftforge.fluids.IFluidTank;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
 
 //The internal.Robot interface will get replaced by a custom Interface later.
 //But I will do that later because I have to create custom dirvers for some internal components. (and I'am lazy) ;)
@@ -404,6 +406,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public boolean interactFirst(EntityPlayer p){
 		ItemStack refMan = API.items.get("manual").createItemStack(1);
 		boolean openwiki = p.getHeldItem()!=null && p.isSneaking() && p.getHeldItem().getItem() == refMan.getItem() && p.getHeldItem().getItemDamage() == refMan.getItemDamage();
+		
+		if(Loader.isModLoaded("Railcraft") && RailcraftUtils.isUsingChrowbar(p)) return true;
 		
 		if(this.worldObj.isRemote && openwiki){
 			Manual.navigate(OCMinecart.MODID+"/%LANGUAGE%/item/cart.md");
