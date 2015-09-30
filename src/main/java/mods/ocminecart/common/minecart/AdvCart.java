@@ -53,6 +53,7 @@ public class AdvCart extends EntityMinecart {
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setDouble("enginespeed", this.dataWatcher.getWatchableObjectFloat(4));
 		tag.setBoolean("break", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0));
+		tag.setBoolean("locked", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1));
 		nbt.setTag("advcart", tag);
 	}
 	
@@ -63,6 +64,8 @@ public class AdvCart extends EntityMinecart {
 			if(tag.hasKey("enginespeed")) this.dataWatcher.updateObject(4, (float)tag.getDouble("enginespeed"));
 			if(tag.hasKey("break")) 
 				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("break"), this.dataWatcher.getWatchableObjectByte(3), 0));
+			if(tag.hasKey("locked")) 
+				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("locked"), this.dataWatcher.getWatchableObjectByte(3), 1));
 		}
 	}
 
@@ -146,7 +149,8 @@ public class AdvCart extends EntityMinecart {
 	/*-------Railcraft-------*/
 	
 	public void lockdown(boolean lock){
-		this.dataWatcher.updateObject(3, BitUtil.setBit(lock, this.dataWatcher.getWatchableObjectByte(3), 1));
+		if(lock != BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1))
+			this.dataWatcher.updateObject(3, BitUtil.setBit(lock, this.dataWatcher.getWatchableObjectByte(3), 1));
 	}
 
 
