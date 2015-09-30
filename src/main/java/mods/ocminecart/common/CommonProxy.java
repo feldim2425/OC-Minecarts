@@ -8,6 +8,7 @@ import mods.ocminecart.common.driver.CustomDriver;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.recipe.Recipes;
+import mods.ocminecart.interaction.railcraft.RailcraftEventHandler;
 import mods.ocminecart.interaction.waila.ModWaila;
 import mods.ocminecart.network.ModNetwork;
 import cpw.mods.fml.common.Loader;
@@ -29,6 +30,7 @@ public class CommonProxy {
 		Recipes.init();
 		
 		if(Loader.isModLoaded("Waila")) ModWaila.initWailaModule();
+		if(Loader.isModLoaded("Railcraft")) RailcraftEventHandler.init();
 	}
 
 	public void preInit() {
@@ -39,7 +41,6 @@ public class CommonProxy {
 		ModBlocks.init();
 		
 		EntityRegistry.registerModEntity(ComputerCart.class, "computercart", 1,OCMinecart.instance, 80, 1, true);
-		
 	}
 	
 }
