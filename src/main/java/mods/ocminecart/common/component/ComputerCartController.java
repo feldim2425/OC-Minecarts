@@ -77,12 +77,12 @@ public class ComputerCartController implements ManagedEnvironment{
 		return new Object[]{state, null};
 	}
 	
-	@Callback(doc="function():boolean -- Get the status of the break.")
+	@Callback(direct = true,doc="function():boolean -- Get the status of the break.")
 	public Object[] getBreak(Context context, Arguments arguments){
 		return new Object[]{this.cart.getBreakState()};
 	}
 	
-	@Callback(doc="function():boolean -- Get engine speed")
+	@Callback(direct = true,doc="function():number -- Get engine speed")
 	public Object[] getEngineSpeed(Context context, Arguments arguments){
 		return new Object[]{this.cart.getEngineState()};
 	}
@@ -115,7 +115,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		return new Object[]{color};
 	}
 	
-	@Callback(doc="function():number -- Get light color")
+	@Callback(direct = true,doc="function():number -- Get light color")
 	public Object[] getLightColor(Context context, Arguments arguments){
 		return new Object[]{this.cart.getLightColor()};
 	}
@@ -128,14 +128,19 @@ public class ComputerCartController implements ManagedEnvironment{
 		return new Object[]{};
 	}
 	
-	@Callback(doc="function():boolean -- Check if the cart is on a rail")
+	@Callback(direct = true,doc="function():boolean -- Check if the cart is on a rail")
 	public Object[] onRail(Context context, Arguments arguments){
 		return new Object[]{this.cart.onRail()};
 	}
 	
-	@Callback(doc="function():boolean -- Check if the cart is connected to a network rail")
+	@Callback(direct = true,doc="function():boolean -- Check if the cart is connected to a network rail")
 	public Object[] hasNetworkRail(Context context, Arguments arguments){
 		return new Object[]{this.cart.hasNetRail()};
+	}
+	
+	@Callback(direct = true,doc="function():boolean -- Check if the cart is locked down")
+	public Object[] isLocked(Context context, Arguments arguments){
+		return new Object[]{this.cart.isLocked()};
 	}
 	
 	/*--------Component-Functions-Inventory--------*/
