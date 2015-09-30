@@ -40,27 +40,40 @@ minecraft {
 }
 
 repositories {
-    maven { url = "http://maven.cil.li/" }
-    //maven { url = "http://dl.tsr.me/artifactory/libs-release-local" }
+    maven { 
+        name = "OpenComputers"
+	url = "http://maven.cil.li/" 
+    }
     maven {
-	    name = "chickenbones"
-	    url = "http://chickenbones.net/maven"
-    	}
+        name = "FireBall API Depot"
+        url = "http://dl.tsr.me/artifactory/libs-release-local" 
+    }
+    maven {
+	name = "chickenbones"
+	url = "http://chickenbones.net/maven"
+    }
+
+    ivy {
+        name "Railcraft"
+        artifactPattern "http://addons-origin.cursecdn.com/files/${config.rc.cf}/[module]_[revision].[ext]"
+    }
 }
 
 dependencies {
-    // you may put jars on which you depend on in ./libs
-    // or you may define them like so..
-    //compile "some.group:artifact:version:classifier"
-    //compile "some.group:artifact:version"
-     compile "li.cil.oc:OpenComputers:MC${config.minecraft.version}-${config.oc.version}:dev"
-    // compile "appeng:appliedenergistics2:${config.ae2.version}:dev"
-    
+      
+      compile "li.cil.oc:OpenComputers:MC${config.minecraft.version}-${config.oc.version}:dev"
+      compile ("appeng:appliedenergistics2:${config.ae2.version}:dev"){
+          exclude module: "buildcraft"
+	  exclude module: "industrialcraft-2"
+          exclude module: "BetterStorage"
+      }
       compile "codechicken:CodeChickenCore:${config.minecraft.version}-${config.ccc.version}:dev"
       compile "codechicken:CodeChickenLib:${config.minecraft.version}-${config.ccl.version}:dev"
     //compile "codechicken:ForgeMultipart:${config.minecraft.version}-${config.fmp.version}:dev"
       compile "codechicken:NotEnoughItems:${config.minecraft.version}-${config.nei.version}:dev"
       
+      compile name: 'Railcraft', version: config.rc.version, ext: 'jar'
+
     // real examples
     //compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
     //compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
