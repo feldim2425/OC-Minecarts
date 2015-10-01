@@ -623,14 +623,12 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public String name() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.func_95999_t();
 	}
 
 	@Override
 	public void setName(String name) {
-		// TODO Auto-generated method stub
-		
+		this.setMinecartName(name);
 	}
 
 	@Override
@@ -817,7 +815,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	
 	public void lockdown(boolean lock){
 		super.lockdown(lock);
-		this.machine.signal("cart_lockdown", lock);
+		if(lock != this.isLocked())
+			this.machine.signal("cart_lockdown", lock);
 	}
 
 	/*------Setters & Getters-----*/
@@ -860,4 +859,14 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public void setLightColor(int color){ this.dataWatcher.updateObject(24, color);}
 	
 	public boolean hasNetRail(){ return this.cRailCon; }
+
+	@Override
+	protected double maxCartEnergy() {
+		return ((Connector)this.machine().node()).globalBufferSize();
+	}
+
+	@Override
+	protected double curCartEnergy() {
+		return ((Connector)this.machine().node()).globalBuffer();
+	}
 }

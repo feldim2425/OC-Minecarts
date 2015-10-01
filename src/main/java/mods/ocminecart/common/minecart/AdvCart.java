@@ -1,9 +1,14 @@
 package mods.ocminecart.common.minecart;
 
+import scala.reflect.internal.Trees.This;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.util.BitUtil;
+import mods.railcraft.api.carts.IEnergyTransfer;
+import mods.railcraft.api.electricity.IElectricMinecart;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
@@ -15,7 +20,11 @@ import net.minecraft.world.World;
 
 //Is the Base for a solid, self powered cart with a break.
 //Later I will add the Railcraft integration here
-public class AdvCart extends EntityMinecart {
+@Optional.InterfaceList({
+	@Optional.Interface(iface = "mods.railcraft.api.carts.IEnergyTransfer", modid = "Railcraft") ,
+	@Optional.Interface(iface = "mods.railcraft.api.carts.IElectricMinecart", modid = "Railcraft")
+})
+public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer, IElectricMinecart {
 
 	//protected boolean enableBreak = false; // enable break
 	//protected double engineSpeed = 0.0D;
@@ -64,7 +73,7 @@ public class AdvCart extends EntityMinecart {
 			if(tag.hasKey("enginespeed")) this.dataWatcher.updateObject(4, (float)tag.getDouble("enginespeed"));
 			if(tag.hasKey("break")) 
 				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("break"), this.dataWatcher.getWatchableObjectByte(3), 0));
-			if(tag.hasKey("locked")) 
+			if(tag.hasKey("locked") && Loader.isModLoaded("Railcraft")) 
 				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("locked"), this.dataWatcher.getWatchableObjectByte(3), 1));
 		}
 	}
@@ -95,6 +104,7 @@ public class AdvCart extends EntityMinecart {
 
 	public void onUpdate() {
 		super.onUpdate();
+			
 	}
 
     protected void applyDrag() {
@@ -146,12 +156,59 @@ public class AdvCart extends EntityMinecart {
 		return (!BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3),0) || !onRail());
 	}
 	
-	/*-------Railcraft-------*/
+	protected abstract double maxCartEnergy();
+	protected abstract double curCartEnergy();
 	
+	/*-------Railcraft-------*/
+	private ChargeHandler chargeHandler;
 	public void lockdown(boolean lock){
 		if(lock != BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1))
 			this.dataWatcher.updateObject(3, BitUtil.setBit(lock, this.dataWatcher.getWatchableObjectByte(3), 1));
 	}
 
+	@Override
+	public boolean canExtractEnergy() { return true; }
+
+	@Override
+	public boolean canInjectEnergy() { return true; }
+
+	@Override
+	public double extractEnergy(Object arg0, double arg1, int arg2, boolean arg3, boolean arg4, boolean arg5) { 
+		OCMinecart.logger.info("<<< GET Energy");
+		return 0; }
+
+	@Override
+	public int getCapacity() {
+		return (int)Math.floor(((double)this.maxCartEnergy()/Settings.OC_IC2PWR)+0.9);
+	}
+
+	@Override
+	public double getEnergy() {
+		return(int)Math.floor(((double)this.curCartEnergy()/Settings.OC_IC2PWR)+0.9);
+	}
+
+	@Override
+	public int getTier() { return 1; }
+
+	@Override
+	public int getTransferLimit() { return (int)((double)Settings.ComputerCartETrackLoad / Settings.OC_IC2PWR); }
+
+	@Override
+	public double injectEnergy(Object arg0, double arg1, int arg2, boolean arg3, boolean arg4, boolean arg5) {
+		OCMinecart.logger.info("<<< GET Energy");
+		return 0;
+	}
+	
+	@Override
+	public ChargeHandler getChargeHandler(){
+		return this.chargeHandler;
+	}
+	
+	@Override
+    protected void func_145821_a(int trackX, int trackY, int trackZ, double maxSpeed, double slopeAdjustement, Block trackBlock, int trackMeta) {
+        super.func_145821_a(trackX, trackY, trackZ, maxSpeed, slopeAdjustement, trackBlock, trackMeta);
+        if (this.worldObj.isRemote) return;
+        //chargeHandler.tickOnTrack(trackX, trackY, trackZ);
+    }
 
 }
