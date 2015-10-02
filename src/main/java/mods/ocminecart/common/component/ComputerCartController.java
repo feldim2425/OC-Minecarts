@@ -138,7 +138,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		return new Object[]{this.cart.hasNetRail()};
 	}
 	
-	@Callback(direct = true,doc="function():boolean -- Check if the cart is locked down")
+	@Callback(direct = true,doc="function():boolean -- Check if the cart is locked on a track")
 	public Object[] isLocked(Context context, Arguments arguments){
 		return new Object[]{this.cart.isLocked()};
 	}
@@ -300,7 +300,7 @@ public class ComputerCartController implements ManagedEnvironment{
 	 public Object[] transferFluidTo(Context context, Arguments args){
 		 int tankA = args.checkInteger(0);
 		 int tankB = this.cart.selectedTank();
-		 int count = args.optInteger(1, Integer.MAX_VALUE);
+		 int count = args.optInteger(1, 1000);
 		 if(!(tankA>0 && tankA<=this.cart.tankcount()))
 			 throw new IllegalArgumentException("invalid tank index");
 		 if(!(tankB>0 && tankB<=this.cart.tankcount()))
