@@ -85,7 +85,7 @@ public class ComputerCartDataProvider implements IWailaEntityProvider {
 		if(ent instanceof ComputerCart){
 			ComputerCart cart = (ComputerCart) ent;
 			newtag.setInteger("tier", cart.tier());
-			newtag.setInteger("energy", (int)Math.floor(cart.getEnergy()+0.5D));
+			newtag.setInteger("energy", (int)Math.floor(cart.getCurEnergy()+0.5D));
 			newtag.setInteger("maxenergy", (int)Math.floor(cart.getMaxEnergy()));
 			newtag.setString("address", cart.node().address());
 		}

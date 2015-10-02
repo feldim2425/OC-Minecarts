@@ -836,7 +836,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		return this.isRun;
 	}
 
-	public double getEnergy() {
+	public double getCurEnergy() {
 		if(!this.worldObj.isRemote) return ((Connector)this.machine.node()).globalBuffer();
 		return -1;
 	}
@@ -861,12 +861,12 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	public boolean hasNetRail(){ return this.cRailCon; }
 
 	@Override
-	protected double maxCartEnergy() {
-		return ((Connector)this.machine().node()).globalBufferSize();
-	}
-
-	@Override
-	protected double curCartEnergy() {
-		return ((Connector)this.machine().node()).globalBuffer();
+	protected double addEnergy(double amount, boolean simulate) {
+		Connector n = ((Connector)this.machine.node());
+		double max = Math.min(n.globalBufferSize() - n.globalBuffer(), amount);
+		if(!simulate){
+			max -= n.changeBuffer(max);
+		}
+		return max;
 	}
 }

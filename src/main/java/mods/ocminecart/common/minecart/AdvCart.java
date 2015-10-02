@@ -1,13 +1,16 @@
 package mods.ocminecart.common.minecart;
 
 import scala.reflect.internal.Trees.This;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
+import li.cil.oc.api.network.Connector;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.util.BitUtil;
 import mods.railcraft.api.carts.IEnergyTransfer;
 import mods.railcraft.api.electricity.IElectricMinecart;
+import mods.railcraft.api.electricity.IElectricMinecart.ChargeHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
@@ -22,13 +25,12 @@ import net.minecraft.world.World;
 //Later I will add the Railcraft integration here
 @Optional.InterfaceList({
 	@Optional.Interface(iface = "mods.railcraft.api.carts.IEnergyTransfer", modid = "Railcraft") ,
-	@Optional.Interface(iface = "mods.railcraft.api.carts.IElectricMinecart", modid = "Railcraft")
+	@Optional.Interface(iface = "mods.railcraft.api.electricity.IElectricMinecart", modid = "Railcraft")
 })
 public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer, IElectricMinecart {
-
-	//protected boolean enableBreak = false; // enable break
-	//protected double engineSpeed = 0.0D;
-
+	
+	private ChargeHandler charge;
+	
 	public AdvCart(World p_i1713_1_, double p_i1713_2_, double p_i1713_4_,
 			double p_i1713_6_) {
 		super(p_i1713_1_, p_i1713_2_, p_i1713_4_, p_i1713_6_);
@@ -42,6 +44,9 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 
 	protected void entityInit() {
 		super.entityInit();
+		
+		if(Loader.isModLoaded("Railcraft") && FMLCommonHandler.instance().getEffectiveSide().isServer())
+			charge = new ChargeHandler(this, ChargeHandler.Type.USER, Settings.ComputerCartETrackBuf, Settings.ComputerCartETrackLoss);
 		
 		this.dataWatcher.addObject(3, (byte)0);
 		this.dataWatcher.addObject(4, 0.0F);
@@ -62,7 +67,12 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setDouble("enginespeed", this.dataWatcher.getWatchableObjectFloat(4));
 		tag.setBoolean("break", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0));
-		tag.setBoolean("locked", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1));
+		if(Loader.isModLoaded("Railcraft")){
+			NBTTagCompound rctag = new NBTTagCompound();
+			rctag.setBoolean("locked", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1));
+			if(this.charge!=null) this.charge.writeToNBT(rctag);
+			tag.setTag("railcraft", rctag);
+		}
 		nbt.setTag("advcart", tag);
 	}
 	
@@ -73,8 +83,11 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 			if(tag.hasKey("enginespeed")) this.dataWatcher.updateObject(4, (float)tag.getDouble("enginespeed"));
 			if(tag.hasKey("break")) 
 				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("break"), this.dataWatcher.getWatchableObjectByte(3), 0));
-			if(tag.hasKey("locked") && Loader.isModLoaded("Railcraft")) 
-				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("locked"), this.dataWatcher.getWatchableObjectByte(3), 1));
+			if(tag.hasKey("railcraft") && Loader.isModLoaded("Railcraft")){
+				NBTTagCompound rctag = tag.getCompoundTag("railcraft");
+				this.dataWatcher.updateObject(3, BitUtil.setBit(rctag.getBoolean("locked"), this.dataWatcher.getWatchableObjectByte(3), 1));
+				if(this.charge!=null) this.charge.writeToNBT(rctag);
+			}
 		}
 	}
 
@@ -104,8 +117,25 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 
 	public void onUpdate() {
 		super.onUpdate();
-			
+		if (this.worldObj.isRemote) return;
+		
+		if(charge!=null && Loader.isModLoaded("Railcraft")){
+			this.charge.tick();
+			double mv = this.addEnergy(this.charge.getCharge() * Settings.OC_IC2PWR, true);  //Get max. energy we can load to the node
+			mv = Math.min(mv, Settings.ComputerCartETrackLoad); //Check if the movable energy is higher than the limit.
+			mv = this.charge.removeCharge(mv / Settings.OC_IC2PWR) * Settings.OC_IC2PWR; //Remove the charge from the buffer
+			this.addEnergy(mv , false);	//Add the removed energy to the node network
+		}
 	}
+	
+	@Override
+    protected void func_145821_a(int trackX, int trackY, int trackZ, double maxSpeed, double slopeAdjustement, Block trackBlock, int trackMeta) {
+        super.func_145821_a(trackX, trackY, trackZ, maxSpeed, slopeAdjustement, trackBlock, trackMeta);
+        if (this.worldObj.isRemote) return;
+        if(charge!=null && Loader.isModLoaded("Railcraft")){
+        	this.charge.tickOnTrack(trackX, trackY, trackZ);
+        }
+    }
 
     protected void applyDrag() {
         if(!(BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0) || BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1))){
@@ -156,35 +186,31 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		return (!BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3),0) || !onRail());
 	}
 	
-	protected abstract double maxCartEnergy();
-	protected abstract double curCartEnergy();
+	protected abstract double addEnergy(double amount, boolean simulate);
 	
 	/*-------Railcraft-------*/
-	private ChargeHandler chargeHandler;
 	public void lockdown(boolean lock){
 		if(lock != BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1))
 			this.dataWatcher.updateObject(3, BitUtil.setBit(lock, this.dataWatcher.getWatchableObjectByte(3), 1));
 	}
 
 	@Override
-	public boolean canExtractEnergy() { return true; }
+	public boolean canExtractEnergy() { return false; }
 
 	@Override
-	public boolean canInjectEnergy() { return true; }
+	public boolean canInjectEnergy() { return false; }
 
 	@Override
-	public double extractEnergy(Object arg0, double arg1, int arg2, boolean arg3, boolean arg4, boolean arg5) { 
-		OCMinecart.logger.info("<<< GET Energy");
-		return 0; }
+	public double extractEnergy(Object arg0, double arg1, int arg2, boolean arg3, boolean arg4, boolean arg5) { return 0; }
 
 	@Override
 	public int getCapacity() {
-		return (int)Math.floor(((double)this.maxCartEnergy()/Settings.OC_IC2PWR)+0.9);
+		return (int) this.charge.getCapacity();
 	}
 
 	@Override
 	public double getEnergy() {
-		return(int)Math.floor(((double)this.curCartEnergy()/Settings.OC_IC2PWR)+0.9);
+		return charge.getCharge();
 	}
 
 	@Override
@@ -194,21 +220,11 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 	public int getTransferLimit() { return (int)((double)Settings.ComputerCartETrackLoad / Settings.OC_IC2PWR); }
 
 	@Override
-	public double injectEnergy(Object arg0, double arg1, int arg2, boolean arg3, boolean arg4, boolean arg5) {
-		OCMinecart.logger.info("<<< GET Energy");
-		return 0;
-	}
+	public double injectEnergy(Object arg0, double arg1, int arg2, boolean arg3, boolean arg4, boolean arg5) { return 0; }
 	
 	@Override
-	public ChargeHandler getChargeHandler(){
-		return this.chargeHandler;
+	public ChargeHandler getChargeHandler() {
+		return this.charge;
 	}
-	
-	@Override
-    protected void func_145821_a(int trackX, int trackY, int trackZ, double maxSpeed, double slopeAdjustement, Block trackBlock, int trackMeta) {
-        super.func_145821_a(trackX, trackY, trackZ, maxSpeed, slopeAdjustement, trackBlock, trackMeta);
-        if (this.worldObj.isRemote) return;
-        //chargeHandler.tickOnTrack(trackX, trackY, trackZ);
-    }
 
 }

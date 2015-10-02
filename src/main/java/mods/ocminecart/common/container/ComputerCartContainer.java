@@ -89,7 +89,7 @@ public class ComputerCartContainer extends Container {
 	public void addCraftigToICrafters(ICrafting craft){
 		super.addCraftingToCrafters(craft);
 		
-		craft.sendProgressBarUpdate(this, 0, (int) this.entity.getEnergy());
+		craft.sendProgressBarUpdate(this, 0, (int) this.entity.getCurEnergy());
 		craft.sendProgressBarUpdate(this, 1, (int) this.entity.getMaxEnergy());
 		craft.sendProgressBarUpdate(this, 2, this.entity.getInventorySpace());
 		craft.sendProgressBarUpdate(this, 3, this.entity.selectedSlot());
@@ -101,8 +101,8 @@ public class ComputerCartContainer extends Container {
 		for(int i=0;i<this.crafters.size();i+=1){
         	ICrafting craft = (ICrafting) this.crafters.get(i);
         	
-        	if(this.entity.getEnergy() != this.sEnergy){
-        		craft.sendProgressBarUpdate(this, 0, (int) (this.entity.getEnergy()*10));
+        	if(this.entity.getCurEnergy() != this.sEnergy){
+        		craft.sendProgressBarUpdate(this, 0, (int) (this.entity.getCurEnergy()*10));
         	}
         	
         	if(this.entity.getMaxEnergy() != this.smaxEnergy){
@@ -119,7 +119,7 @@ public class ComputerCartContainer extends Container {
         }
 		
 		this.smaxEnergy=(int) this.entity.getMaxEnergy();
-		this.sEnergy=(int) this.entity.getEnergy();
+		this.sEnergy=(int) this.entity.getCurEnergy();
 		this.sizeinv=this.entity.getInventorySpace();
 	}
 	
