@@ -18,7 +18,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = OCMinecart.MODID, name=OCMinecart.NAME, version=OCMinecart.VERSION, dependencies = "required-after:OpenComputers@[1.5.13,); after:Waile@[1.5.8a,)")
+@Mod(modid = OCMinecart.MODID, name=OCMinecart.NAME, version=OCMinecart.VERSION, dependencies = "required-after:OpenComputers@[1.5.14,); after:Waile@[1.5.8a,)")
 public class OCMinecart {
 	public static final String MODID = "ocminecart";
 	public static final String VERSION = "0.4-alpha";
