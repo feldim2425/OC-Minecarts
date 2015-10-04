@@ -20,12 +20,22 @@ public class InventoryUtil {
 		return -1;
 	}
 	
-	public static ItemStack suckItemInventoryWorld(ItemStack filter,World world, int x, int y, int z, ForgeDirection access, int num){
+	public static int suckItemInventoryWorld(IInventory target, int[] taccess, World world, int x, int y, int z, ForgeDirection access, int num){
 		TileEntity entity = world.getTileEntity(x, y, z);
+		int moved = 0;
 		if(entity instanceof IInventory){
-			return suckInventory(filter, (IInventory) entity, num, access);
+			for(int i=0;i<taccess.length && moved<1;i+=1){
+				ItemStack filter = target.getStackInSlot(taccess[i]);
+				num=Math.min(num, spaceforItem(filter,target,taccess));
+				ItemStack mov = suckInventory(filter, (IInventory) entity, num, access);
+				if(mov!=null && mov.stackSize>0){
+					moved = mov.stackSize;
+					putInventory(mov,target,64,ForgeDirection.UNKNOWN);
+				}
+			}
+			return moved;
 		}
-		return null;
+		return -1;
 	}
 	
 	public static ItemStack suckInventory(ItemStack filter,IInventory inv, int maxnum, ForgeDirection access) {
@@ -108,7 +118,11 @@ public class InventoryUtil {
 		int[] res = new int[slots.length];
 		ArrayList<Integer> sort = new ArrayList<Integer>();
 		for(int i=0;i<slots.length;i+=1){	//Check if slot is a accessible slot
-			if(slots[i] == slot) sort.add(slots[i]);
+			if(slots[i] == slot){
+				for(int j=i;j<slots.length;j+=1){
+					sort.add(slots[j]);
+				}
+			}
 		}
 		for(int i=0;i<slots.length;i+=1){	//Add all other slots
 			if(!sort.contains(slots[i]))
@@ -122,7 +136,7 @@ public class InventoryUtil {
 	}
 	
 	public static int[] getAccessible(IInventory inv, ForgeDirection access){
-		if(inv instanceof ISidedInventory) 
+		if((inv instanceof ISidedInventory) && access != ForgeDirection.UNKNOWN) 
 			return ((ISidedInventory)inv).getAccessibleSlotsFromSide(access.ordinal());
 		int sides[] = new int[inv.getSizeInventory()];
 		for(int i=0;i<inv.getSizeInventory();i+=1){
@@ -131,5 +145,23 @@ public class InventoryUtil {
 		
 		return sides;
 	}
+	
+	/*
+	 * Takes all items from invA and returns the matching slots in invB
+	 */
+	public static int spaceforItem(ItemStack stack, IInventory inv, int[] access){
+		int space = 0;
+		int maxstack = Math.min(stack.getMaxStackSize(), inv.getInventoryStackLimit());
+		for(int i=0;i<access.length;i+=1){
+			ItemStack slot = inv.getStackInSlot(access[i]);
+			if(slot==null)
+				space+=maxstack;
+			else if(slot.isItemEqual(stack)){
+				space+=Math.max(0, maxstack-slot.stackSize);
+			}
+		}
+		return space;
+	}
+	
 	
 }
