@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 public class ItemUtil {
-	public static void dropItemList(Iterable<ItemStack> items, World world, double x, double y, double z){
+	public static void dropItemList(Iterable<ItemStack> items, World world, double x, double y, double z, boolean motion){
 		if(!world.isRemote){
 			Iterator<ItemStack> itemlist = items.iterator();
 			while(itemlist.hasNext()){
@@ -23,6 +23,11 @@ public class ItemUtil {
 				if(stack.stackSize > 0){
 					EntityItem entityitem = new EntityItem(world, x, y, z, stack);
 					entityitem.delayBeforeCanPickup = 10;
+					if(!motion){
+						entityitem.motionX=0;
+						entityitem.motionY=0;
+						entityitem.motionZ=0;
+					}
 					world.spawnEntityInWorld(entityitem);
 				}
 			}

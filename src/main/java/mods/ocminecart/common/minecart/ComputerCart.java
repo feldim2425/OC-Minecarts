@@ -315,7 +315,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 			}
 		}
 		Iterable<ItemStack> over = this.maininv.removeOverflowItems(this.invsize);
-		ItemUtil.dropItemList(over, this.worldObj, this.posX, this.posY, this.posZ);
+		ItemUtil.dropItemList(over, this.worldObj, this.posX, this.posY, this.posZ, true);
 	}
 	
 	@Override
@@ -398,7 +398,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		}
 		Iterator<ItemStack> minv = this.maininv.removeOverflowItems(0).iterator();
 		while(minv.hasNext()) drop.add(minv.next());
-		ItemUtil.dropItemList(drop, this.worldObj, this.posX, this.posY, this.posZ);
+		ItemUtil.dropItemList(drop, this.worldObj, this.posX, this.posY, this.posZ,true);
 		this.setDamage(Float.MAX_VALUE); //Sometimes the cart stay alive this should fix it.
 	}
 	
