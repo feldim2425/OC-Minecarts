@@ -360,7 +360,7 @@ public class ComputerCartController implements ManagedEnvironment{
 			 if(dstack.stackSize < 1) 
 				 this.cart.mainInventory().setInventorySlotContents(sslot, null);
 			 drop.add(dif);
-			 ItemUtil.dropItemList(drop, this.cart.world(), x, y, z);
+			 ItemUtil.dropItemList(drop, this.cart.world(), x+0.5D, y+0.5D, z+0.5D);
 			 return new Object[]{ true };
 		 }
 		 else{
