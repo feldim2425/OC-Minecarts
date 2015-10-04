@@ -75,7 +75,15 @@ public abstract class Inventory implements IInventory{
 	}
 
 	@Override
-	public void markDirty() {}
+	public void markDirty() {
+		if(this.ignoreNullStacks()) return;
+		for(int i=0;i<this.getSizeInventory();i+=1){
+			ItemStack stack = this.getStackInSlot(i);
+			if(stack!=null && stack.stackSize<1){
+				this.updateSlotContents(i, null);
+			}
+		}
+	}
 
 	@Override
 	public void openInventory() {}
@@ -117,5 +125,6 @@ public abstract class Inventory implements IInventory{
 	protected abstract void slotChanged(int slot);
 	
 	abstract public int getMaxSizeInventory();
+	abstract protected boolean ignoreNullStacks();
 
 }

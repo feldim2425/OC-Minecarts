@@ -1,5 +1,7 @@
 package mods.ocminecart.common.component;
 
+import java.util.ArrayList;
+
 import li.cil.oc.api.API;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -11,8 +13,12 @@ import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.Visibility;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
+import mods.ocminecart.common.util.InventoryUtil;
+import mods.ocminecart.common.util.ItemUtil;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
@@ -325,5 +331,44 @@ public class ComputerCartController implements ManagedEnvironment{
 			 tankS.fill(ret, true);
 		 }
 		 return new Object[]{ true };
+	 }
+	 
+	 //--------World-Inventory----------//
+	 
+	 @Callback(doc = "function(side:number[, count:number=64]):boolean -- Drops items from the selected slot towards the specified side.")
+	 public Object[] drop(Context context, Arguments args){
+		 int side = args.checkInteger(0);
+		 int amount = args.optInteger(1,64);
+		 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
+		 int sslot = this.cart.selectedSlot();
+		 if(!(sslot>=0 && sslot<this.cart.mainInventory().getSizeInventory()))
+				throw new IllegalArgumentException("invalid slot");
+		 
+		 ForgeDirection dir = this.cart.toGlobal(ForgeDirection.getOrientation(side));
+		 int x = (int)Math.floor(this.cart.xPosition())+dir.offsetX;
+		 int y = (int)Math.floor(this.cart.yPosition())+dir.offsetY;
+		 int z = (int)Math.floor(this.cart.zPosition())+dir.offsetZ;
+		 
+		 ItemStack dstack = this.cart.mainInventory().getStackInSlot(sslot);
+		 if(dstack == null) return new Object[]{ false };
+		 
+		 if(this.cart.world().getBlock(x,y,z) == Blocks.air){
+			 ArrayList<ItemStack> drop = new ArrayList<ItemStack>();
+			 
+			 int mov = Math.min(dstack.stackSize, amount);
+			 ItemStack dif = dstack.splitStack(mov);
+			 if(dstack.stackSize < 1) 
+				 this.cart.mainInventory().setInventorySlotContents(sslot, null);
+			 drop.add(dif);
+			 ItemUtil.dropItemList(drop, this.cart.world(), x, y, z);
+			 return new Object[]{ true };
+		 }
+		 else{
+			 int moved = InventoryUtil.dropItemInventoryWorld(dstack.copy(),  this.cart.world(), x, y, z, dir.getOpposite(), amount);
+			 if(moved < 1) return new Object[]{ false };
+			 if(dstack.stackSize > moved) dstack.stackSize-=moved;
+			 else this.cart.mainInventory().setInventorySlotContents(sslot, null);
+			 return new Object[]{ true };
+		 }
 	 }
 }

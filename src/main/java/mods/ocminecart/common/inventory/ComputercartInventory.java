@@ -48,4 +48,9 @@ public class ComputercartInventory extends Inventory {
 		return 80;
 	}
 
+	@Override
+	protected boolean ignoreNullStacks() {
+		return false;
+	}
+
 }
