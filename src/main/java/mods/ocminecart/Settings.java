@@ -10,6 +10,7 @@ public class Settings {
 	
 	public static float OC_SoundVolume;
 	public static double OC_IC2PWR;
+	public static double OC_SuckDelay;
 	
 	public static int ComputerCartBaseCost; //Config Value -> basecost
 	public static int ComputerCartComplexityCost; //Config Value -> costmultiplier
@@ -39,6 +40,7 @@ public class Settings {
 	private static void ocValues(){	//Get the settings from OpenCOmputers
 		OC_SoundVolume = li.cil.oc.Settings.get().soundVolume();
 		OC_IC2PWR = li.cil.oc.Settings.get().ratioIndustrialCraft2();
+		OC_SuckDelay = li.cil.oc.Settings.get().suckDelay();
 	}
 	
 	private static void confValues(){
@@ -49,8 +51,8 @@ public class Settings {
 		ComputerCartEnergyUse = OCMinecart.config.get("computercart", "energyuse", 0.25 , "Energy a Computer cart consume every tick [default: 0.25]").getDouble(0.25);
 		ComputerCartCreateEnergy= OCMinecart.config.get("computercart", "newenergy", 20000 , "Energy new a Computer cart has stored [default: 20000]").getInt(20000);
 		ComputerCartEngineUse = OCMinecart.config.get("computercart", "engineuse", 2 , "Energy multiplier for the Engine. Speed times Value [default: 2]").getDouble(2);
-		ComputerCartETrackBuf = OCMinecart.config.get("computercart", "trackchargebuffer", 5000 , "[Railcraft] Charge buffer for the chart (EU) [default: 5000]").getDouble(5000);
-		ComputerCartETrackLoss = OCMinecart.config.get("computercart", "chargebufferloss", 0.5 , "[Railcraft] Charge buffer loss per tick (EU) [default: 0.5]").getDouble(0.5);
+		ComputerCartETrackBuf = OCMinecart.config.get("computercart", "trackchargebuffer", 1000 , "[Railcraft] Charge buffer for the chart (EU) [default: 1000]").getDouble(1000);
+		ComputerCartETrackLoss = OCMinecart.config.get("computercart", "chargebufferloss", 0.1 , "[Railcraft] Charge buffer loss per tick (EU) [default: 0.1]").getDouble(0.1);
 		ComputerCartETrackLoad = OCMinecart.config.get("computercart", "maxtrackcharge", 16 , "[Railcraft] Max. Energy a cart can take from the charge buffer (EU) [default: 16]").getDouble(16);
 		
 		// networkrail
