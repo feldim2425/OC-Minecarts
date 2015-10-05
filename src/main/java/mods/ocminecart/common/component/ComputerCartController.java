@@ -392,8 +392,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		 }
 		 else{
 			 int[] mslots = InventoryUtil.getAccessible(this.cart.mainInventory(), ForgeDirection.UNKNOWN);
-			 mslots = InventoryUtil.prioritizeAccessible(mslots, this.cart.selectedSlot());
-			 int moved = InventoryUtil.suckItemInventoryWorld(this.cart.mainInventory(), mslots, this.cart.worldObj, 
+			 int moved = InventoryUtil.suckItemInventoryWorld(this.cart.mainInventory(), mslots, this.cart.selectedSlot(), this.cart.worldObj, 
 					 x, y, z, dir.getOpposite(), amount);
 			 if(moved > 0) return new Object[]{ true };
 			 return new Object[]{ false };

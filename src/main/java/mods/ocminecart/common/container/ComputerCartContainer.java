@@ -98,6 +98,8 @@ public class ComputerCartContainer extends Container {
 	public void detectAndSendChanges(){
 		super.detectAndSendChanges();
 		
+		if(this.entity.worldObj.isRemote) return;
+		
 		for(int i=0;i<this.crafters.size();i+=1){
         	ICrafting craft = (ICrafting) this.crafters.get(i);
         	
@@ -121,6 +123,7 @@ public class ComputerCartContainer extends Container {
 		this.smaxEnergy=(int) this.entity.getMaxEnergy();
 		this.sEnergy=(int) this.entity.getCurEnergy();
 		this.sizeinv=this.entity.getInventorySpace();
+		this.selSlot = this.entity.selectedSlot();
 	}
 	
 	@SideOnly(Side.CLIENT)

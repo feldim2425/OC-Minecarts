@@ -21,6 +21,10 @@ public class InventoryUtil {
 	}
 	
 	public static int suckItemInventoryWorld(IInventory target, int[] taccess, World world, int x, int y, int z, ForgeDirection access, int num){
+		return suckItemInventoryWorld(target, taccess, -1, world, x,y,z, access, num);
+	}
+	
+	public static int suckItemInventoryWorld(IInventory target, int[] taccess, int tfirst, World world, int x, int y, int z, ForgeDirection access, int num){
 		TileEntity entity = world.getTileEntity(x, y, z);
 		int moved = 0;
 		if(entity instanceof IInventory){
@@ -30,7 +34,9 @@ public class InventoryUtil {
 				ItemStack mov = suckInventory(filter, (IInventory) entity, num, access);
 				if(mov!=null && mov.stackSize>0){
 					moved = mov.stackSize;
-					putInventory(mov,target,64,ForgeDirection.UNKNOWN,taccess);
+					int[] slots = sortAccessible(target, taccess, mov);
+					if(tfirst >= 0) slots = prioritizeAccessible(slots, tfirst);
+					putInventory(mov,target,64,ForgeDirection.UNKNOWN,slots);
 				}
 			}
 			return moved;
