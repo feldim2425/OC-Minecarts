@@ -16,6 +16,7 @@ import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.InventoryUtil;
 import mods.ocminecart.common.util.ItemUtil;
 import net.minecraft.init.Blocks;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -352,7 +353,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		 ItemStack dstack = this.cart.mainInventory().getStackInSlot(sslot);
 		 if(dstack == null) return new Object[]{ false };
 		 
-		 if(this.cart.world().getBlock(x,y,z) == Blocks.air){
+		 if(!(this.cart.world().getTileEntity(x, y, z) instanceof IInventory)){
 			 ArrayList<ItemStack> drop = new ArrayList<ItemStack>();
 			 
 			 int mov = Math.min(dstack.stackSize, amount);
@@ -369,6 +370,33 @@ public class ComputerCartController implements ManagedEnvironment{
 			 if(dstack.stackSize > moved) dstack.stackSize-=moved;
 			 else this.cart.mainInventory().setInventorySlotContents(sslot, null);
 			 return new Object[]{ true };
+		 }
+	 }
+	 
+	 @Callback(doc = "function(side:number[, count:number=64]):boolean -- Suck up items from the specified side.")
+	 public Object[] suck(Context context, Arguments args){
+		 int side = args.checkInteger(0);
+		 int amount = args.optInteger(1,64);
+		 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
+		 int sslot = this.cart.selectedSlot();
+		 if(!(sslot>=0 && sslot<this.cart.mainInventory().getSizeInventory()))
+				throw new IllegalArgumentException("invalid slot");
+		 
+		 ForgeDirection dir = this.cart.toGlobal(ForgeDirection.getOrientation(side));
+		 int x = (int)Math.floor(this.cart.xPosition())+dir.offsetX;
+		 int y = (int)Math.floor(this.cart.yPosition())+dir.offsetY;
+		 int z = (int)Math.floor(this.cart.zPosition())+dir.offsetZ;
+		 
+		 if(!(this.cart.world().getTileEntity(x, y, z) instanceof IInventory)){
+			 return new Object[]{ false , "not implemented yet"};
+		 }
+		 else{
+			 int[] mslots = InventoryUtil.getAccessible(this.cart.mainInventory(), ForgeDirection.UNKNOWN);
+			 mslots = InventoryUtil.prioritizeAccessible(mslots, this.cart.selectedSlot());
+			 int moved = InventoryUtil.suckItemInventoryWorld(this.cart.mainInventory(), mslots, this.cart.worldObj, 
+					 x, y, z, dir.getOpposite(), amount);
+			 if(moved > 0) return new Object[]{ true };
+			 return new Object[]{ false };
 		 }
 	 }
 }

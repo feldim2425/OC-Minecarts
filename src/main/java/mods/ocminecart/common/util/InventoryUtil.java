@@ -30,7 +30,7 @@ public class InventoryUtil {
 				ItemStack mov = suckInventory(filter, (IInventory) entity, num, access);
 				if(mov!=null && mov.stackSize>0){
 					moved = mov.stackSize;
-					putInventory(mov,target,64,ForgeDirection.UNKNOWN);
+					putInventory(mov,target,64,ForgeDirection.UNKNOWN,taccess);
 				}
 			}
 			return moved;
@@ -63,11 +63,15 @@ public class InventoryUtil {
 		}
 		return pulled;
 	}
-
+	
 	public static int putInventory(ItemStack stack, IInventory inv, int maxnum, ForgeDirection access){
 		int[] slots = getAccessible(inv,access);
-		int maxcount = maxnum;
 		slots = sortAccessible(inv, slots, stack);
+		return putInventory(stack,inv,maxnum,access,slots);
+	}
+
+	public static int putInventory(ItemStack stack, IInventory inv, int maxnum, ForgeDirection access, int[] slots){
+		int maxcount = maxnum;
 		for(int i=0;i<slots.length;i+=1){
 			if(!(!(inv instanceof ISidedInventory) || ((inv instanceof ISidedInventory) && ((ISidedInventory)inv).canInsertItem(slots[i], stack, access.ordinal()))))
 				continue;
@@ -151,12 +155,12 @@ public class InventoryUtil {
 	 */
 	public static int spaceforItem(ItemStack stack, IInventory inv, int[] access){
 		int space = 0;
-		int maxstack = Math.min(stack.getMaxStackSize(), inv.getInventoryStackLimit());
+		int maxstack = Math.min((stack==null) ? 64 : stack.getMaxStackSize(), inv.getInventoryStackLimit());
 		for(int i=0;i<access.length;i+=1){
 			ItemStack slot = inv.getStackInSlot(access[i]);
 			if(slot==null)
 				space+=maxstack;
-			else if(slot.isItemEqual(stack)){
+			else if(stack != null && slot.isItemEqual(stack)){
 				space+=Math.max(0, maxstack-slot.stackSize);
 			}
 		}
