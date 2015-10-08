@@ -388,7 +388,22 @@ public class ComputerCartController implements ManagedEnvironment{
 		 int z = (int)Math.floor(this.cart.zPosition())+dir.offsetZ;
 		 
 		 if(!(this.cart.world().getTileEntity(x, y, z) instanceof IInventory)){
-			 return new Object[]{ false , "not implemented yet"};
+			 int moved = 0;
+			 int[] acc = InventoryUtil.getAccessible(this.cart.mainInventory(), ForgeDirection.UNKNOWN);
+			 acc = InventoryUtil.prioritizeAccessible(acc, this.cart.selectedSlot());
+			 if(!ItemUtil.hasDroppedItems(this.cart.world(), x, y, z))
+				 return new Object[]{ false };
+			 for(int i=0;i<acc.length && moved<1;i+=1){
+				 ItemStack filter = this.cart.mainInventory().getStackInSlot(acc[i]);
+				 if(filter != null) acc = InventoryUtil.sortAccessible(this.cart.mainInventory(), acc, filter);
+				 acc = InventoryUtil.prioritizeAccessible(acc, this.cart.selectedSlot());
+				 int movable = InventoryUtil.spaceforItem(filter, this.cart.mainInventory(), acc);
+				 movable = Math.min(movable, Math.min((filter == null) ? 64 :filter.getMaxStackSize(), amount));
+				 ItemStack stack = ItemUtil.suckItems(this.cart.world(), x, y, z, filter, movable);
+				 if(stack!=null) moved = stack.stackSize;
+				 if(moved > 0) InventoryUtil.putInventory(stack, this.cart.mainInventory(), moved, ForgeDirection.UNKNOWN, acc);
+			 }
+			 return new Object[]{ (moved > 0) };
 		 }
 		 else{
 			 int[] mslots = InventoryUtil.getAccessible(this.cart.mainInventory(), ForgeDirection.UNKNOWN);
@@ -398,4 +413,6 @@ public class ComputerCartController implements ManagedEnvironment{
 			 return new Object[]{ false };
 		 }
 	 }
+	 
+	 //-------World-Tank-------//
 }

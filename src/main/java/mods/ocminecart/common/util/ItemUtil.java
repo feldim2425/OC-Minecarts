@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.inventory.IInventory;
@@ -38,7 +39,7 @@ public class ItemUtil {
 		if(!world.isRemote){
 			ArrayList<ItemStack> items = new ArrayList<ItemStack>();
 			AxisAlignedBB box = AxisAlignedBB.getBoundingBox(1,1,1,16,16,16);
-			box.addCoord(x, y, z);
+			box.offset(x-1, y-1, z-1);
 			List entls = world.getEntitiesWithinAABB(EntityItem.class, box);
 			Iterator entit = entls.iterator();
 			while(entit.hasNext()){
@@ -54,6 +55,17 @@ public class ItemUtil {
 			}
 		}
 		return null;
+	}
+	
+	public static boolean hasDroppedItems(World world, int x, int y, int z){
+		if(!world.isRemote){
+			ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+			AxisAlignedBB box = AxisAlignedBB.getBoundingBox(1,1,1,16,16,16);
+			box.offset(x-1, y-1, z-1);
+			List entls = world.getEntitiesWithinAABB(EntityItem.class, box);
+			return !entls.isEmpty();
+		}
+		return false;
 	}
 	
 	public static ItemStack sumItemStacks(ItemStack stackA, ItemStack stackB, boolean pull){
