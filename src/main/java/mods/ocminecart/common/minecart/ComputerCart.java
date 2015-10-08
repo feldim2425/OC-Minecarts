@@ -218,7 +218,6 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		super.readEntityFromNBT(nbt);
 		
 		if(nbt.hasKey("components")) this.compinv.readNBT((NBTTagList) nbt.getTag("components"));
-		if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier"); //TODO: Remove this in the next version.
 		if(nbt.hasKey("controller")) this.controller.load(nbt.getCompoundTag("controller"));
 		if(nbt.hasKey("inventory")) this.maininv.readFromNBT((NBTTagList) nbt.getTag("inventory"));
 		if(nbt.hasKey("netrail")){
@@ -642,10 +641,11 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	}
 
 	@Override
-	//http://jabelarminecraft.blogspot.co.at/p/minecraft-forge-172-finding-block.html
 	public ForgeDirection facing() {
-		int dir = MathHelper.floor_double((double) (this.rotationYaw * 4.0F / 360) + 0.50) & 3;
-		return ForgeDirection.getOrientation(dir);
+		ForgeDirection res = RotationHelper.directionFromYaw(this.rotationYaw);
+		if(res == ForgeDirection.WEST || res == ForgeDirection.EAST)	//Don't know why but it works.
+			res = res.getOpposite();
+		return res;
 	}
 
 	@Override

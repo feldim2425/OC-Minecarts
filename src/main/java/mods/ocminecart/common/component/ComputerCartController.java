@@ -59,7 +59,6 @@ public class ComputerCartController implements ManagedEnvironment{
 	@Override
 	public void load(NBTTagCompound nbt) {
 		if(nbt.hasKey("node")) ((Component)this.node).load(nbt.getCompoundTag("node"));
-		if(nbt.hasKey("color")) cart.setLightColor(nbt.getInteger("color")); //TODO: Remove this in the next version.
 	}
 
 	@Override
