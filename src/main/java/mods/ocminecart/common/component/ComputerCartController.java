@@ -12,9 +12,11 @@ import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.Visibility;
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.Settings;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.InventoryUtil;
 import mods.ocminecart.common.util.ItemUtil;
+import mods.ocminecart.common.util.TankUtil;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -22,6 +24,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTank;
+import net.minecraftforge.fluids.FluidTankInfo;
+import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
 
 
@@ -180,6 +185,8 @@ public class ComputerCartController implements ManagedEnvironment{
 			}
 		}
 		else{
+			if(args.count() < 1)
+				return new Object[]{ 0 , "no slot selected"};
 			throw new IllegalArgumentException("invalid slot");
 		}
 		return new Object[]{num};
@@ -201,6 +208,8 @@ public class ComputerCartController implements ManagedEnvironment{
 			}
 		}
 		else{
+			if(args.count() < 1)
+				return new Object[]{ 0 , "no slot selected"};
 			throw new IllegalArgumentException("invalid slot");
 		}
 		return new Object[]{num};
@@ -211,7 +220,9 @@ public class ComputerCartController implements ManagedEnvironment{
 		int slotA = args.checkInteger(0) - 1;
 		int slotB = this.cart.selectedSlot();
 		boolean result;
-		if(slotA>=0 && slotA<this.cart.mainInventory().getSizeInventory() && slotB>=0 && slotB<this.cart.mainInventory().getSizeInventory()){
+		if(slotB>=0 && slotB<this.cart.mainInventory().getSizeInventory())
+			return new Object[]{ false , "no slot selected"};
+		if(slotA>=0 && slotA<this.cart.mainInventory().getSizeInventory()){
 			ItemStack stackA = this.cart.mainInventory().getStackInSlot(slotA);
 			ItemStack stackB = this.cart.mainInventory().getStackInSlot(slotB);
 			result = (stackA==null && stackB==null) || 
@@ -228,7 +239,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		if(!(tslot>=0 && tslot<this.cart.mainInventory().getSizeInventory()))
 			throw new IllegalArgumentException("invalid slot");
 		if(!(this.cart.selectedSlot()>=0 && this.cart.selectedSlot()<this.cart.mainInventory().getSizeInventory()))
-			throw new IllegalArgumentException("invalid slot");
+			return new Object[]{ false , "no slot selected"};
 		
 		ItemStack stackT = this.cart.mainInventory().getStackInSlot(tslot);
 		ItemStack stackS = this.cart.mainInventory().getStackInSlot(this.cart.selectedSlot());
@@ -271,8 +282,11 @@ public class ComputerCartController implements ManagedEnvironment{
 	 public Object[] tankLevel(Context context, Arguments args){
 		 int index = args.optInteger(0, 0);
 		 index = (args.count()>0) ? index : this.cart.selectedTank();
-		 if(!(index>0 && index<=this.cart.tankcount()))
+		 if(!(index>0 && index<=this.cart.tankcount())){
+			 if(args.count()<1)
+				 	return new Object[]{ false ,"no tank selected" };
 			 throw new IllegalArgumentException("invalid tank index");
+		 }
 		 return new Object[]{ this.cart.getTank(index).getFluidAmount() };
 	 }
 	 
@@ -280,8 +294,11 @@ public class ComputerCartController implements ManagedEnvironment{
 	 public Object[] tankSpace(Context context, Arguments args){
 		 int index = args.optInteger(0, 0);
 		 index = (args.count()>0) ? index : this.cart.selectedTank();
-		 if(!(index>0 && index<=this.cart.tankcount()))
+		 if(!(index>0 && index<=this.cart.tankcount())){
+			 if(args.count()<1)
+			 	return new Object[]{ false ,"no tank selected" };
 			 throw new IllegalArgumentException("invalid tank index");
+		 }
 		 IFluidTank tank = this.cart.getTank(index);
 		 return new Object[]{ tank.getCapacity() - tank.getFluidAmount() };
 	 }
@@ -293,7 +310,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		 if(!(tankA>0 && tankA<=this.cart.tankcount()))
 			 throw new IllegalArgumentException("invalid tank index");
 		 if(!(tankB>0 && tankB<=this.cart.tankcount()))
-			 throw new IllegalArgumentException("invalid tank index");
+			 return new Object[]{ false ,"no tank selected" };
 		 
 		 FluidStack stackA = this.cart.getTank(tankA).getFluid();
 		 FluidStack stackB = this.cart.getTank(tankB).getFluid();
@@ -311,7 +328,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		 if(!(tankA>0 && tankA<=this.cart.tankcount()))
 			 throw new IllegalArgumentException("invalid tank index");
 		 if(!(tankB>0 && tankB<=this.cart.tankcount()))
-			 throw new IllegalArgumentException("invalid tank index");
+			 return new Object[]{ false ,"no tank selected" };
 		 IFluidTank tankT = this.cart.getTank(tankA);
 		 IFluidTank tankS = this.cart.getTank(tankB);
 		 
@@ -343,7 +360,8 @@ public class ComputerCartController implements ManagedEnvironment{
 		 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
 		 int sslot = this.cart.selectedSlot();
 		 if(!(sslot>=0 && sslot<this.cart.mainInventory().getSizeInventory()))
-				throw new IllegalArgumentException("invalid slot");
+			 return new Object[]{ false , "no slot selected"};
+		 if(amount<1) return new Object[]{ false };
 		 
 		 ForgeDirection dir = this.cart.toGlobal(ForgeDirection.getOrientation(side));
 		 int x = (int)Math.floor(this.cart.xPosition())+dir.offsetX;
@@ -362,13 +380,15 @@ public class ComputerCartController implements ManagedEnvironment{
 				 this.cart.mainInventory().setInventorySlotContents(sslot, null);
 			 drop.add(dif);
 			 ItemUtil.dropItemList(drop, this.cart.world(), x+0.5D, y+0.5D, z+0.5D, false);
+			 context.pause(Settings.OC_DropDelay);
 			 return new Object[]{ true };
 		 }
 		 else{
 			 int moved = InventoryUtil.dropItemInventoryWorld(dstack.copy(),  this.cart.world(), x, y, z, dir.getOpposite(), amount);
-			 if(moved < 1) return new Object[]{ false };
+			 if(moved < 1) return new Object[]{ false, "inventory full" };
 			 if(dstack.stackSize > moved) dstack.stackSize-=moved;
 			 else this.cart.mainInventory().setInventorySlotContents(sslot, null);
+			 context.pause(Settings.OC_DropDelay);
 			 return new Object[]{ true };
 		 }
 	 }
@@ -380,7 +400,8 @@ public class ComputerCartController implements ManagedEnvironment{
 		 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
 		 int sslot = this.cart.selectedSlot();
 		 if(!(sslot>=0 && sslot<this.cart.mainInventory().getSizeInventory()))
-				throw new IllegalArgumentException("invalid slot");
+			 return new Object[]{ false ,"no slot selected"};
+		 if(amount<1) return new Object[]{ false };
 		 
 		 ForgeDirection dir = this.cart.toGlobal(ForgeDirection.getOrientation(side));
 		 int x = (int)Math.floor(this.cart.xPosition())+dir.offsetX;
@@ -403,16 +424,102 @@ public class ComputerCartController implements ManagedEnvironment{
 				 if(stack!=null) moved = stack.stackSize;
 				 if(moved > 0) InventoryUtil.putInventory(stack, this.cart.mainInventory(), moved, ForgeDirection.UNKNOWN, acc);
 			 }
+			 if(moved>0) context.pause(Settings.OC_SuckDelay);
 			 return new Object[]{ (moved > 0) };
 		 }
 		 else{
 			 int[] mslots = InventoryUtil.getAccessible(this.cart.mainInventory(), ForgeDirection.UNKNOWN);
 			 int moved = InventoryUtil.suckItemInventoryWorld(this.cart.mainInventory(), mslots, this.cart.selectedSlot(), this.cart.worldObj, 
 					 x, y, z, dir.getOpposite(), amount);
-			 if(moved > 0) return new Object[]{ true };
+			 if(moved > 0){
+				 context.pause(Settings.OC_SuckDelay);
+				 return new Object[]{ true };
+			 }
 			 return new Object[]{ false };
 		 }
 	 }
 	 
 	 //-------World-Tank-------//
+	 
+	 @Callback(doc = "function(side:number):boolean -- Compare the fluid in the selected tank with the fluid on the specified side. Returns true if equal.")
+	 public Object[] compareFluid(Context context, Arguments args){
+		 int side = args.checkInteger(0);
+		 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
+		 int stank = this.cart.selectedTank();
+		 if(!(stank>0 && stank<=this.cart.tankcount()))
+			 return new Object[]{ false , "no tank selected"};
+		 
+		 ForgeDirection dir = this.cart.toGlobal(ForgeDirection.getOrientation(side));
+		 int x = (int)Math.floor(this.cart.xPosition())+dir.offsetX;
+		 int y = (int)Math.floor(this.cart.yPosition())+dir.offsetY;
+		 int z = (int)Math.floor(this.cart.zPosition())+dir.offsetZ;
+		 
+		 IFluidHandler t1 = TankUtil.getFluidHandler(this.cart.world(), x, y, z);
+		 FluidStack st = this.cart.getTank(stank).getFluid();
+		 if(t1 == null) return new Object[]{ false };
+		 return new Object[]{ TankUtil.hasFluid(t1, st, dir.getOpposite()) };
+	 }
+	 
+	 @Callback(doc = "function(side:number[, amount:number=1000]):boolean, number or string -- Drains the specified amount of fluid from the specified side. Returns the amount drained, or an error message.")
+	 public Object[] drain(Context context, Arguments args){
+		 int side = args.checkInteger(0);
+		 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
+		 int amount = args.optInteger(1, 1000);
+		 int stank = this.cart.selectedTank();
+		 if(!(stank>0 && stank<=this.cart.tankcount()))
+			 return new Object[]{ false , "no tank selected"};
+		 
+		 ForgeDirection dir = this.cart.toGlobal(ForgeDirection.getOrientation(side));
+		 int x = (int)Math.floor(this.cart.xPosition())+dir.offsetX;
+		 int y = (int)Math.floor(this.cart.yPosition())+dir.offsetY;
+		 int z = (int)Math.floor(this.cart.zPosition())+dir.offsetZ;
+		 
+		 IFluidTank t1 = this.cart.getTank(stank);
+		 IFluidHandler t2 = TankUtil.getFluidHandler(this.cart.world(), x, y, z);
+		 if(t2 == null )  return new Object[]{ false , "no tank found"};
+		 
+		 FluidStack filter = t1.getFluid();
+		 FluidStack drain = null;
+		 if(filter == null) 
+			 drain = t2.drain(dir.getOpposite(), amount, false);
+		 else
+			 drain = t2.drain(dir.getOpposite(), new FluidStack(filter,amount), false);
+		 
+		 if(drain == null) return new Object[]{ false, "incompatible or no fluid" };
+		 int moved = t1.fill(drain, false);
+		 if(moved < 1) return new Object[]{ false, "tank full" };
+		 
+		 t1.fill(t2.drain(dir.getOpposite(), new FluidStack(drain, moved), true), true);
+		 return new Object[]{ true,  moved};
+	 }
+	 
+	  @Callback(doc = "function(side:number[, amount:number=1000]):boolean, number of string -- Eject the specified amount of fluid to the specified side. Returns the amount ejected or an error message.")
+	  public Object[] fill(Context context, Arguments args){
+		  int side = args.checkInteger(0);
+			 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
+			 int amount = args.optInteger(1, 1000);
+			 int stank = this.cart.selectedTank();
+			 if(!(stank>0 && stank<=this.cart.tankcount()))
+				 return new Object[]{ false , "no tank selected"};
+			 
+			 ForgeDirection dir = this.cart.toGlobal(ForgeDirection.getOrientation(side));
+			 int x = (int)Math.floor(this.cart.xPosition())+dir.offsetX;
+			 int y = (int)Math.floor(this.cart.yPosition())+dir.offsetY;
+			 int z = (int)Math.floor(this.cart.zPosition())+dir.offsetZ;
+			 
+			 IFluidTank t1 = this.cart.getTank(stank);
+			 IFluidHandler t2 = TankUtil.getFluidHandler(this.cart.world(), x, y, z);
+			 if(t2 == null )  return new Object[]{ false , "no tank found"};
+			 
+			 FluidStack drain = t1.drain(amount, false);
+			 if(drain == null)
+				 return new Object[]{ false, "tank is empty" };
+			 if(TankUtil.getSpaceForFluid(t2, drain, dir.getOpposite()) < 1) 
+				 return new Object[]{ false, "incompatible or no fluid" };
+			 int moved = t2.fill(dir.getOpposite(),drain, false);
+			 if(moved < 1) return new Object[]{ false, "no space" };
+			 
+			 t2.fill(dir.getOpposite(),t1.drain(moved, true), true);
+			 return new Object[]{ true,  moved };
+	  }
 }

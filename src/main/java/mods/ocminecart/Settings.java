@@ -11,6 +11,7 @@ public class Settings {
 	public static float OC_SoundVolume;
 	public static double OC_IC2PWR;
 	public static double OC_SuckDelay;
+	public static double OC_DropDelay;
 	
 	public static int ComputerCartBaseCost; //Config Value -> basecost
 	public static int ComputerCartComplexityCost; //Config Value -> costmultiplier
@@ -41,6 +42,7 @@ public class Settings {
 		OC_SoundVolume = li.cil.oc.Settings.get().soundVolume();
 		OC_IC2PWR = li.cil.oc.Settings.get().ratioIndustrialCraft2();
 		OC_SuckDelay = li.cil.oc.Settings.get().suckDelay();
+		OC_DropDelay = li.cil.oc.Settings.get().dropDelay();
 	}
 	
 	private static void confValues(){
