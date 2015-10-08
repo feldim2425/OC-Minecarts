@@ -39,7 +39,6 @@ public class RotationHelper {
 		yaw = (yaw+360)%360;
 		int di = MathHelper.floor_double((yaw * 4.0D / 360D) + 0.5D);
 		di=(di+4)%4;
-		OCMinecart.logger.info(">>> "+di+" > "+yaw);
 		return RotationHelper.dir[di];
 	}
 }
