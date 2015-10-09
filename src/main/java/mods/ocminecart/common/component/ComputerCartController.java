@@ -492,7 +492,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		 return new Object[]{ true,  moved};
 	 }
 	 
-	  @Callback(doc = "function(side:number[, amount:number=1000]):boolean, number of string -- Eject the specified amount of fluid to the specified side. Returns the amount ejected or an error message.")
+	  @Callback(doc = "function(side:number[, amount:number=1000]):boolean, number or string -- Eject the specified amount of fluid to the specified side. Returns the amount ejected or an error message.")
 	  public Object[] fill(Context context, Arguments args){
 		  int side = args.checkInteger(0);
 			 if(side<0 || side > 5) throw new IllegalArgumentException("invalid side");
