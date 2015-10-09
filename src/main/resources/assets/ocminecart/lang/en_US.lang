@@ -6,6 +6,7 @@ item.ocminecart.computercartcase_0.name=Computercart Case (Tier 1)
 item.ocminecart.computercartcase_1.name=Computercart Case (Tier 2)
 item.ocminecart.computercartcase_2.name=Computercart Case (Tier 3)
 item.ocminecart.computercartcase_3.name=Computercart Case (Creative)
+item.ocminecart.remotemodule.name=Remote Module
 
 #Tile Entity Names
 tile.ocminecart.networkrail.name=Network Rail
@@ -22,6 +23,10 @@ gui.ocminecart.manual=OC-Minecarts
 #Tooltip for Items
 tooltip.ocminecart.instcomponents=Installed Components
 tooltip.ocminecart.viewcomponents=Hold %s to view installed components.
+tooltip.ocminecart.moreinfo=Hold %s to see more informations.
+
+#Tooltio for Items (item descriptions)
+tooltip.ocminecart.remotemodule.desc=You can install this item by right clicking a compatible cart. It allows to control Locomotives
 
 #Tooltip for GUIs
 tooltip.ocminecart.gui.turnon=Turn on
