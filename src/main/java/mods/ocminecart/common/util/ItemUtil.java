@@ -35,6 +35,19 @@ public class ItemUtil {
 		}
 	}
 	
+	public static void dropItem(ItemStack stack, World world, double x, double y, double z, boolean motion){
+		if(stack.stackSize > 0){
+			EntityItem entityitem = new EntityItem(world, x, y, z, stack);
+			entityitem.delayBeforeCanPickup = 10;
+			if(!motion){
+				entityitem.motionX=0;
+				entityitem.motionY=0;
+				entityitem.motionZ=0;
+			}
+			world.spawnEntityInWorld(entityitem);
+		}
+	}
+	
 	public static ItemStack suckItems(World world, int x, int y, int z, ItemStack filter, int num){
 		if(!world.isRemote){
 			ArrayList<ItemStack> items = new ArrayList<ItemStack>();
