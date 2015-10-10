@@ -25,7 +25,7 @@ tooltip.ocminecart.instcomponents=Installed Components
 tooltip.ocminecart.viewcomponents=Hold %s to view installed components.
 tooltip.ocminecart.moreinfo=Hold %s to see more informations.
 
-#Tooltio for Items (item descriptions)
+#Tooltip for Items (item descriptions)
 tooltip.ocminecart.remotemodule.desc=You can install this item by right clicking a compatible cart. It allows to control Locomotives
 
 #Tooltip for GUIs
@@ -34,3 +34,8 @@ tooltip.ocminecart.gui.turnoff=Turn off
 tooltip.ocminecart.gui.useanalyzer=Use an Analyzer to troubleshoot errors.
 tooltip.ocminecart.storedenergy=Stored Energy
 tooltip.ocminecart.address=Address
+
+#Chat messages
+chat.ocminecart.invalidcart=Incompatible cart
+chat.ocminecart.moduleinstalled=The module has been successfully installed
+chat.ocminecart.hasmodule=This car already has a remote module

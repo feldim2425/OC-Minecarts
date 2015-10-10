@@ -5,6 +5,7 @@ import mods.ocminecart.common.assemble.AssembleRegister;
 import mods.ocminecart.common.blocks.ModBlocks;
 import mods.ocminecart.common.disassemble.DisassembleRegister;
 import mods.ocminecart.common.driver.CustomDriver;
+import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.recipe.Recipes;
@@ -28,6 +29,7 @@ public class CommonProxy {
 		AssembleRegister.register();
 		CustomDriver.init();
 		Recipes.init();
+		RemoteExtenderRegister.register();
 		
 		if(Loader.isModLoaded("Waila")) ModWaila.initWailaModule();
 		if(Loader.isModLoaded("Railcraft")) RailcraftEventHandler.init();
