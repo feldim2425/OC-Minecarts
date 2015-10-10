@@ -3,12 +3,7 @@ package mods.ocminecart.network;
 import java.util.Iterator;
 
 import mods.ocminecart.OCMinecart;
-import mods.ocminecart.network.message.ComputercartInventoryUpdate;
-import mods.ocminecart.network.message.EntitySyncData;
-import mods.ocminecart.network.message.EntitySyncRequest;
-import mods.ocminecart.network.message.GuiButtonClick;
-import mods.ocminecart.network.message.GuiEntityButtonClick;
-import mods.ocminecart.network.message.UpdateRunning;
+import mods.ocminecart.network.message.*;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.tileentity.TileEntity;
@@ -25,13 +20,15 @@ public class ModNetwork {
 	
 	public static void init(){
 		channel=NetworkRegistry.INSTANCE.newSimpleChannel(OCMinecart.MODID.toLowerCase());
+		int id=-1;
 		
-		channel.registerMessage(GuiButtonClick.Handler.class, GuiButtonClick.class, 0, Side.SERVER);
-		channel.registerMessage(GuiEntityButtonClick.Handler.class, GuiEntityButtonClick.class, 1, Side.SERVER);
-		channel.registerMessage(ComputercartInventoryUpdate.Handler.class, ComputercartInventoryUpdate.class, 2, Side.CLIENT);
-		channel.registerMessage(EntitySyncRequest.Handler.class, EntitySyncRequest.class, 3, Side.SERVER);
-		channel.registerMessage(EntitySyncData.Handler.class, EntitySyncData.class, 4, Side.CLIENT);
-		channel.registerMessage(UpdateRunning.Handler.class, UpdateRunning.class, 5, Side.CLIENT);
+		channel.registerMessage(GuiButtonClick.Handler.class, GuiButtonClick.class, id++, Side.SERVER);
+		channel.registerMessage(GuiEntityButtonClick.Handler.class, GuiEntityButtonClick.class, id++, Side.SERVER);
+		channel.registerMessage(ComputercartInventoryUpdate.Handler.class, ComputercartInventoryUpdate.class, id++, Side.CLIENT);
+		channel.registerMessage(EntitySyncRequest.Handler.class, EntitySyncRequest.class, id++, Side.SERVER);
+		channel.registerMessage(EntitySyncData.Handler.class, EntitySyncData.class, id++, Side.CLIENT);
+		channel.registerMessage(UpdateRunning.Handler.class, UpdateRunning.class, id++, Side.CLIENT);
+		channel.registerMessage(ItemUseMessage.Handler.class, ItemUseMessage.class, id++, Side.CLIENT);
 	}
 	
 	public static void sendToNearPlayers(IMessage msg, TileEntity entity){
