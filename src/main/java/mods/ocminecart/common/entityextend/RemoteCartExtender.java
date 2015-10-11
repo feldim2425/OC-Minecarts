@@ -19,20 +19,21 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	protected EntityMinecart entity;
 	protected boolean enabled=false;
+	private int oX,oY,oZ;
 	
 	@Override
 	public int x() {
-		return (int)Math.floor(entity.posX+0.5);
+		return (int)entity.posX;
 	}
 
 	@Override
 	public int y() {
-		return (int)Math.floor(entity.posY+0.5);
+		return (int)entity.posY;
 	}
 
 	@Override
 	public int z() {
-		return (int)Math.floor(entity.posZ+0.5);
+		return (int)entity.posZ-1;
 	}
 	
 	public final void setEnabled(boolean state) {
@@ -41,6 +42,9 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			if(state){
 				API.network.joinWirelessNetwork(this);
 				RemoteExtenderRegister.addRemoteUpdate(this);
+				this.oX = x();
+				this.oY = y();
+				this.oZ = z();
 			}
 			else{
 				API.network.leaveWirelessNetwork(this);
@@ -62,6 +66,12 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			ItemUtil.dropItem(new ItemStack(ModItems.item_CartRemoteModule), this.entity.worldObj, 
 					this.entity.posX, this.entity.posY, this.entity.posZ, true);
 		}
+		else if(oX!=x() || oY!=y() || oZ!=z()){
+			API.network.updateWirelessNetwork(this);
+			this.oX = x();
+			this.oY = y();
+			this.oZ = z();
+		}
 	}
 
 	@Override
@@ -81,6 +91,18 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	public void loadNBTData(NBTTagCompound nbt) {
 		if(nbt.hasKey(OCMinecart.MODID+":rc_enabled"))
 			enabled = nbt.getBoolean(OCMinecart.MODID+":rc_enabled");
+		
+		if(this.enabled){
+			API.network.joinWirelessNetwork(this);
+			RemoteExtenderRegister.addRemoteUpdate(this);
+			this.oX = x();
+			this.oY = y();
+			this.oZ = z();
+		}
+		else{
+			API.network.leaveWirelessNetwork(this);
+			RemoteExtenderRegister.removeRemoteUpdate(this);
+		}
 	}
 
 	@Override
