@@ -59,9 +59,6 @@ public class RemoteExtenderRegister {
 		return ext.isEnabled();
 	}
 	
-	public static void register(){
-		registerRemote(mods.railcraft.common.carts.EntityCartBasic.class, RemoteMinecart.class);
-	}
 	
 	public static boolean addRemoteUpdate(RemoteCartExtender ext){
 		synchronized(updater){
@@ -85,6 +82,11 @@ public class RemoteExtenderRegister {
 				updater.get(i).update();
 			}
 		}
+	}
+	
+	public static void register(){
+		registerRemote(mods.railcraft.common.carts.EntityCartBasic.class, RemoteMinecart.class);
+		registerRemote(mods.railcraft.common.carts.EntityLocomotiveSteam.class, RemoteSteamLocomotive.class);
 	}
 
 }
