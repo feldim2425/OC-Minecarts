@@ -1,5 +1,6 @@
 package mods.ocminecart.common.entityextend;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -14,7 +15,7 @@ public class RemoteExtenderRegister {
 	private static HashMap<Class<? extends EntityMinecart>, Class<? extends RemoteCartExtender>> list = 
 			new HashMap<Class<? extends EntityMinecart>, Class<? extends RemoteCartExtender>>();
 	
-	
+	private static ArrayList<RemoteCartExtender> updater = new ArrayList<RemoteCartExtender>();
 
 	public static boolean registerRemote(Class<? extends EntityMinecart> cart, Class<? extends RemoteCartExtender> remote){
 		if(list.containsKey(cart)) return false;
@@ -60,6 +61,30 @@ public class RemoteExtenderRegister {
 	
 	public static void register(){
 		registerRemote(mods.railcraft.common.carts.EntityCartBasic.class, RemoteMinecart.class);
+	}
+	
+	public static boolean addRemoteUpdate(RemoteCartExtender ext){
+		synchronized(updater){
+			if(updater.contains(ext)) return false;
+			updater.add(ext);
+			return true;
+		}
+	}
+	
+	public static boolean removeRemoteUpdate(RemoteCartExtender ext){
+		synchronized(updater){
+			if(!updater.contains(ext)) return false;
+			updater.remove(ext);
+			return true;
+		}
+	}
+	
+	public static void serverTick(){
+		synchronized(updater){
+			for(int i=0;i<updater.size();i+=1){
+				updater.get(i).update();
+			}
+		}
 	}
 
 }

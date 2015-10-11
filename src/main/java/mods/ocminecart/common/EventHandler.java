@@ -21,6 +21,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -59,5 +60,10 @@ public class EventHandler {
 		if(event.entity instanceof EntityMinecart){
 			RemoteExtenderRegister.addRemote((EntityMinecart) event.entity);
 		}
+	}
+	
+	@SubscribeEvent
+	public void onServerTick(ServerTickEvent event){
+		RemoteExtenderRegister.serverTick();
 	}
 }

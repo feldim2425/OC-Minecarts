@@ -18,9 +18,9 @@ public class RemoteMinecart extends RemoteCartExtender{
 		super.init(entity, world);
 	}
 	
-	public void setEnabled(boolean state){
-		super.setEnabled(state);
-		OCMinecart.logger.info(">>> State: "+state);
+	public void changeEnabled(){
+		super.setEnabled(this.enabled);
+		OCMinecart.logger.info(">>> State: "+this.enabled);
 	}
 
 

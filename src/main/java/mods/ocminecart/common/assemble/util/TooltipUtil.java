@@ -33,7 +33,6 @@ public class TooltipUtil {
 			cur+=cut.length();
 		}
 		ArrayList<String> res = new ArrayList<String>();
-		OCMinecart.logger.info(sp);
 		String[] s = sp.split("\\n");
 		for(int i=0;i<s.length;i+=1){
 			res.add(s[i]);
