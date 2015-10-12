@@ -86,7 +86,7 @@ public class RemoteExtenderRegister {
 	
 	public static void register(){
 		registerRemote(mods.railcraft.common.carts.EntityCartBasic.class, RemoteMinecart.class);
-		registerRemote(mods.railcraft.common.carts.EntityLocomotiveSteam.class, RemoteSteamLocomotive.class);
+		registerRemote(mods.railcraft.common.carts.EntityLocomotiveSteamSolid.class, RemoteSteamLocomotive.class);
 	}
 
 }
