@@ -10,7 +10,7 @@ public class RemoteMinecart extends RemoteCartExtender{
 
 	@Override
 	public void receivePacket(Packet packet, WirelessEndpoint sender) {
-		
+		super.receivePacket(packet, sender);
 	}
 	
 	@Override

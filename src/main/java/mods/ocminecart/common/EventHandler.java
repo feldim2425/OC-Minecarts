@@ -1,24 +1,16 @@
 package mods.ocminecart.common;
 
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
-import mods.ocminecart.common.items.ItemCartRemoteModule;
-import mods.ocminecart.common.items.ModItems;
+import mods.ocminecart.common.items.interfaces.ItemEntityInteract;
 import mods.ocminecart.common.recipe.event.CraftingHandler;
-import mods.ocminecart.common.util.ItemUtil;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.minecart.MinecartUpdateEvent;
-import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
@@ -48,8 +40,8 @@ public class EventHandler {
 	@SubscribeEvent
 	public void onEntityClick(EntityInteractEvent event) {
 		ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
-		if(stack!=null && stack.getItem() == ModItems.item_CartRemoteModule){
-			if(((ItemCartRemoteModule) ModItems.item_CartRemoteModule).onEntityClick(event.entityPlayer, event.target, stack))
+		if(stack!=null && stack.getItem() instanceof ItemEntityInteract){
+			if(((ItemEntityInteract) stack.getItem()).onEntityClick(event.entityPlayer, event.target, stack))
 				event.setCanceled(true);
 		}
 	}

@@ -13,6 +13,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.assemble.util.TooltipUtil;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
+import mods.ocminecart.common.items.interfaces.ItemEntityInteract;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ItemUseMessage;
 import net.minecraft.client.Minecraft;
@@ -30,7 +31,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
-public class ItemCartRemoteModule extends Item{
+public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	
 	public ItemCartRemoteModule(){
 		super();

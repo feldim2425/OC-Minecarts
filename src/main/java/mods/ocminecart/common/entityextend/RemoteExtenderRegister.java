@@ -39,8 +39,8 @@ public class RemoteExtenderRegister {
 	}
 	
 	public static boolean hasRemote(EntityMinecart cart){
-		return cart.getExtendedProperties(RemoteCartExtender.PROP_ID)!=null ||
-				!(cart.getExtendedProperties(RemoteCartExtender.PROP_ID) instanceof RemoteCartExtender);
+		return cart.getExtendedProperties(RemoteCartExtender.PROP_ID)!=null &&
+				(cart.getExtendedProperties(RemoteCartExtender.PROP_ID) instanceof RemoteCartExtender);
 	}
 	
 	public static int enableRemote(EntityMinecart cart, boolean b){
@@ -84,8 +84,13 @@ public class RemoteExtenderRegister {
 		}
 	}
 	
+	public static RemoteCartExtender getExtender(EntityMinecart cart){
+		if(!hasRemote(cart)) return null;
+		return (RemoteCartExtender) cart.getExtendedProperties(RemoteCartExtender.PROP_ID);
+	}
+	
 	public static void register(){
-		registerRemote(mods.railcraft.common.carts.EntityCartBasic.class, RemoteMinecart.class);
+		registerRemote(mods.railcraft.common.carts.EntityCartBasic.class, RemoteMinecart.class); //This is just a test.
 		registerRemote(mods.railcraft.common.carts.EntityLocomotiveSteamSolid.class, RemoteSteamLocomotive.class);
 	}
 

@@ -3,14 +3,21 @@ package mods.ocminecart.common.entityextend;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
+
+import com.google.common.base.Charsets;
 
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ItemUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 import li.cil.oc.api.API;
@@ -23,12 +30,12 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	protected EntityMinecart entity;
 	protected boolean enabled=false;
-	protected boolean respbroadcast = false;
-	private int oX,oY,oZ;
+	protected boolean respbroadcast = true;
 	private int nextResp = -1;
 	private String nextAddr = null;
-	protected int respport = -1;
-	protected int cmdport = -1;
+	protected int respport = 1;
+	protected int cmdport = 2;
+	private String uuid = UUID.randomUUID().toString();
 	
 	@Override
 	public int x() {
@@ -51,9 +58,6 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			if(state){
 				API.network.joinWirelessNetwork(this);
 				RemoteExtenderRegister.addRemoteUpdate(this);
-				this.oX = x();
-				this.oY = y();
-				this.oZ = z();
 			}
 			else{
 				API.network.leaveWirelessNetwork(this);
@@ -74,16 +78,38 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	protected void processCommand(String cmd, Object[] args) {
 		if(cmd == null || cmd.equals("doc")){
-			if(args.length > 1 && (args[1] instanceof String) && this.getCommands().contains(args[1]))
+			String a1 = (args.length >= 1 && (args[0] instanceof String)) ? (String)args[0] : null;
+			if(a1 != null && this.getCommands().contains(a1))
 			{
-				this.sendPacket(new Object[]{this.getDoc((String) args[1])}, this.getRespPort(), this.getRespAddress());
+				String doc = this.getDoc(a1);
+				doc = (doc == null || doc == "") ? "No documentation available" : doc;
+				this.sendPacket(new Object[]{doc}, this.getRespPort(), this.getRespAddress());
 			}
 			else
 			{
 				this.sendPacket(new Object[]{this.getCmdList()}, this.getRespPort(), this.getRespAddress());
 			}
 		}
-			
+		else if(cmd.equals("response_port")){
+			boolean isValid = args.length>=1 && (args[0] instanceof Double);
+			int port = (isValid) ? (int)(double)args[0] : 0; //Double is a Class and have to be converted to a double (type)
+			port = Math.max(-1, port);
+			if(isValid) this.respport = port;
+			this.sendPacket(new Object[]{this.respport}, this.getRespPort(), this.getRespAddress());
+		}
+		else if(cmd.equals("command_port")){
+			boolean isValid = args.length>=1 && (args[0] instanceof Double);
+			int port = (isValid) ? (int)(double)args[0] : 0;
+			port = Math.max(-1, port);
+			if(isValid) this.cmdport = port;
+			this.sendPacket(new Object[]{this.cmdport}, this.getRespPort(), this.getRespAddress());
+		}
+		else if(cmd.equals("response_broadcast")){
+			boolean isValid = args.length>=1 && (args[0] instanceof Boolean);
+			boolean value = (isValid) ? (boolean)args[0] : false;
+			if(isValid) this.respbroadcast = value;
+			this.sendPacket(new Object[]{this.respbroadcast}, this.getRespPort(), this.getRespAddress());
+		}
 			
 	}
 	
@@ -94,7 +120,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		{
 			st += "  "+it.next()+ ((it.hasNext()) ? " ," : "") + "\n";
 		}
-		st = "}";
+		st += "}";
 		return st;
 	}
 	
@@ -110,8 +136,8 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	protected final void sendPacket(Object[] msg, int port, String des){
 		if(this.getRespPort()<0) return;
-		Packet packet = API.network.newPacket("", des, port, msg);
-		API.network.sendWirelessPacket(this, 8, packet);
+		Packet packet = API.network.newPacket(uuid, des, port, msg);
+		API.network.sendWirelessPacket(this, 4, packet);
 	}
 	
 	protected List<String> getCommands(){
@@ -124,23 +150,28 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	}
 	
 	protected String getDoc(String cmd){
-		if(cmd == null || cmd.equals("doc"))
-			return "doc([func:string]):table or string -- get a list of functions or a documentation for a function";
-		
+		if(cmd == null) return null;
+		if(cmd.equals("doc"))
+			return "doc([func:string]):table or string -- get a list of functions or a documentation for a function. -t (as 2. String) to get a table object";
+		else if(cmd.equals("response_port"))
+			return "response_port([port:number]):number -- sets the response port and returns the new port. -1 to response on the same port as the last message";
+		else if(cmd.equals("command_port"))
+			return "command_port([port:number]):number -- sets the command port and returns the new port. -1 to accept all ports";
+		else if(cmd.equals("response_broadcast"))
+			return "response_broadcast([value:boolean]):boolean -- if the value is true it will respond with private messages.";
+	
 		return null;
 	}
 	
 	public void update() {
+		if(this.world().isRemote) return;
 		if(this.entity.isDead){
 			this.setEnabled(false);
 			ItemUtil.dropItem(new ItemStack(ModItems.item_CartRemoteModule), this.entity.worldObj, 
 					this.entity.posX, this.entity.posY, this.entity.posZ, true);
 		}
-		else if(oX!=x() || oY!=y() || oZ!=z()){
+		else{
 			API.network.updateWirelessNetwork(this);
-			this.oX = x();
-			this.oY = y();
-			this.oZ = z();
 		}
 	}
 
@@ -150,14 +181,33 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	}
 
 	@Override
-	synchronized public void receivePacket(Packet packet, WirelessEndpoint sender){
-		if(packet.ttl()<0 || !this.inRange(sender, 8)) return;
-		if(!(packet.data()[0] instanceof String)) return;
+	public void receivePacket(Packet packet, WirelessEndpoint sender){
+		if(packet.ttl()<0 || !this.inRange(sender, 4)) return;
+		if(!(packet.destination()==null || packet.destination().equals(this.uuid)) || !(this.cmdport==-1 || packet.port()==this.cmdport))
+			return;
+		if(!(packet.data()[0] instanceof byte[])) return;
 		this.nextAddr = packet.source();
 		this.nextResp = packet.port();
-		String cmd = (String) packet.data()[0];
-		Object[] data = (this.getCommands().contains(cmd))? packet.data() : new Object[]{cmd};
-		this.processCommand((this.getCommands().contains(cmd))? cmd : null, packet.data());
+		String cmd = new String((byte[])packet.data()[0],Charsets.UTF_8);
+		Object[] data = (this.getCommands().contains(cmd))? this.processPacket(packet.data()) : new Object[]{};
+		this.processCommand((this.getCommands().contains(cmd))? cmd : null, data);
+	}
+	
+	private Object[] processPacket(Object[] data){
+		if(data.length-1<1) return new Object[]{};
+		Object[] res = new Object[data.length-1];
+		for(int i=1;i<data.length;i+=1)
+		{
+			if(data[i] instanceof byte[])
+			{
+				res[i-1] = new String((byte[]) data[i], Charsets.UTF_8);
+			}
+			else
+			{
+				res[i-1] = data[i];
+			}
+		}
+		return res;
 	}
 
 	@Override
@@ -165,9 +215,11 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		nbt.setBoolean(OCMinecart.MODID+":rc_enabled", enabled);
 		if(enabled){
 			NBTTagCompound rc = new NBTTagCompound();
+			rc.setString("rc_uuid", this.uuid);
 			rc.setBoolean("rc_respbroadcast", this.respbroadcast);
 			rc.setInteger("rc_respport", this.respport);
 			rc.setInteger("rc_cmdport", this.cmdport);
+			this.writeModuleNBT(rc);
 			nbt.setTag(OCMinecart.MODID+":rc_settings", rc);
 		}
 	}
@@ -179,17 +231,16 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		
 		if(nbt.hasKey(OCMinecart.MODID+":rc_settings") && this.enabled){
 			NBTTagCompound rc = nbt.getCompoundTag(OCMinecart.MODID+":rc_settings");
+			if(rc.hasKey("rc_uuid")) this.uuid = rc.getString("rc_uuid");
 			if(rc.hasKey("rc_respbroadcast")) this.respbroadcast = rc.getBoolean("rc_respbroadcast");
 			if(rc.hasKey("rc_respport")) this.respport = rc.getInteger("rc_respport");
 			if(rc.hasKey("rc_cmdport")) this.cmdport = rc.getInteger("rc_cmdport");	
+			this.loadModuleNBT(rc);
 		}
 		
 		if(this.enabled){
 			API.network.joinWirelessNetwork(this);
 			RemoteExtenderRegister.addRemoteUpdate(this);
-			this.oX = x();
-			this.oY = y();
-			this.oZ = z();
 		}
 		else{
 			API.network.leaveWirelessNetwork(this);
@@ -209,5 +260,19 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		int z = this.z() - w.z();
 		return (x*x) + (y*y) + (z*z) <= (range * range); 
 	}
+	
+	public String getAddress(){
+		return (this.enabled) ? this.uuid : null;
+	}
+	
+	protected void loadModuleNBT(NBTTagCompound nbt){};
+	protected void writeModuleNBT(NBTTagCompound nbt){}
+
+	public void onAnalyzeModule(EntityPlayer p) {
+		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Address: "+EnumChatFormatting.RESET+this.uuid));
+		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Response Port: "+EnumChatFormatting.RESET+this.respport));
+		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Command Port: "+EnumChatFormatting.RESET+this.cmdport));
+		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Boradcast Response: "+EnumChatFormatting.RESET+this.respbroadcast));
+	};
 	
 }
