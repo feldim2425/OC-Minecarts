@@ -15,6 +15,7 @@ import mods.ocminecart.common.items.interfaces.ItemEntityInteract;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ItemUseMessage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
@@ -43,13 +44,28 @@ public class ItemRemoteAnalyzer extends Item implements ItemEntityInteract{
 	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s){
 		if(e instanceof EntityMinecart && RemoteExtenderRegister.hasRemote((EntityMinecart) e)){
 			if(p.worldObj.isRemote) return true;
-			if(RemoteExtenderRegister.getExtender((EntityMinecart) e).isEnabled())
+			if(RemoteExtenderRegister.getExtender((EntityMinecart) e).isEnabled()){
 				RemoteExtenderRegister.getExtender((EntityMinecart) e).onAnalyzeModule(p);
+				
+				NBTTagCompound usedat = new NBTTagCompound();
+				usedat.setString("address", RemoteExtenderRegister.getExtender((EntityMinecart) e).getAddress());
+				ModNetwork.channel.sendTo(new ItemUseMessage(1,p.getEntityId(),usedat), (EntityPlayerMP) p);
+			}
 			else
 				p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"No Module found."));
 			return true;
 		}
 		return false;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public void onMPUsage(EntityPlayer p, NBTTagCompound data){
+		if(p!=Minecraft.getMinecraft().thePlayer) return;
+		if(p.isSneaking()){
+			GuiScreen.setClipboardString(data.getString("address"));
+			p.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat."+OCMinecart.MODID+".clipboard")));
+		}
+		p.swingItem();
 	}
 	
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean adv) {

@@ -85,9 +85,13 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 				doc = (doc == null || doc == "") ? "No documentation available" : doc;
 				this.sendPacket(new Object[]{doc}, this.getRespPort(), this.getRespAddress());
 			}
+			else if(a1!=null && a1.equals("-t"))
+			{
+				this.sendPacket(new Object[]{this.getCmdList(true)}, this.getRespPort(), this.getRespAddress());
+			}
 			else
 			{
-				this.sendPacket(new Object[]{this.getCmdList()}, this.getRespPort(), this.getRespAddress());
+				this.sendPacket(new Object[]{this.getCmdList(false)}, this.getRespPort(), this.getRespAddress());
 			}
 		}
 		else if(cmd.equals("response_port")){
@@ -113,15 +117,26 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			
 	}
 	
-	private String getCmdList(){
+	private String getCmdList(boolean compress){
 		Iterator<String> it = this.getCommands().iterator();
-		String st = "{\n";
-		while(it.hasNext())
-		{
-			st += "  "+it.next()+ ((it.hasNext()) ? " ," : "") + "\n";
+		if(!compress){
+			String st = "{\n";
+			while(it.hasNext())
+			{
+				st += "  "+it.next()+ ((it.hasNext()) ? " ," : "") + "\n";
+			}
+			st += "}";
+			return st;
 		}
-		st += "}";
-		return st;
+		else{
+			String st = "{";
+			while(it.hasNext())
+			{
+				st += it.next()+ ((it.hasNext()) ? "," : "");
+			}
+			st += "}";
+			return st;
+		}
 	}
 	
 	protected final int getRespPort() {
@@ -152,7 +167,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	protected String getDoc(String cmd){
 		if(cmd == null) return null;
 		if(cmd.equals("doc"))
-			return "doc([func:string]):table or string -- get a list of functions or a documentation for a function. -t (as 2. String) to get a table object";
+			return "doc([func:string]):table or string -- get a list of functions or a documentation for a function. -t (as 2. String) to get a compressed list";
 		else if(cmd.equals("response_port"))
 			return "response_port([port:number]):number -- sets the response port and returns the new port. -1 to response on the same port as the last message";
 		else if(cmd.equals("command_port"))
@@ -273,6 +288,6 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Response Port: "+EnumChatFormatting.RESET+this.respport));
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Command Port: "+EnumChatFormatting.RESET+this.cmdport));
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Boradcast Response: "+EnumChatFormatting.RESET+this.respbroadcast));
-	};
+	}
 	
 }
