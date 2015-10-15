@@ -2,11 +2,16 @@ package mods.ocminecart.common.entityextend;
 
 import java.util.List;
 
+import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidTankInfo;
 import li.cil.oc.api.network.Packet;
 import li.cil.oc.api.network.WirelessEndpoint;
 import mods.railcraft.common.carts.EntityLocomotive.LocoMode;
 import mods.railcraft.common.carts.EntityLocomotive.LocoSpeed;
 import mods.railcraft.common.carts.EntityLocomotiveSteamSolid;
+import mods.railcraft.common.fluids.Fluids;
 
 public class RemoteSteamLocomotive extends RemoteCartExtender {
 	
@@ -35,6 +40,33 @@ public class RemoteSteamLocomotive extends RemoteCartExtender {
 		}
 		else if(cmd.equals("whistle")){
 			loco.whistle();
+		}
+		else if(cmd.equals("heat")){
+			this.sendPacket(new Object[]{loco.boiler.getHeat()}, this.getRespPort(), this.getRespAddress());
+		}
+		else if(cmd.equals("steam")){
+			FluidTankInfo[] info = loco.getTankInfo(ForgeDirection.UNKNOWN);
+			for(int i=0;i<info.length;i+=1)
+			{
+				if(info[i].fluid != null && info[i].fluid.isFluidEqual(FluidRegistry.getFluidStack("steam", 1)))
+				{
+					this.sendPacket(new Object[]{info[i].fluid.amount,"steam"}, this.getRespPort(), this.getRespAddress());
+					return;
+				}
+			}
+			this.sendPacket(new Object[]{0,"steam"}, this.getRespPort(), this.getRespAddress());
+		}
+		else if(cmd.equals("water")){
+			FluidTankInfo[] info = loco.getTankInfo(ForgeDirection.UNKNOWN);
+			for(int i=0;i<info.length;i+=1)
+			{
+				if(info[i].fluid != null && info[i].fluid.isFluidEqual(new FluidStack(FluidRegistry.WATER,1)))
+				{
+					this.sendPacket(new Object[]{info[i].fluid.amount,"water"}, this.getRespPort(), this.getRespAddress());
+					return;
+				}
+			}
+			this.sendPacket(new Object[]{0 ,"water"}, this.getRespPort(), this.getRespAddress());
 		}
 	}
 
