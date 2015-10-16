@@ -1,6 +1,5 @@
 package mods.ocminecart.common.util;
 
-import mods.ocminecart.OCMinecart;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.common.util.ForgeDirection;
 

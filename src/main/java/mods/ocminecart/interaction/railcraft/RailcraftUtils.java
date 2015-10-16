@@ -1,8 +1,8 @@
 package mods.ocminecart.interaction.railcraft;
 
-import cpw.mods.fml.common.Loader;
 import mods.railcraft.api.core.items.IToolCrowbar;
 import net.minecraft.entity.player.EntityPlayer;
+import cpw.mods.fml.common.Loader;
 
 public class RailcraftUtils {
 	

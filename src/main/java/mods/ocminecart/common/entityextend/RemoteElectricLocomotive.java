@@ -2,14 +2,9 @@ package mods.ocminecart.common.entityextend;
 
 import java.util.List;
 
-import mods.railcraft.common.carts.EntityLocomotiveElectric;
-import mods.railcraft.common.carts.EntityLocomotiveSteamSolid;
 import mods.railcraft.common.carts.EntityLocomotive.LocoMode;
 import mods.railcraft.common.carts.EntityLocomotive.LocoSpeed;
-import net.minecraftforge.common.util.ForgeDirection;
-import net.minecraftforge.fluids.FluidRegistry;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidTankInfo;
+import mods.railcraft.common.carts.EntityLocomotiveElectric;
 
 public class RemoteElectricLocomotive extends RemoteCartExtender{
 	@Override

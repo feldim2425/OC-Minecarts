@@ -3,7 +3,6 @@ package mods.ocminecart.common.assemble.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import mods.ocminecart.OCMinecart;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 

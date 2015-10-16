@@ -2,7 +2,6 @@ package mods.ocminecart.common.util;
 
 import java.util.ArrayList;
 
-import mods.ocminecart.OCMinecart;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;

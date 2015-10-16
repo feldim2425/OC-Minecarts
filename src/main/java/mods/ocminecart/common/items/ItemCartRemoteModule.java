@@ -1,15 +1,8 @@
 package mods.ocminecart.common.items;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Random;
 
-import org.lwjgl.input.Keyboard;
-
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.assemble.util.TooltipUtil;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
@@ -19,10 +12,8 @@ import mods.ocminecart.network.message.ItemUseMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,6 +21,12 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+
+import org.lwjgl.input.Keyboard;
+
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	

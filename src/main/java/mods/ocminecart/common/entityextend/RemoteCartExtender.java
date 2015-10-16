@@ -5,8 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import com.google.common.base.Charsets;
-
+import li.cil.oc.api.API;
+import li.cil.oc.api.network.Packet;
+import li.cil.oc.api.network.WirelessEndpoint;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ItemUtil;
@@ -14,15 +15,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagByteArray;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
-import li.cil.oc.api.API;
-import li.cil.oc.api.network.Packet;
-import li.cil.oc.api.network.WirelessEndpoint;
+
+import com.google.common.base.Charsets;
 
 public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedEntityProperties{
 	

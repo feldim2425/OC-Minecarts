@@ -2,11 +2,9 @@ package mods.ocminecart.interaction.railcraft;
 
 import java.util.HashMap;
 
-import net.minecraftforge.common.MinecraftForge;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.AdvCart;
 import mods.railcraft.api.events.CartLockdownEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
+import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 public class RailcraftEventHandler {

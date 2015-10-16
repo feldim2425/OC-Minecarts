@@ -1,16 +1,9 @@
 package mods.ocminecart.common.minecart;
 
-import scala.reflect.internal.Trees.This;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
-import li.cil.oc.api.network.Connector;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.util.BitUtil;
 import mods.railcraft.api.carts.IEnergyTransfer;
 import mods.railcraft.api.electricity.IElectricMinecart;
-import mods.railcraft.api.electricity.IElectricMinecart.ChargeHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
@@ -20,6 +13,9 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 
 //Is the Base for a solid, self powered cart with a break.
 //Later I will add the Railcraft integration here

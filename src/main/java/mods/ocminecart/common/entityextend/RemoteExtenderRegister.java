@@ -2,13 +2,9 @@ package mods.ocminecart.common.entityextend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
-import scala.remote;
 import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.entity.item.EntityMinecartEmpty;
 
 public class RemoteExtenderRegister {
 	

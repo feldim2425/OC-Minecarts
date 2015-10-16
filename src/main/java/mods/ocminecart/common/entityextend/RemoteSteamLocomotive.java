@@ -2,16 +2,13 @@ package mods.ocminecart.common.entityextend;
 
 import java.util.List;
 
+import mods.railcraft.common.carts.EntityLocomotive.LocoMode;
+import mods.railcraft.common.carts.EntityLocomotive.LocoSpeed;
+import mods.railcraft.common.carts.EntityLocomotiveSteamSolid;
 import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTankInfo;
-import li.cil.oc.api.network.Packet;
-import li.cil.oc.api.network.WirelessEndpoint;
-import mods.railcraft.common.carts.EntityLocomotive.LocoMode;
-import mods.railcraft.common.carts.EntityLocomotive.LocoSpeed;
-import mods.railcraft.common.carts.EntityLocomotiveSteamSolid;
-import mods.railcraft.common.fluids.Fluids;
 
 public class RemoteSteamLocomotive extends RemoteCartExtender {
 	
