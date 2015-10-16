@@ -3,6 +3,7 @@ package mods.ocminecart.common.entityextend;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import cpw.mods.fml.common.Loader;
 import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.item.EntityMinecart;
 
@@ -86,8 +87,10 @@ public class RemoteExtenderRegister {
 	}
 	
 	public static void register(){
-		registerRemote(mods.railcraft.common.carts.EntityLocomotiveSteamSolid.class, RemoteSteamLocomotive.class);
-		registerRemote(mods.railcraft.common.carts.EntityLocomotiveElectric.class, RemoteElectricLocomotive.class);
+		if(Loader.isModLoaded("Railcraft")){
+			registerRemote(mods.railcraft.common.carts.EntityLocomotiveSteamSolid.class, RemoteSteamLocomotive.class);
+			registerRemote(mods.railcraft.common.carts.EntityLocomotiveElectric.class, RemoteElectricLocomotive.class);
+		}
 	}
 
 }
