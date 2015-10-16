@@ -87,6 +87,19 @@ public class RemoteSteamLocomotive extends RemoteCartExtender {
 		String su = super.getDoc(cmd);
 		if(su!=null) return su;
 		
+		if(cmd.equals("speed"))
+			return "speed([value:number]):number -- set/get the speed. -1 reverse; 0 slowest; 3 max. speed";
+		else if(cmd.equals("mode"))
+			return "mode([value:number]):number -- set/get the mode. 0 shutdown; 1 idle; 2 running";
+		else if(cmd.equals("whistle"))
+			return "whistle() -- make the whistle sound";
+		else if(cmd.equals("steam"))
+			return "steam():number -- get Steam amount in mB.";
+		else if(cmd.equals("water"))
+			return "water():number -- get Water amount in mB.";
+		else if(cmd.equals("heat"))
+			return "heat():number -- get boiler heat";
+		
 		return null;
 	}
 	

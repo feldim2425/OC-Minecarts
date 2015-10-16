@@ -58,6 +58,16 @@ public class RemoteElectricLocomotive extends RemoteCartExtender{
 		String su = super.getDoc(cmd);
 		if(su!=null) return su;
 		
+		if(cmd.equals("speed"))
+			return "speed([value:number]):number -- set/get the speed. -1 reverse; 0 slowest; 3 max. speed";
+		else if(cmd.equals("mode"))
+			return "mode([value:number]):number -- set/get the mode. 0 shutdown; 1 running";
+		else if(cmd.equals("whistle"))
+			return "whistle() -- make the whistle sound";
+		else if(cmd.equals("energy"))
+			return "energy():number -- get the stored energy";
+		
+		
 		return null;
 	}
 }
