@@ -25,10 +25,10 @@ public class Recipes {
 		RecipeSorter.register(OCMinecart.MODID + ":romcrafting", RomCrafting.class , Category.SHAPELESS, "after:minecraft:shaped");
 		
 		GameRegistry.addShapedRecipe(new ItemStack(Item.getItemFromBlock(ModBlocks.block_NetworkRailBase),1), 
-		"CSC",
-		"MBM",
-		"IKI", 'S',items.get("lanCard").createItemStack(1), 'C',items.get("chamelium").createItemStack(1), 'I', new ItemStack(Items.iron_ingot),
-		       'M',items.get("chip2").createItemStack(1), 'K',Item.getItemFromBlock(items.get("cable").block()), 'B',items.get("printedCircuitBoard").createItemStack(1));
+				"CSC",
+				"MBM",
+				"IKI", 'S',items.get("lanCard").createItemStack(1), 'C',items.get("chamelium").createItemStack(1), 'I', new ItemStack(Items.iron_ingot),
+					   'M',items.get("chip2").createItemStack(1), 'K',Item.getItemFromBlock(items.get("cable").block()), 'B',items.get("printedCircuitBoard").createItemStack(1));
 		
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_CartRemoteModule,1,0),
 				"IC0",
@@ -36,7 +36,11 @@ public class Recipes {
 				"IGW", 'I',items.get("nuggetIron").createItemStack(1), 'C',items.get("chip2").createItemStack(1), 'B', items.get("printedCircuitBoard").createItemStack(1), 'R', Items.redstone,
 					   'G',items.get("generatorUpgrade").createItemStack(1),'W',items.get("wlanCard").createItemStack(1));
 		
-	
+		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_CartRemoteAnalyzer,1,0),
+				"W",
+				"C",
+				"A",   'A',items.get("analyzer").createItemStack(1), 'C', items.get("chip2").createItemStack(1), 'W',items.get("wlanCard").createItemStack(1));
+		
 		GameRegistry.addShapelessRecipe(new ItemStack(ModBlocks.block_NetworkRail ), Item.getItemFromBlock(items.get("cable").block()), new ItemStack(Items.redstone), Item.getItemFromBlock(Blocks.detector_rail));
 	
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_ComputerCartCase,1,0),"X","Y","Z",'X',Item.getItemFromBlock(items.get("case1").block()), 'Y', Items.minecart, 'Z', Item.getItemFromBlock(items.get("cable").block()));
