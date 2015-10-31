@@ -40,5 +40,5 @@ tooltip.ocminecart.address=Address
 #Chat messages
 chat.ocminecart.invalidcart=Incompatible cart
 chat.ocminecart.moduleinstalled=The module has been successfully installed
-chat.ocminecart.hasmodule=This car already has a remote module
+chat.ocminecart.hasmodule=This cart already has a remote module
 chat.ocminecart.clipboard=Copied to Clipboard
