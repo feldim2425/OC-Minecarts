@@ -23,7 +23,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 		+ "after:Railcraft@[9.7.0.0,)")
 public class OCMinecart {
 	public static final String MODID = "ocminecart";
-	public static final String VERSION = "0.6.1-alpha";
+	public static final String VERSION = "0.7-beta";
 	public static final String NAME = "OC-Minecarts";
 	
 	@Instance(OCMinecart.MODID)

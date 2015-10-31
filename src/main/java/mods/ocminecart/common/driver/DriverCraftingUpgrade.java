@@ -18,7 +18,8 @@ public class DriverCraftingUpgrade implements Item, HostAware, EnvironmentAware 
 
 	@Override
 	public boolean worksWith(ItemStack stack) {
-		if(Items.get("craftingUpgrade").item() == stack.getItem()) return true;
+		if(stack!= null && Items.get("craftingUpgrade").createItemStack(1).isItemEqual(stack))
+				return true;
 		return false;
 	}
 

@@ -23,6 +23,7 @@ public class CustomDriver {
 	public static void init(){
 		CustomDriver.registerNewDriver(new DriverInventoryController());
 		CustomDriver.registerNewDriver(new DriverTankController());
+		CustomDriver.registerNewDriver(new DriverCraftingUpgrade());
 	}
 	
 	//Data tags for OC components

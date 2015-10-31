@@ -2,6 +2,7 @@ package mods.ocminecart.common.util;
 
 import java.util.ArrayList;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
@@ -170,6 +171,24 @@ public class InventoryUtil {
 			}
 		}
 		return space;
+	}
+	
+	/*
+	 * Try inserting an item stack into a player inventory. If that fails, drop it into the world.
+	 * Copy from li.cil.oc.util.InventoryUtils  Line 308
+	 */
+	public static void addToPlayerInventory(ItemStack stack, EntityPlayer player) {
+		if (stack != null) {
+			if (player.inventory.addItemStackToInventory(stack)) {
+				player.inventory.markDirty();
+				if (player.openContainer != null) {
+					player.openContainer.detectAndSendChanges();
+				}
+			}
+			if (stack.stackSize > 0) {
+				player.dropPlayerItemWithRandomChoice(stack, false);
+			}
+		}
 	}
 	
 	
