@@ -1,5 +1,6 @@
 package mods.ocminecart.common.driver;
 
+import li.cil.oc.api.Driver;
 import li.cil.oc.api.Items;
 import li.cil.oc.api.driver.EnvironmentAware;
 import li.cil.oc.api.driver.EnvironmentHost;
@@ -32,12 +33,12 @@ public class DriverTankController implements Item, HostAware, EnvironmentAware{
 
 	@Override
 	public String slot(ItemStack stack) {
-		return Slot.Upgrade;
+		return Driver.driverFor(stack).slot(stack);
 	}
 
 	@Override
 	public int tier(ItemStack stack) {
-		return 1;
+		return Driver.driverFor(stack).tier(stack);
 	}
 
 	@Override
