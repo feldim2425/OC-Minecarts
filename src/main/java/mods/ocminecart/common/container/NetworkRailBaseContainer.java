@@ -19,8 +19,8 @@ public class NetworkRailBaseContainer extends Container {
 	public NetworkRailBaseContainer(InventoryPlayer inventory,NetworkRailBaseTile entity) {
 		this.entity=entity;
 		
-		this.addPlayerInv(8, 84, inventory);
 		this.addSlotToContainer(new SlotGhost(entity,0,116,35));
+		this.addPlayerInv(8, 84, inventory);
 	}
 
 	public boolean canInteractWith(EntityPlayer player) {
@@ -69,6 +69,11 @@ public class NetworkRailBaseContainer extends Container {
 	}
 	
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot){
+		Slot s = this.getSlot(slot);
+		if(s==null || !s.getHasStack() || s.inventory.equals(entity)) return null;
+		ItemStack nitem = s.getStack().copy();
+		nitem.stackSize = 0;
+		this.getSlot(0).putStack(nitem); // Slot 0 is the camo slot
 		return null;
 	}
 	
