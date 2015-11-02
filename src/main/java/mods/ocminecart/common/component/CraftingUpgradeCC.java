@@ -2,7 +2,14 @@ package mods.ocminecart.common.component;
 
 import java.util.ArrayList;
 
-import cpw.mods.fml.common.FMLCommonHandler;
+import li.cil.oc.api.Network;
+import li.cil.oc.api.machine.Arguments;
+import li.cil.oc.api.machine.Callback;
+import li.cil.oc.api.machine.Context;
+import li.cil.oc.api.network.Visibility;
+import li.cil.oc.api.prefab.ManagedEnvironment;
+import mods.ocminecart.common.minecart.IComputerCart;
+import mods.ocminecart.common.util.InventoryUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -11,16 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import li.cil.oc.api.Network;
-import li.cil.oc.api.machine.Arguments;
-import li.cil.oc.api.machine.Callback;
-import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.Node;
-import li.cil.oc.api.network.Visibility;
-import li.cil.oc.api.prefab.ManagedEnvironment;
-import mods.ocminecart.common.minecart.ComputerCart;
-import mods.ocminecart.common.minecart.IComputerCart;
-import mods.ocminecart.common.util.InventoryUtil;
+import cpw.mods.fml.common.FMLCommonHandler;
 
 /*
  * Copy from li.cil.oc.server.component.CraftingUpgrade

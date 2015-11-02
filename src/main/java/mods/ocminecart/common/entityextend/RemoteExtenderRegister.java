@@ -3,9 +3,9 @@ package mods.ocminecart.common.entityextend;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import cpw.mods.fml.common.Loader;
 import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.item.EntityMinecart;
+import cpw.mods.fml.common.Loader;
 
 public class RemoteExtenderRegister {
 	
