@@ -1,6 +1,8 @@
 package mods.ocminecart.common.container;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
@@ -63,19 +65,111 @@ public class ComputerCartContainer extends Container {
 	
 	
 	private void addPlayerInv(int x,int y, InventoryPlayer inventory){
+		for(int i=0;i<9;i++){
+			this.addSlotToContainer(new Slot(inventory, i, x+i*18, y+58));
+		}
+		
 		for(int i=0;i<3;i++){
 			for(int j=0;j<9;j++){
 				this.addSlotToContainer(new Slot(inventory, j+i*9+9, x+j*18, y+i*18));
 			}
 		}
-		
-		for(int i=0;i<9;i++){
-			this.addSlotToContainer(new Slot(inventory, i, x+i*18, y+58));
-		}
 	}
 	
 	public ItemStack transferStackInSlot(EntityPlayer player, int slot){
-		return null;
+		Slot s = this.getSlot(slot);
+		if(s==null || !s.getHasStack()) return null;
+		ItemStack stack = s.getStack();
+		List<Integer> a = getPlayerInvSlots(stack,player);
+		List<Integer> b = getCartInvSlots(stack);
+		if(s.inventory.equals(player.inventory)){
+			for(int sl : b){
+				transferToSlot(sl,stack);
+				if(stack.stackSize<1){
+					s.putStack(null);
+					return null;
+				}
+			}
+			for(int sl : a){
+				transferToSlot(sl,stack);
+				if(stack.stackSize<1){
+					s.putStack(null);
+					return null;
+				}
+			}
+		}
+		else{
+			for(int sl : a){
+				transferToSlot(sl,stack);
+				if(stack.stackSize<1){
+					s.putStack(null);
+					return null;
+				}
+			}
+			for(int sl : b){
+				transferToSlot(sl,stack);
+				if(stack.stackSize<1){
+					s.putStack(null);
+					return null;
+				}
+			}
+		}
+		if(stack==null || stack.stackSize<1) s.putStack(null);
+		return (stack==null || stack.stackSize<1) ? null : stack;
+	}
+	
+	private List<Integer> getCartInvSlots(ItemStack stack){
+		ArrayList<Integer> slots = new ArrayList<Integer>();
+		for(Slot slot : (List<Slot>)this.inventorySlots){
+			if(slot.inventory.equals(this.entity.maininv) || slot.inventory.equals(this.entity.compinv)){
+				slots.add(slot.slotNumber);
+			}
+		}
+		return sortSlots(stack,slots);
+	}
+	
+	private List<Integer> getPlayerInvSlots(ItemStack stack, EntityPlayer player){
+		ArrayList<Integer> slots = new ArrayList<Integer>();
+		for(Slot slot : (List<Slot>)this.inventorySlots){
+			if(slot.inventory.equals(player.inventory)){
+				slots.add(slot.slotNumber);
+			}
+		}
+		return sortSlots(stack,slots);
+	}
+	
+	private List<Integer> sortSlots(ItemStack stack, List<Integer> slots){
+		ArrayList<Integer> res = new ArrayList<Integer>();
+		for(int slot : slots){
+			Slot s = this.getSlot(slot);
+			if(s.getHasStack() && s.getStack().isItemEqual(stack)){
+				res.add(slot);
+			}
+		}
+		for(int slot : slots){
+			Slot s = this.getSlot(slot);
+			if(!s.getHasStack() || !s.getStack().isItemEqual(stack)){
+				res.add(slot);
+			}
+		}
+		return res;
+	}
+	
+	private void transferToSlot(int slotindex, ItemStack stack){
+		Slot slot = this.getSlot(slotindex);
+		if(slot == null || !slot.isItemValid(stack) || stack == null || stack.stackSize < 1) return;
+		if(slot.getHasStack() && !slot.getStack().isItemEqual(stack)) return;
+		int max = Math.min(slot.getSlotStackLimit(), Math.min(slot.inventory.getInventoryStackLimit(), stack.getMaxStackSize()));
+		int cur = (slot.getHasStack()) ? slot.getStack().stackSize : 0;
+		int transfer = max - cur;
+		transfer = Math.min(stack.stackSize, transfer);
+		if(transfer > 0){
+			ItemStack sstack = stack.copy();
+			sstack.stackSize = transfer + cur;
+			slot.putStack(sstack);
+			stack.stackSize-=transfer;
+		}
+		return;
 	}
 	
 	public ComputerCart getEntity(){
@@ -144,4 +238,5 @@ public class ComputerCartContainer extends Container {
 			break;
 		}
 	}
+	
 }
