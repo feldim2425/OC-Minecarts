@@ -286,13 +286,13 @@ public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, 
 	
 	@Override
 	public Node sidedNode(ForgeDirection side) {
-		if(!side.equals(ForgeDirection.UP)) return this.side.node();
+		if(this.worldObj!=null && !this.worldObj.isRemote && side!=null && !side.equals(ForgeDirection.UP)) return this.side.node();
 		return null;
 	}
 	
 	@Override
 	public boolean canConnect(ForgeDirection side) {
-		if(!side.equals(ForgeDirection.UP)) return true;
+		if(side!=null && !side.equals(ForgeDirection.UP)) return true;
 		return false;
 	}
 
