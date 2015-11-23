@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import mods.ocminecart.OCMinecart;
-import mods.ocminecart.common.items.traits.IComponentInventoryItem;
+import mods.ocminecart.common.items.interfaces.IComponentInventoryItem;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.ComputerCartData;
 import net.minecraft.client.Minecraft;

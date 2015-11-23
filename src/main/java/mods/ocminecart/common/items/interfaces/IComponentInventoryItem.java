@@ -1,4 +1,4 @@
-package mods.ocminecart.common.items.traits;
+package mods.ocminecart.common.items.interfaces;
 
 import java.util.Map;
 
