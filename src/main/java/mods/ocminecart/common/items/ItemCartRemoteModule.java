@@ -5,6 +5,7 @@ import java.util.Random;
 
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.assemble.util.TooltipUtil;
+import mods.ocminecart.common.entityextend.RemoteCartExtender;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
 import mods.ocminecart.common.items.interfaces.ItemEntityInteract;
 import mods.ocminecart.network.ModNetwork;
@@ -44,6 +45,13 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 		if(e instanceof EntityMinecart){
 			if(p.worldObj.isRemote) return true;
 			int err = RemoteExtenderRegister.enableRemote((EntityMinecart) e, true);
+			if(err==0){
+				RemoteCartExtender ext = RemoteExtenderRegister.getExtender((EntityMinecart) e);
+				if(ext!=null){
+					ext.setRemoteItem(s);
+					ext.setMaxWlanStrength(4);
+				}
+			}
 			
 			NBTTagCompound usedat = new NBTTagCompound();
 			usedat.setDouble("posX", e.posX);
@@ -68,7 +76,8 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 		Random r = new Random();
 		if(error == 0){
 			p.swingItem();
-			p.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN+StatCollector.translateToLocal("chat."+OCMinecart.MODID+".moduleinstalled")));
+			if(p.equals(Minecraft.getMinecraft().thePlayer))
+				p.addChatMessage(new ChatComponentText(EnumChatFormatting.GREEN+StatCollector.translateToLocal("chat."+OCMinecart.MODID+".moduleinstalled")));
 		}
 		else if(error == 1) p.addChatMessage(new ChatComponentText(EnumChatFormatting.RED+StatCollector.translateToLocal("chat."+OCMinecart.MODID+".invalidcart")));
 		else p.addChatMessage(new ChatComponentText(EnumChatFormatting.RED+StatCollector.translateToLocal("chat."+OCMinecart.MODID+".hasmodule")));

@@ -35,6 +35,9 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	protected int respport = 1;
 	protected int cmdport = 2;
 	private String uuid = UUID.randomUUID().toString();
+	private ItemStack drop = null;
+	private int maxWlanStrength = 4;
+	private int curWlanStrength = 4;
 	
 	@Override
 	public int x() {
@@ -181,8 +184,9 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(this.world().isRemote) return;
 		if(this.entity.isDead){
 			this.setEnabled(false);
-			ItemUtil.dropItem(new ItemStack(ModItems.item_CartRemoteModule), this.entity.worldObj, 
-					this.entity.posX, this.entity.posY, this.entity.posZ, true);
+			if(this.drop!=null)
+				ItemUtil.dropItem(this.drop, this.entity.worldObj, 
+						this.entity.posX, this.entity.posY, this.entity.posZ, true);
 		}
 		else{
 			API.network.updateWirelessNetwork(this);
@@ -196,7 +200,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 
 	@Override
 	public void receivePacket(Packet packet, WirelessEndpoint sender){
-		if(packet.ttl()<0 || !this.inRange(sender, 4)) return;
+		if(packet.ttl()<0) return;
 		if(!(packet.destination()==null || packet.destination().equals(this.uuid)) || !(this.cmdport==-1 || packet.port()==this.cmdport))
 			return;
 		if(!(packet.data()[0] instanceof byte[])) return;
@@ -233,6 +237,11 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			rc.setBoolean("rc_respbroadcast", this.respbroadcast);
 			rc.setInteger("rc_respport", this.respport);
 			rc.setInteger("rc_cmdport", this.cmdport);
+			if(drop!=null){
+				NBTTagCompound dropnbt = new NBTTagCompound();
+				drop.writeToNBT(dropnbt);
+				rc.setTag("rc_dropitem", dropnbt);
+			}
 			this.writeModuleNBT(rc);
 			nbt.setTag(OCMinecart.MODID+":rc_settings", rc);
 		}
@@ -248,7 +257,13 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			if(rc.hasKey("rc_uuid")) this.uuid = rc.getString("rc_uuid");
 			if(rc.hasKey("rc_respbroadcast")) this.respbroadcast = rc.getBoolean("rc_respbroadcast");
 			if(rc.hasKey("rc_respport")) this.respport = rc.getInteger("rc_respport");
-			if(rc.hasKey("rc_cmdport")) this.cmdport = rc.getInteger("rc_cmdport");	
+			if(rc.hasKey("rc_cmdport")) this.cmdport = rc.getInteger("rc_cmdport");
+			if(rc.hasKey("rc_maxwlan")) this.maxWlanStrength = rc.getInteger("rc_maxwlan");
+			if(rc.hasKey("rc_curwlan")) this.cmdport = rc.getInteger("rc_cmdport");
+			if(rc.hasKey("rc_dropitem")){
+				NBTTagCompound dropnbt = rc.getCompoundTag("rc_dropitem");
+				drop=ItemStack.loadItemStackFromNBT(dropnbt);
+			}
 			this.loadModuleNBT(rc);
 		}
 		
@@ -287,6 +302,31 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Response Port: "+EnumChatFormatting.RESET+this.respport));
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Command Port: "+EnumChatFormatting.RESET+this.cmdport));
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Boradcast Response: "+EnumChatFormatting.RESET+this.respbroadcast));
+		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.DARK_PURPLE+"Wireless Strength: "+EnumChatFormatting.RESET+this.curWlanStrength+" / "+this.maxWlanStrength));
 	}
 	
+	public ItemStack getRemoteItem(){
+		return this.drop;
+	}
+	
+	public void setRemoteItem(ItemStack drop){
+		this.drop=drop.copy();
+		if(drop!=null) this.drop.stackSize = 1;
+	}
+
+	public int getMaxWlanStrength() {
+		return maxWlanStrength;
+	}
+
+	public void setMaxWlanStrength(int maxWlanStrength) {
+		this.maxWlanStrength = maxWlanStrength;
+	}
+
+	public int getCurWlanStrength() {
+		return curWlanStrength;
+	}
+
+	public void setCurWlanStrength(int curWlanStrength) {
+		this.curWlanStrength = Math.min(curWlanStrength, maxWlanStrength);
+	}
 }
