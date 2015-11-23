@@ -60,7 +60,7 @@ public class ItemRemoteAnalyzer extends Item implements ItemEntityInteract{
 	@SideOnly(Side.CLIENT)
 	public void onMPUsage(EntityPlayer p, NBTTagCompound data){
 		if(p!=Minecraft.getMinecraft().thePlayer) return;
-		if(p.isSneaking()){
+		if(p.isSneaking() && Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)){
 			GuiScreen.setClipboardString(data.getString("address"));
 			p.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat."+OCMinecart.MODID+".clipboard")));
 		}
