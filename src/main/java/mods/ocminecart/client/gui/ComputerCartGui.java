@@ -24,7 +24,7 @@ import mods.ocminecart.common.inventory.ComponetInventory;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.interaction.NEI;
 import mods.ocminecart.network.ModNetwork;
-import mods.ocminecart.network.message.GuiEntityButtonClick;
+import mods.ocminecart.network.message.GuiButtonClick;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -225,7 +225,7 @@ public class ComputerCartGui extends GuiContainer {
 	protected void actionPerformed(GuiButton button) {
 		switch(button.id){
 		case 0:
-			ModNetwork.channel.sendToServer(new GuiEntityButtonClick(this.container.getEntity(),0));
+			ModNetwork.channel.sendToServer(GuiButtonClick.entityButtonClick(this.container.getEntity(),0,1));
 			break;
 		}
 	}

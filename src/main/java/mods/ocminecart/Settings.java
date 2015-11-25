@@ -53,9 +53,9 @@ public class Settings {
 		ComputerCartEnergyUse = OCMinecart.config.get("computercart", "energyuse", 0.25 , "Energy a Computer cart consume every tick [default: 0.25]").getDouble(0.25);
 		ComputerCartCreateEnergy= OCMinecart.config.get("computercart", "newenergy", 20000 , "Energy new a Computer cart has stored [default: 20000]").getInt(20000);
 		ComputerCartEngineUse = OCMinecart.config.get("computercart", "engineuse", 2 , "Energy multiplier for the Engine. Speed times Value [default: 2]").getDouble(2);
-		ComputerCartETrackBuf = OCMinecart.config.get("computercart", "trackchargebuffer", 1000 , "[Railcraft] Charge buffer for the chart (EU) [default: 1000]").getDouble(1000);
+		ComputerCartETrackBuf = OCMinecart.config.get("computercart", "trackchargebuffer", 1000 , "[Railcraft] Charge buffer for the computer cart (EU) [default: 1000]").getDouble(1000);
 		ComputerCartETrackLoss = OCMinecart.config.get("computercart", "chargebufferloss", 0.1 , "[Railcraft] Charge buffer loss per tick (EU) [default: 0.1]").getDouble(0.1);
-		ComputerCartETrackLoad = OCMinecart.config.get("computercart", "maxtrackcharge", 16 , "[Railcraft] Max. Energy a cart can take from the charge buffer (EU) [default: 16]").getDouble(16);
+		ComputerCartETrackLoad = OCMinecart.config.get("computercart", "maxtrackcharge", 16 , "[Railcraft] Max. Energy a cart can take from the charge buffer per tick (EU) [default: 16]").getDouble(16);
 		
 		// networkrail
 		NetRailPowerTransfer= OCMinecart.config.get("networkrail", "transferspeed",150 , "Energy that a network rail can transfer per tick [default: 100]").getInt(150);
@@ -70,6 +70,7 @@ public class Settings {
 		
 		OCMinecart.config.addCustomCategoryComment("networkrail", "Settings for the network rail");
 		OCMinecart.config.addCustomCategoryComment("general", "Some general settings for the mod");
+		OCMinecart.config.addCustomCategoryComment("upgrades", "Some general settings for upgrades");
 	}
 	
 	private static void confOrder(){

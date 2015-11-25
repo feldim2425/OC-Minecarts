@@ -86,7 +86,7 @@ public class NetworkRailBaseGui extends GuiContainer{
 	public void actionPerformed(GuiButton button){
 		switch(button.id){
 		case 0:
-			ModNetwork.channel.sendToServer(new GuiButtonClick(tile,0));
+			ModNetwork.channel.sendToServer(GuiButtonClick.tileButtonClick(tile,0,0));
 			break;
 		}
 	}

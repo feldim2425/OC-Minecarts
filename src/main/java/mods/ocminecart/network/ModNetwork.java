@@ -7,7 +7,6 @@ import mods.ocminecart.network.message.ComputercartInventoryUpdate;
 import mods.ocminecart.network.message.EntitySyncData;
 import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.GuiButtonClick;
-import mods.ocminecart.network.message.GuiEntityButtonClick;
 import mods.ocminecart.network.message.ItemUseMessage;
 import mods.ocminecart.network.message.UpdateRunning;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -29,7 +28,6 @@ public class ModNetwork {
 		int id=-1;
 		
 		channel.registerMessage(GuiButtonClick.Handler.class, GuiButtonClick.class, id++, Side.SERVER);
-		channel.registerMessage(GuiEntityButtonClick.Handler.class, GuiEntityButtonClick.class, id++, Side.SERVER);
 		channel.registerMessage(ComputercartInventoryUpdate.Handler.class, ComputercartInventoryUpdate.class, id++, Side.CLIENT);
 		channel.registerMessage(EntitySyncRequest.Handler.class, EntitySyncRequest.class, id++, Side.SERVER);
 		channel.registerMessage(EntitySyncData.Handler.class, EntitySyncData.class, id++, Side.CLIENT);
