@@ -9,7 +9,6 @@ import li.cil.oc.api.API;
 import li.cil.oc.api.network.Packet;
 import li.cil.oc.api.network.WirelessEndpoint;
 import mods.ocminecart.OCMinecart;
-import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ItemUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;

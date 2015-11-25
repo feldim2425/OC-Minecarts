@@ -3,6 +3,7 @@ package mods.ocminecart.common.driver;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
@@ -24,6 +25,8 @@ public class CustomDriver {
 		CustomDriver.registerNewDriver(new DriverInventoryController());
 		CustomDriver.registerNewDriver(new DriverTankController());
 		CustomDriver.registerNewDriver(new DriverCraftingUpgrade());
+		
+		API.driver.add(new DriverLinkingUpgrade());
 	}
 	
 	//Data tags for OC components
