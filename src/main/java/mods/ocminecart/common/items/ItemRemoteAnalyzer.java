@@ -40,18 +40,23 @@ public class ItemRemoteAnalyzer extends Item implements ItemEntityInteract{
 	public boolean doesSneakBypassUse(World world, int x, int y, int z, EntityPlayer player){ return true; }
 	
 	//Called in the EventHandler
-	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s){
-		if(e instanceof EntityMinecart && RemoteExtenderRegister.hasRemote((EntityMinecart) e)){
+	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s, Type t){
+		if(e instanceof EntityMinecart){
 			if(p.worldObj.isRemote) return true;
-			if(RemoteExtenderRegister.getExtender((EntityMinecart) e).isEnabled()){
-				RemoteExtenderRegister.getExtender((EntityMinecart) e).onAnalyzeModule(p);
+			if(RemoteExtenderRegister.hasRemote((EntityMinecart) e) &&
+					RemoteExtenderRegister.getExtender((EntityMinecart) e).isEnabled()){
+				if(t==Type.RIGHT_CLICK){
+					RemoteExtenderRegister.getExtender((EntityMinecart) e).onAnalyzeModule(p);
 				
-				NBTTagCompound usedat = new NBTTagCompound();
-				usedat.setString("address", RemoteExtenderRegister.getExtender((EntityMinecart) e).getAddress());
-				ModNetwork.channel.sendTo(new ItemUseMessage(1,p.getEntityId(),usedat), (EntityPlayerMP) p);
+					NBTTagCompound usedat = new NBTTagCompound();
+					usedat.setString("address", RemoteExtenderRegister.getExtender((EntityMinecart) e).getAddress());
+					ModNetwork.channel.sendTo(new ItemUseMessage(1,p.getEntityId(),usedat), (EntityPlayerMP) p);
+				}
 			}
-			else
+			else if(RemoteExtenderRegister.hasRemote((EntityMinecart) e))
 				p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"No Module found."));
+			else
+				p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"No Module installable."));
 			return true;
 		}
 		return false;

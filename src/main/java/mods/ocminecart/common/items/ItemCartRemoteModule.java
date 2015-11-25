@@ -33,7 +33,7 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	
 	public ItemCartRemoteModule(){
 		super();
-		this.setMaxStackSize(4);
+		this.setMaxStackSize(64);
 		this.setTextureName(OCMinecart.MODID+":remotemodule");
 		this.setUnlocalizedName(OCMinecart.MODID+".remotemodule");
 	}
@@ -41,8 +41,8 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	 public boolean doesSneakBypassUse(World world, int x, int y, int z, EntityPlayer player){ return true; }
 	
 	//Called in the EventHandler
-	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s){
-		if(e instanceof EntityMinecart){
+	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s, Type t){
+		if((e instanceof EntityMinecart) && t == Type.RIGHT_CLICK){
 			if(p.worldObj.isRemote) return true;
 			int err = RemoteExtenderRegister.enableRemote((EntityMinecart) e, true);
 			if(err==0){

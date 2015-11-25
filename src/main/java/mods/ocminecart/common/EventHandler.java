@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.EntityInteractEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -41,7 +42,18 @@ public class EventHandler {
 	public void onEntityClick(EntityInteractEvent event) {
 		ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
 		if(stack!=null && stack.getItem() instanceof ItemEntityInteract){
-			if(((ItemEntityInteract) stack.getItem()).onEntityClick(event.entityPlayer, event.target, stack))
+			if(((ItemEntityInteract) stack.getItem()).onEntityClick(event.entityPlayer, event.target,
+					stack, ItemEntityInteract.Type.RIGHT_CLICK))
+				event.setCanceled(true);
+		}
+	}
+	
+	@SubscribeEvent
+	public void onEntityHit(AttackEntityEvent event) {
+		ItemStack stack = event.entityPlayer.inventory.getCurrentItem();
+		if(stack!=null && stack.getItem() instanceof ItemEntityInteract){
+			if(((ItemEntityInteract) stack.getItem()).onEntityClick(event.entityPlayer, event.target,
+					stack, ItemEntityInteract.Type.LEFT_CLICK))
 				event.setCanceled(true);
 		}
 	}

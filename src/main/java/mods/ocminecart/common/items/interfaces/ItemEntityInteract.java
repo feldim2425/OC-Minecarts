@@ -6,6 +6,11 @@ import net.minecraft.item.ItemStack;
 
 public interface ItemEntityInteract {
 	
-	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s);
+	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s, Type t);
 	
+	enum Type{
+		UNKNOWN,
+		LEFT_CLICK,
+		RIGHT_CLICK
+	}
 }
