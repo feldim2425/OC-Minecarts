@@ -2,11 +2,13 @@ package mods.ocminecart.interaction.railcraft;
 
 import java.util.HashMap;
 
+import mods.ocminecart.common.util.RotationHelper;
 import mods.railcraft.api.carts.CartTools;
 import mods.railcraft.api.carts.ILinkageManager;
 import mods.railcraft.api.core.items.IToolCrowbar;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.Loader;
 
 public class RailcraftUtils {
@@ -49,16 +51,40 @@ public class RailcraftUtils {
 		if(map==null) return 0;
 		if(first==null) return 1;
 		
-		int dir = 0;
-		if(map.containsKey(1) && map.get(1).equals(first)) dir=1;
-		else if (map.containsKey(-1) && map.get(-1).equals(first)) dir=-1;
-		else return 1;
+		int dir = getCartCountDir(map,first);
+		if(dir==0) return 1;
 		
 		int count = 1;
 		while(map.containsKey(dir*count)){
 			count++;
 		}
 		return count;
+	}
+	
+	public static int getCartCountDir(HashMap<Integer, EntityMinecart> map, EntityMinecart first){
+		int dir = 0;
+		if(map.containsKey(1) && map.get(1).equals(first)) dir=1;
+		else if (map.containsKey(-1) && map.get(-1).equals(first)) dir=-1;
+		return dir;
+	}
+	
+	public static EntityMinecart getConnectedCartSide(EntityMinecart cart, boolean front){
+		if(!Loader.isModLoaded("Railcraft")) return null;
+		ILinkageManager link = CartTools.linkageManager;
+		EntityMinecart cartA = link.getLinkedCartA(cart);
+		EntityMinecart cartB = link.getLinkedCartB(cart);
+		double angleA = (cartA!=null)?RotationHelper.calcAngle(cart.posX,cart.posZ, cartA.posX, cartA.posZ):0;
+		double angleB = (cartB!=null)?RotationHelper.calcAngle(cart.posX,cart.posZ, cartB.posX, cartB.posZ):0;
+		angleA=(angleA-cart.rotationYaw+360)%360;
+		angleB=(angleB-cart.rotationYaw+360)%360;
+		if(!front){
+			angleA=(angleA+180)%360;
+			angleB=(angleB+180)%360;
+		}
+		
+		if(angleA > 90 && angleA < 270 && cartA!=null) return cartA;
+		else if(angleB > 90 && angleB < 270 && cartB!=null) return cartB;
+		return null;
 	}
 	
 	

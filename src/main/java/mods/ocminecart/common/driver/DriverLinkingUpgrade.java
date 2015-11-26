@@ -8,6 +8,7 @@ import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import mods.ocminecart.common.component.LinkingUpgrade;
+import mods.ocminecart.common.items.ItemLinkingUpgrade;
 import mods.ocminecart.common.minecart.IComputerCart;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
@@ -27,7 +28,7 @@ public class DriverLinkingUpgrade implements Item, HostAware, EnvironmentAware {
 
 	@Override
 	public boolean worksWith(ItemStack stack) {
-		return false;
+		return (stack.getItem() instanceof ItemLinkingUpgrade);
 	}
 
 	@Override
