@@ -643,8 +643,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	@Override
 	public ForgeDirection facing() {
 		ForgeDirection res = RotationHelper.directionFromYaw(this.rotationYaw);
-		if(res == ForgeDirection.WEST || res == ForgeDirection.EAST)	//Don't know why but it works.
-			res = res.getOpposite();
+		/*if(res == ForgeDirection.WEST || res == ForgeDirection.EAST)	//Don't know why but it works.
+			res = res.getOpposite();*/
 		return res;
 	}
 

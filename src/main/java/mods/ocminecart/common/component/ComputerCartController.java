@@ -11,6 +11,7 @@ import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.Visibility;
+import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.InventoryUtil;
@@ -131,6 +132,7 @@ public class ComputerCartController implements ManagedEnvironment{
 		float yaw = this.cart.rotationYaw + 180F;
 		if(yaw >= 360F) yaw -= 360F;
 		this.cart.rotationYaw = yaw;
+		//OCMinecart.logger.info("Rotate: "+this.cart.rotationYaw+" + "+cart.facing().toString());
 		return new Object[]{};
 	}
 	
