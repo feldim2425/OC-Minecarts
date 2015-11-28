@@ -30,6 +30,7 @@ tooltip.ocminecart.moreinfo=Hold %s to see more informations.
 #Tooltip for Items (item descriptions)
 tooltip.ocminecart.remotemodule.desc=You can install this item by right clicking a compatible cart. It allows to control Locomotives
 tooltip.ocminecart.remoteanalyzer.desc=Right Click on a cart with a remote module to get informations like address, ports, ... Press Control + Shift to copy the address
+tooltip.ocminecart.linkingupgrade.desc=Provides the "cartlinking" component. Allows computer carts to link and unlink other minecarts to the train.
 
 #Tooltip for GUIs
 tooltip.ocminecart.gui.turnon=Turn on
