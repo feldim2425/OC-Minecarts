@@ -8,6 +8,7 @@ item.ocminecart.computercartcase_2.name=Computercart Case (Tier 3)
 item.ocminecart.computercartcase_3.name=Computercart Case (Creative)
 item.ocminecart.remotemodule.name=Remote Module
 item.ocminecart.remoteanalyzer.name=Remote Module Analyzer
+item.ocminecart.linkingupgrade.name=Minecart Linking Upgrade
 
 #Tile Entity Names
 tile.ocminecart.networkrail.name=Network Rail
