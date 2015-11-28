@@ -1,10 +1,12 @@
 package mods.ocminecart.common.items;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import li.cil.oc.api.API;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.items.interfaces.IComponentInventoryItem;
 import mods.ocminecart.common.minecart.ComputerCart;
@@ -46,7 +48,42 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
     
     @Override
 	public void getSubItems(Item item, CreativeTabs tab, List list){
-		//I will add a prebuild creative cart, but not yet. :P
+    	if(tab!=OCMinecart.itemGroup || item!=ModItems.item_ComputerCart) return;
+		ItemStack stack = new ItemStack(ModItems.item_ComputerCart,1);
+		ComputerCartData data = new ComputerCartData();
+		HashMap<Integer,ItemStack> inv = new HashMap<Integer,ItemStack>();
+		//Container
+		inv.put(0, API.items.get("cardContainer3").createItemStack(1)); 
+		inv.put(1, API.items.get("upgradeContainer3").createItemStack(1));
+		inv.put(2, API.items.get("diskDrive").createItemStack(1));
+		//Upgrades
+		inv.put(3, API.items.get("inventoryUpgrade").createItemStack(1)); 
+		inv.put(4, API.items.get("inventoryUpgrade").createItemStack(1));
+		inv.put(5, API.items.get("inventoryUpgrade").createItemStack(1));
+		inv.put(6, API.items.get("inventoryUpgrade").createItemStack(1));
+		inv.put(7, API.items.get("inventoryControllerUpgrade").createItemStack(1));
+		inv.put(8, API.items.get("tankUpgrade").createItemStack(1));
+		inv.put(9, API.items.get("tankControllerUpgrade").createItemStack(1));
+		inv.put(10, API.items.get("screen1").createItemStack(1));
+		inv.put(11, API.items.get("keyboard").createItemStack(1));
+		//Cards
+		inv.put(12, API.items.get("internetCard").createItemStack(1));
+		inv.put(13, API.items.get("wlanCard").createItemStack(1));
+		inv.put(14, null);
+		//CPU - APU
+		inv.put(15, API.items.get("apuCreative").createItemStack(1));
+		//RAM
+		inv.put(16, API.items.get("ram6").createItemStack(1));
+		inv.put(17, API.items.get("ram6").createItemStack(1));
+		//EEPROM
+		inv.put(18, API.items.get("luaBios").createItemStack(1));
+		//HDD
+		inv.put(19, API.items.get("hdd3").createItemStack(1));
+		data.setComponents(inv);
+		data.setTier(3);
+		data.setEnergy(20000);
+		setData(stack,data);
+		list.add(stack);
 	}
     
     public boolean onItemUse(ItemStack stack, EntityPlayer player, World world, int xb, int yb, int zb, int p_77648_7_, float p_77648_8_, float p_77648_9_, float p_77648_10_){
