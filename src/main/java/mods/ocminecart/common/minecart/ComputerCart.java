@@ -781,7 +781,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 
 	@Override
 	public FluidTankInfo[] getTankInfo(ForgeDirection from) {
-		return null;
+		return new FluidTankInfo[]{};
 	}
 	/*--------------------*/
 
