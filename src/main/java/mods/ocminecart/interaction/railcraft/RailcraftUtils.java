@@ -1,13 +1,18 @@
 package mods.ocminecart.interaction.railcraft;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import mods.ocminecart.common.util.RotationHelper;
 import mods.railcraft.api.carts.CartTools;
+import mods.railcraft.api.carts.ILinkableCart;
 import mods.railcraft.api.carts.ILinkageManager;
 import mods.railcraft.api.core.items.IToolCrowbar;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.Loader;
 
@@ -63,7 +68,8 @@ public class RailcraftUtils {
 	
 	public static int getCartCountDir(HashMap<Integer, EntityMinecart> map, EntityMinecart first){
 		int dir = 0;
-		if(map.containsKey(1) && map.get(1).equals(first)) dir=1;
+		if(first==null) dir=0;
+		else if(map.containsKey(1) && map.get(1).equals(first)) dir=1;
 		else if (map.containsKey(-1) && map.get(-1).equals(first)) dir=-1;
 		return dir;
 	}
@@ -75,16 +81,59 @@ public class RailcraftUtils {
 		EntityMinecart cartB = link.getLinkedCartB(cart);
 		double angleA = (cartA!=null)?RotationHelper.calcAngle(cart.posX,cart.posZ, cartA.posX, cartA.posZ):0;
 		double angleB = (cartB!=null)?RotationHelper.calcAngle(cart.posX,cart.posZ, cartB.posX, cartB.posZ):0;
-		angleA=(angleA-cart.rotationYaw+360)%360;
-		angleB=(angleB-cart.rotationYaw+360)%360;
+		angleA=angleA-cart.rotationYaw;
+		angleB=angleB-cart.rotationYaw;
 		if(!front){
-			angleA=(angleA+180)%360;
-			angleB=(angleB+180)%360;
+			angleA=angleA+180;
+			angleB=angleB+180;
 		}
+		
+		angleA=(angleA+360D)%360D;
+		angleB=(angleB+360D)%360D;
 		
 		if(angleA > 90 && angleA < 270 && cartA!=null) return cartA;
 		else if(angleB > 90 && angleB < 270 && cartB!=null) return cartB;
 		return null;
+	}
+	
+	public static EntityMinecart findLinkableCart(EntityMinecart cart, double dyaw){
+		if(!Loader.isModLoaded("Railcraft")) return null;
+		World w = cart.worldObj;
+		if(w.isRemote) return null;
+		
+		ILinkageManager linkm = CartTools.linkageManager;
+		
+		List<Entity> entlist = w.loadedEntityList;
+		EntityMinecart link=null;
+		double maxdist=0D;
+		for(Entity e: entlist){
+			if(e instanceof EntityMinecart){
+				double dist = e.getDistanceToEntity(cart);
+				if((link==null || dist<maxdist) && !e.equals(cart) && !linkm.areLinked(cart, (EntityMinecart) e)
+						&& isCartInField(cart,(EntityMinecart) e, 90, dyaw)){
+					link = (EntityMinecart) e;
+					maxdist=dist;
+				}
+			}
+		}
+		
+		return link;
+	}
+	
+	public static boolean isCartInField(EntityMinecart c1, EntityMinecart c2,double range, double dyaw){
+		double rot = RotationHelper.calcAngle(c1.posX, c1.posZ, c2.posX, c2.posZ);
+		double yaw = (c1.rotationYaw+360D)%360D;
+		rot=(rot+360D)%360D;
+		double rot1 = rot;
+		rot=rot-(yaw+dyaw);
+		rot=(rot+360D*2D)%360D;
+		
+		//System.out.println(yaw+" : "+dyaw+" : "+rot1+" : "+rot);
+		if((rot>180D-(range/2D)) && (rot<180D+(range/2D))){
+			//System.out.println("YES");
+			return true;
+		}
+		return false;
 	}
 	
 	

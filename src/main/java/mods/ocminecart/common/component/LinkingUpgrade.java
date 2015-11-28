@@ -39,6 +39,18 @@ public class LinkingUpgrade extends ManagedEnvironment{
 		return unlink0(cindex,true);
 	}
 	
+	@Callback(doc = "function():number -- Link a cart behind the chain")
+	public Object[] linkBack(Context ctx, Arguments args){
+		checkRailcraft();
+		return link0(false);
+	}
+	
+	@Callback(doc = "function():number -- Link a cart in front of the chain")
+	public Object[] linkFront(Context ctx, Arguments args){
+		checkRailcraft();
+		return link0(true);
+	}
+	
 	@Callback(doc = "function():number -- Count carts behind this cart.")
 	public Object[] countBack(Context ctx, Arguments args){
 		checkRailcraft();
@@ -52,6 +64,35 @@ public class LinkingUpgrade extends ManagedEnvironment{
 	}
 	
 	
+	private Object[] link0(boolean front){
+		EntityMinecart ccart = RailcraftUtils.getConnectedCartSide((EntityMinecart)cart, front);
+		
+		HashMap<Integer, EntityMinecart> map = RailcraftUtils.sortCarts((EntityMinecart) cart);
+		int dir = RailcraftUtils.getCartCountDir(map, ccart);
+		int count = RailcraftUtils.countCarts((EntityMinecart) this.cart, ccart)-1;
+		
+		
+		EntityMinecart linkcart1 = map.get(dir*count); 
+		if(linkcart1==null) return new Object[]{false, "internal error"};
+		
+		double dyaw = 0D;
+		if(!linkcart1.equals(cart)){
+			if(RailcraftUtils.isCartInField(linkcart1, map.get(dir*(count-1)), 179, 0)){	//If the cart looks to the row, look at the other side
+				dyaw+=180D;
+			}
+		}
+		else if(!front)dyaw+=180D;
+		
+		while(dyaw>=360D) dyaw-=360D;
+		while(dyaw<0D) dyaw+=360D;
+
+		EntityMinecart linkcart2 = RailcraftUtils.findLinkableCart(linkcart1, dyaw);
+		if(linkcart2==null) return new Object[]{false, "No cart in range"};
+		ILinkageManager link = CartTools.linkageManager;
+		boolean done = link.createLink(linkcart1, linkcart2);
+		if(!done) return new Object[]{false, "No cart in range"};
+		return new Object[]{true};
+	}
 	
 	private Object[] count0(boolean front){
 		int count;

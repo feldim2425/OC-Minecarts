@@ -44,6 +44,6 @@ public class RotationHelper {
 	public static double calcAngle(double x1, double z1, double x2, double z2){
 		double dx = x1-x2;
 		double dy = z1-z2;
-		return Math.atan2(dy, dx);
+		return (Math.atan2(dy, dx)*180D)/Math.PI;
 	}
 }

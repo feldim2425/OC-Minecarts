@@ -130,7 +130,8 @@ public class ComputerCartController implements ManagedEnvironment{
 	@Callback(doc="function() -- Rotate the cart")
 	public Object[] rotate(Context context, Arguments arguments){
 		float yaw = this.cart.rotationYaw + 180F;
-		if(yaw >= 360F) yaw -= 360F;
+		if(yaw>180) yaw-=360F;
+		else if(yaw<-180) yaw+=360F;
 		this.cart.rotationYaw = yaw;
 		//OCMinecart.logger.info("Rotate: "+this.cart.rotationYaw+" + "+cart.facing().toString());
 		return new Object[]{};
