@@ -9,12 +9,16 @@ import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.recipe.event.ComputerCartRomCrafting;
 import mods.ocminecart.common.recipe.event.CraftingHandler;
+import mods.railcraft.common.core.Railcraft;
+import mods.railcraft.common.items.ItemCrowbar;
+import mods.railcraft.common.items.RailcraftItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 
 public class Recipes {
@@ -41,6 +45,14 @@ public class Recipes {
 				"C",
 				"A",   'A',items.get("analyzer").createItemStack(1), 'C', items.get("chip2").createItemStack(1), 'W',items.get("wlanCard").createItemStack(1));
 		
+		
+		if(Loader.isModLoaded("Railcraft")){
+			GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_LinkingUpgrade,1,0),
+					"XCX",
+					"MAM",
+					"XPX",'C',ItemCrowbar.getItem(),'M',items.get("chip1").createItemStack(1),'A',Item.getItemFromBlock(Blocks.sticky_piston),'P', items.get("printedCircuitBoard").createItemStack(1));
+		}
+			
 		GameRegistry.addShapelessRecipe(new ItemStack(ModBlocks.block_NetworkRail ), Item.getItemFromBlock(items.get("cable").block()), new ItemStack(Items.redstone), Item.getItemFromBlock(Blocks.detector_rail));
 	
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_ComputerCartCase,1,0),"X","Y","Z",'X',Item.getItemFromBlock(items.get("case1").block()), 'Y', Items.minecart, 'Z', Item.getItemFromBlock(items.get("cable").block()));
