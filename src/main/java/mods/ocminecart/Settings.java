@@ -25,6 +25,11 @@ public class Settings {
 	
 	public static int NetRailPowerTransfer; //Config Value -> transferspeed
 	
+	public static double LinkingLinkDelay;
+	public static double LinkingLinkCost;
+	public static double LinkingUnlinkDelay;
+	public static double LinkingUnlinkCost;
+	
 	public static boolean GeneralFixCartBox; //Config Value -> cartboxfix
 	
 	
@@ -62,6 +67,12 @@ public class Settings {
 		
 		// general
 		GeneralFixCartBox = OCMinecart.config.get("general", "cartboxfix", true, "Fix the computer cart bounding box if railcraft is installed [default:true]").getBoolean(true);
+		
+		//upgrades
+		LinkingLinkDelay= OCMinecart.config.get("upgrades", "linkingdelay", 0.2 , "Pause time when linking two carts with a Linking Upgrade (also when unsuccessful). in seconds [default: 0.5]").getDouble(0.5);
+		LinkingLinkCost= OCMinecart.config.get("upgrades", "linkingcost", 0.5 , "Energy the Linking Upgrade will take when linked successful [default: 0.5]").getDouble(0.5);
+		LinkingUnlinkDelay= OCMinecart.config.get("upgrades", "unlinkdelay", 0.2 , "Pause time when unlinklink two carts with a Linking Upgrade (also when unsuccessful). in seconds [default: 0.3]").getDouble(0.3);
+		LinkingLinkDelay= OCMinecart.config.get("upgrades", "unlinkcost", 0.5 , "Energy the Linking Upgrade will take when unlinked successful [default: 0.4]").getDouble(0.4);
 	}
 	
 	private static void confComments(){

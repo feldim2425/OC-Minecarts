@@ -8,8 +8,10 @@ import li.cil.oc.api.Network;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
+import li.cil.oc.api.network.Connector;
 import li.cil.oc.api.network.Visibility;
 import li.cil.oc.api.prefab.ManagedEnvironment;
+import mods.ocminecart.Settings;
 import mods.ocminecart.common.minecart.IComputerCart;
 import mods.ocminecart.interaction.railcraft.RailcraftUtils;
 import mods.railcraft.api.carts.CartTools;
@@ -29,26 +31,42 @@ public class LinkingUpgrade extends ManagedEnvironment{
 	public Object[] unlinkBack(Context ctx, Arguments args){
 		checkRailcraft();
 		int cindex = args.optInteger(0, 1);
-		return unlink0(cindex,false);
+		if(!hasEnergy(Settings.LinkingUnlinkCost)) return new Object[]{false, "not enougth energy"};
+		Object[] res = unlink0(cindex,false);
+		if(res[0].equals(true))takeEnergy(Settings.LinkingUnlinkCost);
+		ctx.pause(Settings.LinkingUnlinkDelay);
+		return res;
 	}
 	
 	@Callback(doc = "function([index:number]):boolean,[string] -- Unlink cart (with the index) in front of this cart")
 	public Object[] unlinkFront(Context ctx, Arguments args){
 		checkRailcraft();
 		int cindex = args.optInteger(0, 1);
-		return unlink0(cindex,true);
+		if(!hasEnergy(Settings.LinkingUnlinkCost)) return new Object[]{false, "not enougth energy"};
+		Object[] res = unlink0(cindex,true);
+		if(res[0].equals(true))takeEnergy(Settings.LinkingUnlinkCost);
+		ctx.pause(Settings.LinkingUnlinkDelay);
+		return res;
 	}
 	
 	@Callback(doc = "function():number -- Link a cart behind the chain")
 	public Object[] linkBack(Context ctx, Arguments args){
 		checkRailcraft();
-		return link0(false);
+		if(!hasEnergy(Settings.LinkingLinkCost)) return new Object[]{false, "not enougth energy"};
+		Object[] res = link0(false);
+		if(res[0].equals(true))takeEnergy(Settings.LinkingLinkCost);
+		ctx.pause(Settings.LinkingLinkDelay);
+		return res;
 	}
 	
 	@Callback(doc = "function():number -- Link a cart in front of the chain")
 	public Object[] linkFront(Context ctx, Arguments args){
 		checkRailcraft();
-		return link0(true);
+		if(!hasEnergy(Settings.LinkingLinkCost)) return new Object[]{false, "not enougth energy"};
+		Object[] res = link0(true);
+		if(res[0].equals(true))takeEnergy(Settings.LinkingLinkCost);
+		ctx.pause(Settings.LinkingLinkDelay);
+		return res;
 	}
 	
 	@Callback(doc = "function():number -- Count carts behind this cart.")
@@ -63,6 +81,17 @@ public class LinkingUpgrade extends ManagedEnvironment{
 		return count0(true);
 	}
 	
+	private boolean hasEnergy(double e){
+		if(!(cart.node()instanceof Connector)) return false;
+		Connector c = ((Connector)cart.node());
+		return c.globalBuffer()>=e;
+	}
+	
+	private void takeEnergy(double e){
+		if(!(cart.node()instanceof Connector)) return;
+		Connector c = ((Connector)cart.node());
+		c.changeBuffer(-e);
+	}
 	
 	private Object[] link0(boolean front){
 		EntityMinecart ccart = RailcraftUtils.getConnectedCartSide((EntityMinecart)cart, front);
