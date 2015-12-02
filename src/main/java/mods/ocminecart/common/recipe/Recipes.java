@@ -9,6 +9,7 @@ import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.recipe.event.ComputerCartRomCrafting;
 import mods.ocminecart.common.recipe.event.CraftingHandler;
+import mods.ocminecart.common.recipe.event.EmblemCraftingEvent;
 import mods.railcraft.common.core.Railcraft;
 import mods.railcraft.common.items.ItemCrowbar;
 import mods.railcraft.common.items.RailcraftItem;
@@ -51,6 +52,9 @@ public class Recipes {
 					"XCX",
 					"MAM",
 					"XPX",'C',ItemCrowbar.getItem(),'M',items.get("chip1").createItemStack(1),'A',Item.getItemFromBlock(Blocks.sticky_piston),'P', items.get("printedCircuitBoard").createItemStack(1));
+			
+			GameRegistry.addRecipe(new EmblemCrafting());
+			CraftingHandler.registerNewHandler(new EmblemCraftingEvent());
 		}
 			
 		GameRegistry.addShapelessRecipe(new ItemStack(ModBlocks.block_NetworkRail ), Item.getItemFromBlock(items.get("cable").block()), new ItemStack(Items.redstone), Item.getItemFromBlock(Blocks.detector_rail));
