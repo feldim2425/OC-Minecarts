@@ -5,7 +5,7 @@ import java.util.List;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
-public interface IExtraItemHandler {
+public interface ICraftingToolHandler {
 	
 	public boolean match(IInventory grid, ItemStack result);
 	

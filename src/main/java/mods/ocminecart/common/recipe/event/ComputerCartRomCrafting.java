@@ -10,7 +10,7 @@ import mods.ocminecart.common.items.ModItems;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
-public class ComputerCartRomCrafting implements IExtraItemHandler{
+public class ComputerCartRomCrafting implements ICraftingToolHandler{
 
 	@Override
 	public boolean match(IInventory grid, ItemStack result) {

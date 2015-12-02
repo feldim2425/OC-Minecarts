@@ -8,18 +8,18 @@ import net.minecraft.item.ItemStack;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 
 public class CraftingHandler {
-	private static ArrayList<IExtraItemHandler> handlers = new ArrayList<IExtraItemHandler>();
+	private static ArrayList<ICraftingToolHandler> handlers = new ArrayList<ICraftingToolHandler>();
 	
-	public static void registerNewHandler(IExtraItemHandler handler){
+	public static void registerNewHandler(ICraftingToolHandler handler){
 		if(handlers.contains(handler)) return;
 		handlers.add(handler);
 	}
 	
 	public static void onCraftingEvent(ItemCraftedEvent event){
-		Iterator<IExtraItemHandler> list = handlers.iterator();
+		Iterator<ICraftingToolHandler> list = handlers.iterator();
 		ArrayList<ItemStack> items = new ArrayList<ItemStack>();
 		while(list.hasNext()){
-			IExtraItemHandler handler = list.next();
+			ICraftingToolHandler handler = list.next();
 			if(handler.match(event.craftMatrix, event.crafting)){
 				List<ItemStack> ls = handler.getItems(event.craftMatrix, event.crafting);
 				if(ls!=null) items.addAll(ls);
