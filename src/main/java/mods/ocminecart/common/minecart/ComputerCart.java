@@ -63,16 +63,6 @@ import net.minecraftforge.fluids.IFluidTank;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 
-//The internal.Robot interface will get replaced by a custom Interface later.
-//But I will do that later because I have to create custom dirvers for some internal components. (and I'am lazy) ;)
-//I hope this will work and I can override the Drivers for this Host.
-
-/*
- * Items that need new Dirvers:
- * - Crafting Upgrade
- * - Inventory Controller
- * - Tank Controller
- */
 public class ComputerCart extends AdvCart implements MachineHost, Analyzable, ISyncEntity, IComputerCart{
 	
 	private final boolean isServer = FMLCommonHandler.instance().getEffectiveSide().isServer();
@@ -186,6 +176,7 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 		}
 		this.tier=data.getTier();
 		this.startEnergy=data.getEnergy();
+		this.setEmblem(data.getEmblem());
 		
 		Iterator<Entry<Integer, ItemStack>> list = data.getComponents().entrySet().iterator();
 		while(list.hasNext()){

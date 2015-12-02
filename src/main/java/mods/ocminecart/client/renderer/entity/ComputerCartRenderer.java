@@ -2,6 +2,8 @@ package mods.ocminecart.client.renderer.entity;
 
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
@@ -10,9 +12,16 @@ import net.minecraft.util.Vec3;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.common.Loader;
+
 public class ComputerCartRenderer extends Render {
 	
+	private static final double EMBLEM_BX  = 0.5001;
+	private static final double EMBLEM_X  = 0.5002;
+	private static final boolean MOD_RAILCRAFT = Loader.isModLoaded("Railcraft");
+	
 	private static final ResourceLocation minecartTextures = new ResourceLocation(OCMinecart.MODID+":textures/entity/computercart.png");
+	private static final ResourceLocation emblem_back = new ResourceLocation(OCMinecart.MODID+":textures/entity/computercart_eback.png");
 	protected ComputerCartModel modelMinecart = new ComputerCartModel();
 	 
 	@Override
@@ -69,8 +78,47 @@ public class ComputerCartRenderer extends Render {
         GL11.glColor3f(1, 1, 1);
         GL11.glScalef(-1.0F, -1.0F, 1.0F);
         this.modelMinecart.renderTile(cart, 0.0625F);
+        
+        GL11.glRotated(90D, 0.0D, 1.0D, 0.0D);
+        
+        ResourceLocation emblem = (MOD_RAILCRAFT) ? cart.getEmblemIcon() : null;
+        
+        if(emblem!=null){
+        	Tessellator tes = Tessellator.instance;
+        	Minecraft.getMinecraft().renderEngine.bindTexture(emblem_back);	//Render the emblem Background.
+    
+        	tes.startDrawingQuads();
+        	tes.addVertexWithUV((3D/16D)+(6D/16D), (5D/16D), -EMBLEM_BX, 0, 1);
+        	tes.addVertexWithUV((3D/16D)+(6D/16D) ,0, -EMBLEM_BX, 0, 0);
+        	tes.addVertexWithUV((3D/16D), 0, -EMBLEM_BX, 1, 0);
+        	tes.addVertexWithUV((3D/16D), (5D/16D), -EMBLEM_BX, 1, 1);
+        	tes.draw();
+        
+        	tes.startDrawingQuads();
+        	tes.addVertexWithUV((3D/16D), (5D/16D), EMBLEM_BX, 1, 1);
+        	tes.addVertexWithUV((3D/16D), 0, EMBLEM_BX, 1, 0);
+        	tes.addVertexWithUV((3D/16D)+(6D/16D) ,0, EMBLEM_BX, 0, 0);
+        	tes.addVertexWithUV((3D/16D)+(6D/16D), (5D/16D), EMBLEM_BX, 0, 1);
+        	tes.draw();
+        	
+        	Minecraft.getMinecraft().renderEngine.bindTexture(emblem);	//Render the actual emblem
+        	
+        	tes.startDrawingQuads();
+        	tes.addVertexWithUV((4D/16D)+(5D/16D), (5D/16D), -EMBLEM_X, 1, 1);
+        	tes.addVertexWithUV((4D/16D)+(5D/16D) ,0, -EMBLEM_X, 1, 0);
+        	tes.addVertexWithUV((4D/16D), 0, -EMBLEM_X, 0, 0);
+        	tes.addVertexWithUV((4D/16D), (5D/16D), -EMBLEM_X, 0, 1);
+        	tes.draw();
+        
+        	tes.startDrawingQuads();
+        	tes.addVertexWithUV((4D/16D), (5D/16D), EMBLEM_X, 1, 1);
+        	tes.addVertexWithUV((4D/16D), 0, EMBLEM_X, 1, 0);
+        	tes.addVertexWithUV((4D/16D)+(5D/16D) ,0, EMBLEM_X, 0, 0);
+        	tes.addVertexWithUV((4D/16D)+(5D/16D), (5D/16D), EMBLEM_X, 0, 1);
+        	tes.draw();
+        }
+        
         GL11.glPopMatrix();
-		
 	}
 
 

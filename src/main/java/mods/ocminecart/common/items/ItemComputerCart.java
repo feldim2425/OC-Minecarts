@@ -11,6 +11,8 @@ import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.items.interfaces.IComponentInventoryItem;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.ComputerCartData;
+import mods.railcraft.client.emblems.Emblem;
+import mods.railcraft.client.emblems.EmblemToolsClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.creativetab.CreativeTabs;
@@ -26,6 +28,7 @@ import net.minecraft.world.World;
 
 import org.lwjgl.input.Keyboard;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -168,6 +171,16 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
     	
     	String eloc = StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".storedenergy");
     	list.add(EnumChatFormatting.WHITE+eloc+": "+EnumChatFormatting.GREEN+String.format("%.0f", data.getEnergy()));
+    	
+    	String emblemid = data.getEmblem();
+    	if(emblemid!=null && emblemid!="" && Loader.isModLoaded("Railcraft"))
+    	{
+    		Emblem emblem = EmblemToolsClient.packageManager.getEmblem(emblemid);
+    		if(emblem!=null){
+    			list.add(EnumChatFormatting.GOLD+StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".emblem")+
+    					EnumChatFormatting.WHITE+" "+emblem.displayName);
+    		}
+    	}
     	
     	if(!Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode())){
     		String key = GameSettings.getKeyDisplayString(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());

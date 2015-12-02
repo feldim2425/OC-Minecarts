@@ -14,6 +14,7 @@ public class ComputerCartData {
 	private Map<Integer, ItemStack> components = new HashMap<Integer, ItemStack>();
 	private int tier = -1;
 	private double energy = -1;
+	private String emblem ="";
 
 	public void saveItemData(NBTTagCompound nbt) {
 		if (nbt != null){
@@ -32,6 +33,7 @@ public class ComputerCartData {
 			nbt.setTag("componentinv", list);
 			nbt.setInteger("tier", tier);
 			nbt.setDouble("energy", energy);
+			nbt.setString("emblem", emblem);
 		}
 	}
 
@@ -47,6 +49,7 @@ public class ComputerCartData {
 			
 			if(nbt.hasKey("energy")) this.energy = nbt.getDouble("energy");
 			if(nbt.hasKey("tier")) this.tier = nbt.getInteger("tier");
+			if(nbt.hasKey("emblem")) this.emblem = nbt.getString("emblem");
 		}
 	}
 
@@ -72,5 +75,13 @@ public class ComputerCartData {
 
 	public void setEnergy(double energy) {
 		this.energy = energy;
+	}
+
+	public String getEmblem() {
+		return emblem;
+	}
+
+	public void setEmblem(String emblem) {
+		this.emblem = emblem;
 	}
 }

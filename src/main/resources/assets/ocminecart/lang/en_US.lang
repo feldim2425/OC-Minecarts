@@ -26,6 +26,7 @@ gui.ocminecart.manual=OC-Minecarts
 tooltip.ocminecart.instcomponents=Installed Components
 tooltip.ocminecart.viewcomponents=Hold %s to view installed components.
 tooltip.ocminecart.moreinfo=Hold %s to see more informations.
+tooltip.ocminecart.emblem=Emblem:
 
 #Tooltip for Items (item descriptions)
 tooltip.ocminecart.remotemodule.desc=You can install this item by right clicking a compatible cart. It allows to control Locomotives

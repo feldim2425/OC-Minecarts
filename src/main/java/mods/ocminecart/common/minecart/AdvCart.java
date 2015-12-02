@@ -4,6 +4,11 @@ import mods.ocminecart.Settings;
 import mods.ocminecart.common.util.BitUtil;
 import mods.railcraft.api.carts.IEnergyTransfer;
 import mods.railcraft.api.electricity.IElectricMinecart;
+import mods.railcraft.client.emblems.Emblem;
+import mods.railcraft.client.emblems.EmblemToolsClient;
+import mods.railcraft.common.emblems.EmblemManager;
+import mods.railcraft.common.emblems.EmblemToolsServer;
+import mods.railcraft.common.emblems.EmblemUnlocker;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
@@ -12,10 +17,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 //Is the Base for a solid, self powered cart with a break.
 //Later I will add the Railcraft integration here
@@ -46,7 +54,8 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		
 		this.dataWatcher.addObject(3, (byte)0);
 		this.dataWatcher.addObject(4, 0.0F);
-		// Free DataWatcher 5-16, 23-32
+		this.dataWatcher.addObject(5, "");
+		// Free DataWatcher 6-16, 23-32
 	}
 	
 	protected final void setBreak(boolean b){ 
@@ -67,6 +76,8 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 			NBTTagCompound rctag = new NBTTagCompound();
 			rctag.setBoolean("locked", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1));
 			if(this.charge!=null) this.charge.writeToNBT(rctag);
+			String emblem = this.dataWatcher.getWatchableObjectString(5);
+			if(emblem!=null && emblem!="") rctag.setString("emblem_id", emblem);
 			tag.setTag("railcraft", rctag);
 		}
 		nbt.setTag("advcart", tag);
@@ -82,7 +93,8 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 			if(tag.hasKey("railcraft") && Loader.isModLoaded("Railcraft")){
 				NBTTagCompound rctag = tag.getCompoundTag("railcraft");
 				this.dataWatcher.updateObject(3, BitUtil.setBit(rctag.getBoolean("locked"), this.dataWatcher.getWatchableObjectByte(3), 1));
-				if(this.charge!=null) this.charge.writeToNBT(rctag);
+				if(this.charge!=null) this.charge.readFromNBT(rctag);
+				if(rctag.hasKey("emblem_id")) this.dataWatcher.updateObject(5, rctag.getString("emblem_id"));
 			}
 		}
 	}
@@ -118,7 +130,7 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		if(charge!=null && Loader.isModLoaded("Railcraft")){
 			this.charge.tick();
 			double mv = this.addEnergy(this.charge.getCharge() * Settings.OC_IC2PWR, true);  //Get max. energy we can load to the node
-			mv = Math.min(mv, Settings.ComputerCartETrackLoad); //Check if the movable energy is higher than the limit.
+			mv = Math.min(mv, Settings.ComputerCartETrackLoad * Settings.OC_IC2PWR); //Check if the movable energy is higher than the limit.
 			mv = this.charge.removeCharge(mv / Settings.OC_IC2PWR) * Settings.OC_IC2PWR; //Remove the charge from the buffer
 			this.addEnergy(mv , false);	//Add the removed energy to the node network
 		}
@@ -213,7 +225,7 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 	public int getTier() { return 1; }
 
 	@Override
-	public int getTransferLimit() { return (int)((double)Settings.ComputerCartETrackLoad / Settings.OC_IC2PWR); }
+	public int getTransferLimit() { return (int)(Settings.ComputerCartETrackLoad * 1.1); }
 
 	@Override
 	public double injectEnergy(Object arg0, double arg1, int arg2, boolean arg3, boolean arg4, boolean arg5) { return 0; }
@@ -221,6 +233,31 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 	@Override
 	public ChargeHandler getChargeHandler() {
 		return this.charge;
+	}
+	
+	public boolean setEmblem(ItemStack stack){
+		if(!Loader.isModLoaded("Railcraft")) return false;
+		return setEmblem(EmblemToolsServer.getEmblemIdentifier(stack));
+	}
+	
+	public boolean setEmblem(String emblem){
+		if(!Loader.isModLoaded("Railcraft")) return false;
+		if(emblem==this.dataWatcher.getWatchableObjectString(5)) return false;
+		if(emblem==null) emblem="";
+		this.dataWatcher.updateObject(5, emblem);
+		return true;
+	}
+	
+	public String getEmblem(){
+		if(!Loader.isModLoaded("Railcraft")) return null;
+		return this.dataWatcher.getWatchableObjectString(5);
+	}
+	
+	@Optional.Method(modid="Railcraft")
+	public ResourceLocation getEmblemIcon(){
+		String id = this.dataWatcher.getWatchableObjectString(5);
+		if(id==null || id=="") return null;
+		return EmblemToolsClient.packageManager.getEmblemTextureLocation(id);
 	}
 
 }
