@@ -50,7 +50,16 @@ public class ItemRemoteAnalyzer extends Item implements ItemEntityInteract{
 				
 					NBTTagCompound usedat = new NBTTagCompound();
 					usedat.setString("address", RemoteExtenderRegister.getExtender((EntityMinecart) e).getAddress());
-					ModNetwork.channel.sendTo(new ItemUseMessage(1,p.getEntityId(),usedat), (EntityPlayerMP) p);
+					ModNetwork.sendToNearPlayers(new ItemUseMessage(1,p.getEntityId(),usedat), e.posX, e.posY, e.posZ, e.worldObj);
+				}
+				else if(t==Type.LEFT_CLICK){
+					if(RemoteExtenderRegister.getExtender((EntityMinecart) e).editableByPlayer(p,false))
+						p.openGui(OCMinecart.instance, 2, e.worldObj, e.getEntityId(), -10, 0);
+					else{
+						NBTTagCompound usedat = new NBTTagCompound();
+						usedat.setInteger("type", 1);
+						ModNetwork.channel.sendTo(new ItemUseMessage(1,p.getEntityId(),usedat), (EntityPlayerMP) p);
+					}
 				}
 			}
 			else if(RemoteExtenderRegister.hasRemote((EntityMinecart) e))
@@ -65,7 +74,11 @@ public class ItemRemoteAnalyzer extends Item implements ItemEntityInteract{
 	@SideOnly(Side.CLIENT)
 	public void onMPUsage(EntityPlayer p, NBTTagCompound data){
 		if(p!=Minecraft.getMinecraft().thePlayer) return;
-		if(p.isSneaking() && Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)){
+		if(data.hasKey("type") && data.getInteger("type")==1){
+			p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.RED+
+					StatCollector.translateToLocal("chat."+OCMinecart.MODID+".owneronly")));
+		}
+		else if(p.isSneaking() && Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)){
 			GuiScreen.setClipboardString(data.getString("address"));
 			p.addChatComponentMessage(new ChatComponentText(StatCollector.translateToLocal("chat."+OCMinecart.MODID+".clipboard")));
 		}

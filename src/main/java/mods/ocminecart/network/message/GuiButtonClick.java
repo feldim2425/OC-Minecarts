@@ -1,9 +1,14 @@
 package mods.ocminecart.network.message;
 
+import codechicken.lib.tool.ToolMain.Module;
 import io.netty.buffer.ByteBuf;
+import mods.ocminecart.OCMinecart;
+import mods.ocminecart.common.container.RemoteModuleContainer;
+import mods.ocminecart.common.entityextend.RemoteCartExtender;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
 import net.minecraft.entity.Entity;
+import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.DimensionManager;
@@ -75,6 +80,32 @@ public class GuiButtonClick implements IMessage {
 				Entity entity = DimensionManager.getWorld(message.dat.getInteger("dim")).getEntityByID(message.dat.getInteger("en"));
 				if(entity!=null){
 					if(entity instanceof ComputerCart && message.buttonid == 0) ((ComputerCart) entity).setRunning(!((ComputerCart) entity).getRunning());
+				}
+				break;
+			case 2:
+				if(ctx.getServerHandler().playerEntity==null) break;
+				Container c = ctx.getServerHandler().playerEntity.openContainer;
+				if(c!=null && (c instanceof RemoteModuleContainer)){
+					if(message.buttonid==0){
+						RemoteCartExtender module = ((RemoteModuleContainer)c).getModule();
+						String pw = message.dat.getString("password");
+						int stat = (module.editableByPlayer(ctx.getServerHandler().playerEntity ,true)) ? 1 : 2;
+						if(pw==null || pw.length()>10) stat=2;
+						((RemoteModuleContainer)c).sendPassState(ctx.getServerHandler().playerEntity, stat);
+					}
+					else if(message.buttonid==1){
+						RemoteCartExtender module = ((RemoteModuleContainer)c).getModule();
+						if(!module.editableByPlayer(ctx.getServerHandler().playerEntity ,true)) break;
+						module.setLocked(!module.isLocked());
+						if(module.isLocked()) ((RemoteModuleContainer)c).lockGui();
+					}
+					else if(message.buttonid==2){
+						RemoteCartExtender module = ((RemoteModuleContainer)c).getModule();
+						if(!module.editableByPlayer(ctx.getServerHandler().playerEntity ,false)) break;
+						module.setEnabled(false);
+						if(module.getRemoteItem()!=null && !ctx.getServerHandler().playerEntity.inventory.addItemStackToInventory(module.getRemoteItem()))
+							module.dropItem();
+					}
 				}
 				break;
 			}

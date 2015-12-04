@@ -2,11 +2,15 @@ package mods.ocminecart.common;
 
 import mods.ocminecart.client.gui.ComputerCartGui;
 import mods.ocminecart.client.gui.NetworkRailBaseGui;
+import mods.ocminecart.client.gui.RemoteModuleGui;
 import mods.ocminecart.common.container.ComputerCartContainer;
 import mods.ocminecart.common.container.NetworkRailBaseContainer;
+import mods.ocminecart.common.container.RemoteModuleContainer;
+import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -33,6 +37,12 @@ public class GuiHandler implements IGuiHandler{
 				case 1:
 					if(entity instanceof ComputerCart)
 						return new ComputerCartContainer(player.inventory,(ComputerCart) entity);
+					break;
+				case 2:
+					if((entity instanceof EntityMinecart) && RemoteExtenderRegister.isRemoteEnabled((EntityMinecart) entity)){
+						return new RemoteModuleContainer((EntityMinecart) entity);
+					}
+					break;
 				}
 			}
 		}
@@ -57,8 +67,13 @@ public class GuiHandler implements IGuiHandler{
 			if(entity!=null){
 				switch(ID){
 					case 1:
-						if(entity instanceof ComputerCart);
+						if(entity instanceof ComputerCart)
 							return new ComputerCartGui(player.inventory,(ComputerCart) entity);
+						break;
+					case 2:
+						if(entity instanceof EntityMinecart){
+							return new RemoteModuleGui();
+						}
 				}
 			}
 		}
