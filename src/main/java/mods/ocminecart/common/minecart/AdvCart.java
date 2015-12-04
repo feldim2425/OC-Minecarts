@@ -253,8 +253,8 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		return this.dataWatcher.getWatchableObjectString(5);
 	}
 	
-	@Optional.Method(modid="Railcraft")
-	public ResourceLocation getEmblemIcon(){
+	@Optional.Method(modid="Railcraft")		
+	public ResourceLocation getEmblemIcon(){	//Optional.Method because of speed (used in the renderer)
 		String id = this.dataWatcher.getWatchableObjectString(5);
 		if(id==null || id=="") return null;
 		return EmblemToolsClient.packageManager.getEmblemTextureLocation(id);
