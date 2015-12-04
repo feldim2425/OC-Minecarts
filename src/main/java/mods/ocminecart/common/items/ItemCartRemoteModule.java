@@ -8,10 +8,13 @@ import mods.ocminecart.common.assemble.util.TooltipUtil;
 import mods.ocminecart.common.entityextend.RemoteCartExtender;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
 import mods.ocminecart.common.items.interfaces.ItemEntityInteract;
+import mods.ocminecart.common.util.ComputerCartData;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ItemUseMessage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.settings.GameSettings;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,6 +23,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 
@@ -31,14 +35,19 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	
+	private IIcon icons[] = new IIcon[3];
+	
 	public ItemCartRemoteModule(){
 		super();
 		this.setMaxStackSize(64);
-		this.setTextureName(OCMinecart.MODID+":remotemodule");
 		this.setUnlocalizedName(OCMinecart.MODID+".remotemodule");
 	}
 	
 	 public boolean doesSneakBypassUse(World world, int x, int y, int z, EntityPlayer player){ return true; }
+	 
+	 public String getItemStackDisplayName(ItemStack stack){
+	    	return this.getDisplayString(stack, false);
+	 }
 	
 	//Called in the EventHandler
 	public boolean onEntityClick(EntityPlayer p, Entity e, ItemStack s, Type t){
@@ -49,7 +58,8 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 				RemoteCartExtender ext = RemoteExtenderRegister.getExtender((EntityMinecart) e);
 				if(ext!=null){
 					ext.setRemoteItem(s);
-					ext.setMaxWlanStrength(4);
+					ext.setMaxWlanStrength(getRangeByTier(s.getItemDamage()));
+					ext.setOwner(p.getUniqueID().toString());
 				}
 			}
 			
@@ -89,7 +99,68 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 		}
 	}
 	
+	public int getRangeByTier(int tier){
+		switch(tier){
+		case 1:
+			return 64;
+		case 2:
+			return 256;
+		default:
+			return 4;
+		}
+	}
+
+	@Override
+	public void getSubItems(Item item, CreativeTabs tab, List list){
+		for(int i=0;i<3;i+=1){
+			list.add(new ItemStack(item,1,i));
+		}
+	}
+	
+	@SideOnly(Side.CLIENT)
+    public IIcon getIconFromDamage(int damage)
+    {
+       if(damage>2) return null;
+       return icons[damage];
+    }
+
+	@SideOnly(Side.CLIENT)
+    public void registerIcons(IIconRegister register){
+		for(int i=0;i<3;i+=1){
+			icons[i]=register.registerIcon(OCMinecart.MODID+":remotemodule_"+(i+1));
+		}
+	}
+	
+	 public String getDisplayString(ItemStack stack,boolean hasColor){
+	    	EnumChatFormatting color;
+	    	String tier;
+	    	tier=StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".tier"+(stack.getItemDamage()+1));
+	    	switch(stack.getItemDamage()){
+	    	case 0:
+	    		color = EnumChatFormatting.WHITE;
+	    		break;
+	    	case 1:
+	    		color = EnumChatFormatting.YELLOW;
+	    		break;
+	    	case 2:
+	    		color = EnumChatFormatting.AQUA;
+	    		break;
+	    	default:
+	    		color = EnumChatFormatting.DARK_RED;
+	    		tier = "ERROR!";
+	    		break;
+	    	}
+	    	if(!hasColor){
+	    		color=EnumChatFormatting.RESET;
+	    	}
+	    	return color+super.getItemStackDisplayName(stack)+" "+tier;
+	    }
+	
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean adv) {
+		
+		list.clear();
+		list.add(this.getDisplayString(stack, true));
+		
 		if(!Keyboard.isKeyDown(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode())){
 			String key = GameSettings.getKeyDisplayString(Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode());
 			String formkey = "[" + EnumChatFormatting.WHITE + key + EnumChatFormatting.GRAY + "]";
@@ -97,6 +168,7 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 		}
 		else{
 			list.addAll(TooltipUtil.trimString(StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".remotemodule.desc")));
+			list.add("Max. Range: "+EnumChatFormatting.WHITE+getRangeByTier(stack.getItemDamage()));
 			list.add("Railcraft is "+(!Loader.isModLoaded("Railcraft")? 
 					EnumChatFormatting.RED+"not " : EnumChatFormatting.GREEN) +"avaiable");
 		}

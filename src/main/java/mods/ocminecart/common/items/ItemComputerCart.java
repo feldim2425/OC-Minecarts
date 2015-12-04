@@ -132,22 +132,19 @@ public class ItemComputerCart extends MinecartItem implements IComponentInventor
     	EnumChatFormatting color;
     	String tier;
     	ComputerCartData data = getData(stack);
+    	tier=StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".tier"+(data.getTier()+1));
     	switch((data!=null) ? data.getTier() : -1){
     	case 0:
     		color = EnumChatFormatting.WHITE;
-    		tier = "(Tier 1)";
     		break;
     	case 1:
     		color = EnumChatFormatting.YELLOW;
-    		tier = "(Tier 2)";
     		break;
     	case 2:
     		color = EnumChatFormatting.AQUA;
-    		tier = "(Tier 3)";
     		break;
     	case 3:
     		color = EnumChatFormatting.LIGHT_PURPLE;
-    		tier = "(Creative)";
     		break;
     	default:
     		color = EnumChatFormatting.DARK_RED;

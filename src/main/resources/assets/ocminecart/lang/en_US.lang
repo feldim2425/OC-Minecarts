@@ -2,10 +2,7 @@ itemGroup.ocminecart.modtab=OC-Minecarts
 
 #Item Names
 item.ocminecart.itemcomputercart.name=Computer Cart
-item.ocminecart.computercartcase_0.name=Computercart Case (Tier 1)
-item.ocminecart.computercartcase_1.name=Computercart Case (Tier 2)
-item.ocminecart.computercartcase_2.name=Computercart Case (Tier 3)
-item.ocminecart.computercartcase_3.name=Computercart Case (Creative)
+item.ocminecart.computercartcase.name=Computercart Case
 item.ocminecart.remotemodule.name=Remote Module
 item.ocminecart.remoteanalyzer.name=Remote Module Analyzer
 item.ocminecart.linkingupgrade.name=Minecart Linking Upgrade
@@ -17,16 +14,28 @@ tile.ocminecart.networkrailbase.name=Network Rail Controller
 #Entity Names
 entity.ocminecart.computercart.name=Computer Cart
 
-#GUI Text
+#GUI Text (Head)
 gui.ocminecart.networkrailbase.title=Network Rail Controller
-gui.ocminecart.networkrailbase.info=Connection Type
 gui.ocminecart.manual=OC-Minecarts
+gui.ocminecart.remmconf=Remote Module Config
+
+#GUI Text
+gui.ocminecart.networkrailbase.info=Connection Type
+gui.ocminecart.general.confirm=Confirm
+gui.ocminecart.general.success=Success
+gui.ocminecart.general.failed=Failed!
+gui.ocminecart.remotem.chpass=Change Password:
+gui.ocminecart.remotem.remmodule=Remove Module
 
 #Tooltip for Items
 tooltip.ocminecart.instcomponents=Installed Components
 tooltip.ocminecart.viewcomponents=Hold %s to view installed components.
 tooltip.ocminecart.moreinfo=Hold %s to see more informations.
 tooltip.ocminecart.emblem=Emblem:
+tooltip.ocminecart.tier1=(Tier 1)
+tooltip.ocminecart.tier2=(Tier 2)
+tooltip.ocminecart.tier3=(Tier 3)
+tooltip.ocminecart.tier4=(Creative)
 
 #Tooltip for Items (item descriptions)
 tooltip.ocminecart.remotemodule.desc=You can install this item by right clicking a compatible cart. It allows to control Locomotives
@@ -39,9 +48,13 @@ tooltip.ocminecart.gui.turnoff=Turn off
 tooltip.ocminecart.gui.useanalyzer=Use an Analyzer to troubleshoot errors.
 tooltip.ocminecart.storedenergy=Stored Energy
 tooltip.ocminecart.address=Address
+tooltip.ocminecart.gui.chpass=Change Password
+tooltip.ocminecart.gui.empass=Empty Password for no Password.
+tooltip.ocminecart.gui.lockbtn=Click to Lock/Unlock the module.
 
 #Chat messages
 chat.ocminecart.invalidcart=Incompatible cart
-chat.ocminecart.moduleinstalled=The module has been successfully installed
+chat.ocminecart.moduleinstalled=Successfully installed the Remote Module
 chat.ocminecart.hasmodule=This cart already has a remote module
 chat.ocminecart.clipboard=Copied to Clipboard
+chat.ocminecart.owneronly=Only the owner or an admin can access that.
