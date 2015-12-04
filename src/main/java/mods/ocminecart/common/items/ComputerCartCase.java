@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.StatCollector;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -54,15 +55,6 @@ public class ComputerCartCase extends Item{
 		}
 	}
 	
-	public String getUnlocalizedName(ItemStack stack){
-		return "item."+OCMinecart.MODID + ".computercartcase_"+stack.getItemDamage();
-	}
-	
-	public String getItemStackDisplayName(ItemStack stack)
-    {
-        return super.getItemStackDisplayName(stack);
-    }
-	
 	public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean adv) {
 		EnumChatFormatting color = EnumChatFormatting.RESET;
 		switch(stack.getItemDamage()){
@@ -79,6 +71,6 @@ public class ComputerCartCase extends Item{
 			color = EnumChatFormatting.LIGHT_PURPLE;
 		}
 		list.clear();
-		list.add(color+this.getItemStackDisplayName(stack));
+		list.add(color+this.getItemStackDisplayName(stack)+" "+StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".tier"+(stack.getItemDamage()+1)));
 	}
 }
