@@ -16,6 +16,7 @@ import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.client.gui.widget.EnergyBar;
+import mods.ocminecart.client.gui.widget.GuiUtil;
 import mods.ocminecart.client.gui.widget.ImageButton;
 import mods.ocminecart.client.gui.widget.SliderButton;
 import mods.ocminecart.common.container.ComputerCartContainer;
@@ -187,13 +188,13 @@ public class ComputerCartGui extends GuiContainer {
         		ls.add(StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.turnon"));
         		ls.add(EnumChatFormatting.GRAY + StatCollector.translateToLocal("tooltip."+OCMinecart.MODID+".gui.useanalyzer"));
         	}
-            this.drawHoverText(ls, mx - this.guiLeft, my - this.guiTop, Minecraft.getMinecraft().fontRenderer);
+            GuiUtil.drawHoverText(ls, mx - this.guiLeft, my - this.guiTop,  this.width, this.height, this.guiLeft, Minecraft.getMinecraft().fontRenderer);
         }
         if(this.func_146978_c(26+this.guiLeft, 8+this.guiTop+offset, 140, 12, mx+this.guiLeft, my+this.guiTop)){
         	List<String> ls = new ArrayList<String>();
         	int per = (int)(((double)this.container.sEnergy / (double)this.container.smaxEnergy)*100);
         	ls.add("Energy: "+per+"% ("+this.container.sEnergy+" / "+this.container.smaxEnergy+")");
-        	this.drawHoverText(ls, mx - this.guiLeft, my - this.guiTop, Minecraft.getMinecraft().fontRenderer);
+        	GuiUtil.drawHoverText(ls, mx - this.guiLeft, my - this.guiTop, this.width, this.height, this.guiLeft, Minecraft.getMinecraft().fontRenderer);
         }
         
         GL11.glPopAttrib();
@@ -403,65 +404,6 @@ public class ComputerCartGui extends GuiContainer {
 			}
 		}
 		this.zLevel -= 350;
-	}
-	
-	//Render Tooltips
-	private void drawHoverText(List<String> text, int x, int y, FontRenderer font){
-		if(!text.isEmpty()){
-		      GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-		      RenderHelper.disableStandardItemLighting();
-		      GL11.glDisable(GL11.GL_LIGHTING);
-		      GL11.glDisable(GL11.GL_DEPTH_TEST);
-		      
-		      int textWidth = -1;
-		      for(int i=0;i<text.size();i+=1){
-		    	  if(font.getStringWidth(text.get(i)) > textWidth)
-		    		  textWidth = font.getStringWidth(text.get(i));
-		      }
-		      
-		      int posX = x + 12;
-		      int posY = y - 12;
-		      int textHeight = 8;
-		      
-		      if (text.size() > 1) {
-		          textHeight += 2 + (text.size() - 1) * 10;
-		      }
-		      if (posX + textWidth > this.width - this.guiLeft) {
-		    	  
-		          posX -= 28 + textWidth;
-		      }
-		      if (posY + textHeight + 6 > this.height) {
-		          posY = this.height - textHeight - 6;
-		      }
-		      
-		      this.zLevel = 300;
-		      int bg = 0xF0100010;
-		      this.drawGradientRect(posX - 3, posY - 4, posX + textWidth + 3, posY - 3, bg, bg);
-		      this.drawGradientRect(posX - 3, posY + textHeight + 3, posX + textWidth + 3, posY + textHeight + 4, bg, bg);
-		      this.drawGradientRect(posX - 3, posY - 3, posX + textWidth + 3, posY + textHeight + 3, bg, bg);
-		      this.drawGradientRect(posX - 4, posY - 3, posX - 3, posY + textHeight + 3, bg, bg);
-		      this.drawGradientRect(posX + textWidth + 3, posY - 3, posX + textWidth + 4, posY + textHeight + 3, bg, bg);
-		      int color1 = 0x505000FF;
-		      int color2 = 0x505000FE;
-		      this.drawGradientRect(posX - 3, posY - 3 + 1, posX - 3 + 1, posY + textHeight + 3 - 1, color1, color2);
-		      this.drawGradientRect(posX + textWidth + 2, posY - 3 + 1, posX + textWidth + 3, posY + textHeight + 3 - 1, color1, color2);
-		      this.drawGradientRect(posX - 3, posY - 3, posX + textWidth + 3, posY - 3 + 1, color1, color1);
-		      this.drawGradientRect(posX - 3, posY + textHeight + 2, posX + textWidth + 3, posY + textHeight + 3, color2, color2);
-		      
-		      for(int i=0;i<text.size();i+=1){
-		    	  font.drawStringWithShadow(text.get(i), posX, posY, -1);
-		    	  if (i == 0) {
-		              posY += 2;
-		          }
-		    	  posY += 10;
-		      }
-		      this.zLevel = 0;
-		      
-		      GL11.glEnable(GL11.GL_LIGHTING);
-		      GL11.glEnable(GL11.GL_DEPTH_TEST);
-		      RenderHelper.enableStandardItemLighting();
-		      GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-		}
 	}
 	
 	//Draw Screen if there is one
