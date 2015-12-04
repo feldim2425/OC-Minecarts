@@ -20,6 +20,9 @@ public class ManualPathProvider implements PathProvider{
 		
 		if(item == ModItems.item_ComputerCartCase) return PATH_PREFIX+"item/cartcase.md";
 		else if(item == ModItems.item_ComputerCart) return PATH_PREFIX+"item/cart.md";
+		else if(item == ModItems.item_CartRemoteModule) return PATH_PREFIX+"item/remote.md";
+		else if(item == ModItems.item_CartRemoteAnalyzer) return PATH_PREFIX+"item/remoteanalyzer.md";
+		else if(item == ModItems.item_LinkingUpgrade) return PATH_PREFIX+"item/linkingupgrade.md";
 		
 		return null;
 	}

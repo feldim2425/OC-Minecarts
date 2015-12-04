@@ -7,7 +7,8 @@ This Mod adds Computercarts to Minecraft
 - [Computer Cart Case](item/cartcase.md)
 - [Computer Cart](item/cart.md)
 - [Remote Module](item/remote.md)
-- Remote Module Analyzer
+- [Remote Module Analyzer](item/remoteanalyzer.md)
+- [Linking Upgrade](item/linkingupgrade.md)
 
 ## Blocks:
 

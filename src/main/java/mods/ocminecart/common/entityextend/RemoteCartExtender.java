@@ -199,7 +199,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		else if(cmd.equals("response_broadcast"))
 			return "response_broadcast([value:boolean]):boolean -- if the value is true it will respond with private messages.";
 		else if(cmd.equals("wlan_strength"))
-			return "wlan_strength([value:number]):number -- get/set the current and get the max. wireless strength.";
+			return "wlan_strength([value:number]):number,number -- get/set the current and get the max. wireless strength.";
 		else if(cmd.equals("login"))
 			return "login(password:string):boolean -- login when a password is set (200 ticks timeout after every command).";
 		return null;
