@@ -4,11 +4,8 @@ import mods.ocminecart.Settings;
 import mods.ocminecart.common.util.BitUtil;
 import mods.railcraft.api.carts.IEnergyTransfer;
 import mods.railcraft.api.electricity.IElectricMinecart;
-import mods.railcraft.client.emblems.Emblem;
 import mods.railcraft.client.emblems.EmblemToolsClient;
-import mods.railcraft.common.emblems.EmblemManager;
 import mods.railcraft.common.emblems.EmblemToolsServer;
-import mods.railcraft.common.emblems.EmblemUnlocker;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.entity.item.EntityMinecart;
@@ -22,8 +19,6 @@ import net.minecraft.world.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 //Is the Base for a solid, self powered cart with a break.
 //Later I will add the Railcraft integration here

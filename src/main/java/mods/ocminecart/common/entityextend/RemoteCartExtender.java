@@ -13,7 +13,6 @@ import mods.ocminecart.common.util.ItemUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
@@ -23,8 +22,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.IExtendedEntityProperties;
 
 import com.google.common.base.Charsets;
-
-import cpw.mods.fml.server.FMLServerHandler;
 
 public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedEntityProperties{
 	

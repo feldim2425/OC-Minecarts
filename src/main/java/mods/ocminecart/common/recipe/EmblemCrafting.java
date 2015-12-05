@@ -1,16 +1,11 @@
 package mods.ocminecart.common.recipe;
 
-import li.cil.oc.api.Items;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ComputerCartData;
 import mods.railcraft.api.core.items.IToolCrowbar;
 import mods.railcraft.common.emblems.EmblemToolsServer;
 import mods.railcraft.common.emblems.ItemEmblem;
-import mods.railcraft.common.items.ItemCrowbar;
-import mods.railcraft.common.items.RailcraftToolItems;
-import mods.railcraft.common.plugins.forge.RailcraftRegistry;
-import mods.railcraft.common.util.collections.ItemSet;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;

@@ -4,9 +4,7 @@ import java.util.List;
 
 import mods.ocminecart.common.items.ModItems;
 import mods.railcraft.api.core.items.IToolCrowbar;
-import mods.railcraft.common.emblems.ItemEmblem;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 
 public class EmblemCraftingEvent implements ICraftingToolHandler {

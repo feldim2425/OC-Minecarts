@@ -1,19 +1,16 @@
 package mods.ocminecart.common.container;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.entityextend.RemoteCartExtender;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 public class RemoteModuleContainer extends Container{
 	

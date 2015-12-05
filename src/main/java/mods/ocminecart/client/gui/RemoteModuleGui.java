@@ -3,26 +3,22 @@ package mods.ocminecart.client.gui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.client.gui.widget.GuiUtil;
 import mods.ocminecart.common.container.RemoteModuleContainer;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.GuiButtonClick;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
+
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 public class RemoteModuleGui extends GuiContainer {
 	private GuiTextField pass;

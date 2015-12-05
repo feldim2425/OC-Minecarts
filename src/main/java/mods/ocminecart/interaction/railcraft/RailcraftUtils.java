@@ -1,19 +1,16 @@
 package mods.ocminecart.interaction.railcraft;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import mods.ocminecart.common.util.RotationHelper;
 import mods.railcraft.api.carts.CartTools;
-import mods.railcraft.api.carts.ILinkableCart;
 import mods.railcraft.api.carts.ILinkageManager;
 import mods.railcraft.api.core.items.IToolCrowbar;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.ForgeDirection;
 import cpw.mods.fml.common.Loader;
 
 public class RailcraftUtils {

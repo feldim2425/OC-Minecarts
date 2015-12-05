@@ -8,7 +8,6 @@ import mods.ocminecart.common.assemble.util.TooltipUtil;
 import mods.ocminecart.common.entityextend.RemoteCartExtender;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
 import mods.ocminecart.common.items.interfaces.ItemEntityInteract;
-import mods.ocminecart.common.util.ComputerCartData;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.message.ItemUseMessage;
 import net.minecraft.client.Minecraft;
