@@ -35,11 +35,22 @@ public class Recipes {
 				"IKI", 'S',items.get("lanCard").createItemStack(1), 'C',items.get("chamelium").createItemStack(1), 'I', new ItemStack(Items.iron_ingot),
 					   'M',items.get("chip2").createItemStack(1), 'K',Item.getItemFromBlock(items.get("cable").block()), 'B',items.get("printedCircuitBoard").createItemStack(1));
 		
+		
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_CartRemoteModule,1,0),
+				"IC0",
+				"IBR",
+				"IGW", 'I',items.get("nuggetIron").createItemStack(1), 'C',items.get("chip1").createItemStack(1), 'B', items.get("printedCircuitBoard").createItemStack(1), 'R', Items.redstone,
+					   'G',items.get("generatorUpgrade").createItemStack(1),'W',items.get("wlanCard").createItemStack(1));
+		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_CartRemoteModule,1,1),
 				"IC0",
 				"IBR",
 				"IGW", 'I',items.get("nuggetIron").createItemStack(1), 'C',items.get("chip2").createItemStack(1), 'B', items.get("printedCircuitBoard").createItemStack(1), 'R', Items.redstone,
 					   'G',items.get("generatorUpgrade").createItemStack(1),'W',items.get("wlanCard").createItemStack(1));
+		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_CartRemoteModule,1,2),
+				"ICS",
+				"IBR",
+				"IGW", 'I',items.get("nuggetIron").createItemStack(1), 'C',items.get("chip3").createItemStack(1), 'B', items.get("printedCircuitBoard").createItemStack(1), 'R', Items.redstone,
+					   'G',items.get("generatorUpgrade").createItemStack(1),'W',items.get("wlanCard").createItemStack(1) , 'S', items.get("solarGeneratorUpgrade").createItemStack(1));
 		
 		GameRegistry.addShapedRecipe(new ItemStack(ModItems.item_CartRemoteAnalyzer,1,0),
 				"W",
