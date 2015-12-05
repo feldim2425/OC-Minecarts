@@ -2,6 +2,8 @@ package mods.ocminecart.common.entityextend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.item.EntityMinecart;
@@ -59,31 +61,47 @@ public class RemoteExtenderRegister {
 	
 	public static boolean addRemoteUpdate(RemoteCartExtender ext){
 		synchronized(updater){
+			removeExistingRemote(ext.getAddress());
 			if(updater.contains(ext)) return false;
 			updater.add(ext);
 			return true;
 		}
 	}
 	
+	public static void removeExistingRemote(String uuid){
+			if(updater.isEmpty() || uuid == null) return;
+			ArrayList<Integer> marked = new ArrayList<Integer>();
+			for(int i=0;i<updater.size();i+=1){
+				if(updater.get(i).getAddress()!=null && updater.get(i).getAddress().equals(uuid)){
+					marked.add(i);
+				}
+			}
+			if(marked.isEmpty()) return;
+			for(int i=0;i<marked.size();i+=1){
+				updater.remove(marked.get(i));
+			}
+	}
+	
 	public static boolean removeRemoteUpdate(RemoteCartExtender ext){
-		synchronized(updater){
-			if(!updater.contains(ext)) return false;
-			updater.remove(ext);
-			return true;
-		}
+		if(!updater.contains(ext)) return false;
+		removeExistingRemote(ext.getAddress());
+		updater.remove(ext);
+		return true;
 	}
 	
 	public static void serverTick(){
-		synchronized(updater){
-			for(int i=0;i<updater.size();i+=1){
-				updater.get(i).update();
-			}
+		for(int i=0;i<updater.size();i+=1){
+			updater.get(i).update();
 		}
 	}
 	
 	public static RemoteCartExtender getExtender(EntityMinecart cart){
 		if(!hasRemote(cart)) return null;
 		return (RemoteCartExtender) cart.getExtendedProperties(RemoteCartExtender.PROP_ID);
+	}
+	
+	public static void reinit() {
+		updater.clear();
 	}
 	
 	public static void register(){

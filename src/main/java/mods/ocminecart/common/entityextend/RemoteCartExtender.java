@@ -19,6 +19,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.IExtendedEntityProperties;
 
 import com.google.common.base.Charsets;
@@ -40,6 +41,8 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	private ItemStack drop = null;
 	private int maxWlanStrength=4;
 	private int curWlanStrength=4;
+	
+	private World worldObj; //To check a dimesion change;
 	
 	@Override
 	public int x() {
@@ -204,11 +207,18 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	public void update() {
 		if(this.world().isRemote) return;
-		if(this.entity.isDead){
+		boolean hasEntity = worldObj.getLoadedEntityList().contains(this.entity);
+		boolean chunkLoaded = worldObj.getChunkFromBlockCoords((int)entity.posX, (int)entity.posZ).isChunkLoaded;
+		if(this.entity.isDead || this.entity.getDamage()>=this.getMaxModuleDamage() || (!hasEntity && chunkLoaded)){
 			this.setEnabled(false);
-			this.dropItem();
+			if(this.entity.getDamage()>=this.getMaxModuleDamage()){
+				this.dropItem();
+			}
 		}
 		else{
+			if(!chunkLoaded || !hasEntity){
+				RemoteExtenderRegister.removeRemoteUpdate(this);
+			}
 			API.network.updateWirelessNetwork(this);
 		}
 	}
@@ -276,6 +286,8 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	public void loadNBTData(NBTTagCompound nbt) {
 		if(nbt.hasKey(OCMinecart.MODID+":rc_enabled"))
 			enabled = nbt.getBoolean(OCMinecart.MODID+":rc_enabled");
+		else 
+			enabled = false;
 		
 		if(nbt.hasKey(OCMinecart.MODID+":rc_settings") && this.enabled){
 			NBTTagCompound rc = nbt.getCompoundTag(OCMinecart.MODID+":rc_settings");
@@ -308,6 +320,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	public void init(Entity entity, World world) {
 		if(!(entity instanceof EntityMinecart)) return;
 		this.entity = (EntityMinecart)entity;
+		this.worldObj = world;
 	}
 	
 	public boolean inRange(WirelessEndpoint w, double range){
@@ -345,6 +358,10 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	public EntityMinecart getCart(){
 		return this.entity;
+	}
+	
+	public int getMaxModuleDamage(){
+		return 40;
 	}
 	
 	public ItemStack getRemoteItem(){
