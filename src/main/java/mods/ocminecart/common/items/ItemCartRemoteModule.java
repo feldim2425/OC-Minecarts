@@ -41,6 +41,7 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 		super();
 		this.setMaxStackSize(64);
 		this.setUnlocalizedName(OCMinecart.MODID+".remotemodule");
+		this.setHasSubtypes(true);
 	}
 	
 	 public boolean doesSneakBypassUse(World world, int x, int y, int z, EntityPlayer player){ return true; }
@@ -127,7 +128,7 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	@SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister register){
 		for(int i=0;i<3;i+=1){
-			icons[i]=register.registerIcon(OCMinecart.MODID+":remotemodule_"+(i+1));
+			icons[i]=register.registerIcon(OCMinecart.MODID+":remotemodule"+(i+1));
 		}
 	}
 	

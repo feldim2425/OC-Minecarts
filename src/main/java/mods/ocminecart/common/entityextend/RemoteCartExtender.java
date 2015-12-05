@@ -355,8 +355,11 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	}
 	
 	public void setRemoteItem(ItemStack drop){
-		this.drop=drop.copy();
-		if(drop!=null) this.drop.stackSize = 1;
+		if(drop!=null){
+			this.drop=drop.copy();
+			this.drop.stackSize = 1;
+		}
+		else this.drop=null;
 	}
 
 	public int getMaxWlanStrength() {
