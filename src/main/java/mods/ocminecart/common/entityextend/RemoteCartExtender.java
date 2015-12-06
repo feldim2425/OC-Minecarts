@@ -29,6 +29,11 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	public final static String PROP_ID = OCMinecart.MODID+"RCcart";
 	
 	protected EntityMinecart entity;
+	private World worldObj;
+	private int posX;
+	private int posY;
+	private int posZ;
+	
 	protected boolean enabled=false;
 	protected boolean respbroadcast = true;
 	private int nextResp = -1;
@@ -36,42 +41,47 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	protected int respport = 1;
 	protected int cmdport = 2;
 	private String uuid;
+	private String address;
 	private String owner = null;
 	private boolean lock = true;
 	private ItemStack drop = null;
 	private int maxWlanStrength=4;
 	private int curWlanStrength=4;
 	
-	private World worldObj; //To check a dimesion change;
-	
 	@Override
 	public int x() {
-		return (int)entity.posX;
+		return posX;
 	}
 
 	@Override
 	public int y() {
-		return (int)entity.posY;
+		return posY;
 	}
 
 	@Override
 	public int z() {
-		return (int)entity.posZ-1;
+		return posZ;
 	}
 	
-	public final void setEnabled(boolean state) {
-		if(this.enabled != state){
+	public final void setEnabled(boolean state) { this.setEnabled(state,false); }
+	
+	public final void setEnabled(boolean state, boolean force) {
+		if(this.enabled != state || force){
 			this.enabled = state;
 			if(state){
-				API.network.joinWirelessNetwork(this);
+				if(this.maxWlanStrength>0)API.network.joinWirelessNetwork(this);
 				RemoteExtenderRegister.addRemoteUpdate(this);
 			}
 			else{
 				API.network.leaveWirelessNetwork(this);
-				RemoteExtenderRegister.removeRemoteUpdate(this);
+				RemoteExtenderRegister.removeRemote(this.uuid);
 			}
 			this.changeEnabled();
 		}
+	}
+	
+	public String getUUID(){
+		return this.uuid;
 	}
 	
 	public final boolean isEnabled() {
@@ -84,7 +94,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		
 		if(isEnabled()){	//reset some settings
 			curWlanStrength = 4;
-			uuid = UUID.randomUUID().toString();
+			address = UUID.randomUUID().toString();
 			respport = 1;
 			cmdport = 2;
 			respbroadcast = true;
@@ -102,7 +112,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 				doc = (doc == null || doc == "") ? "No documentation available" : doc;
 				this.sendPacket(new Object[]{doc}, this.getRespPort(), this.getRespAddress());
 			}
-			else if(a1!=null && a1.equals("-t"))
+			else if((a1!=null && a1.equals("-t")) || a1==null)
 			{
 				this.sendPacket(new Object[]{this.getCmdList(true)}, this.getRespPort(), this.getRespAddress());
 			}
@@ -142,24 +152,13 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	private String getCmdList(boolean compress){
 		Iterator<String> it = this.getCommands().iterator();
-		if(!compress){
-			String st = "{\n";
-			while(it.hasNext())
-			{
-				st += "  "+it.next()+ ((it.hasNext()) ? " ," : "") + "\n";
-			}
-			st += "}";
-			return st;
+		String st = "{";
+		while(it.hasNext())
+		{
+			st += it.next()+ ((it.hasNext()) ? "," : "");
 		}
-		else{
-			String st = "{";
-			while(it.hasNext())
-			{
-				st += it.next()+ ((it.hasNext()) ? "," : "");
-			}
-			st += "}";
-			return st;
-		}
+		st += "}";
+		return st;
 	}
 	
 	protected final int getRespPort() {
@@ -175,7 +174,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	protected final void sendPacket(Object[] msg, int port, String des){
 		if(this.getRespPort()<0) return;
 		Packet packet = API.network.newPacket(uuid, des, port, msg);
-		API.network.sendWirelessPacket(this, 4, packet);
+		API.network.sendWirelessPacket(this, this.curWlanStrength, packet);
 	}
 	
 	protected List<String> getCommands(){
@@ -191,7 +190,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	protected String getDoc(String cmd){
 		if(cmd == null) return null;
 		if(cmd.equals("doc"))
-			return "doc([func:string]):table or string -- get a list of functions or a documentation for a function. -t (as 2. String) to get a compressed list";
+			return "doc([func:string]):table or string -- get a list of functions or a documentation for a function.";
 		else if(cmd.equals("response_port"))
 			return "response_port([port:number]):number -- sets the response port and returns the new port. -1 to response on the same port as the last message";
 		else if(cmd.equals("command_port"))
@@ -210,22 +209,29 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		boolean hasEntity = worldObj.getLoadedEntityList().contains(this.entity);
 		boolean chunkLoaded = worldObj.getChunkFromBlockCoords((int)entity.posX, (int)entity.posZ).isChunkLoaded;
 		if(this.entity.isDead || this.entity.getDamage()>=this.getMaxModuleDamage() || (!hasEntity && chunkLoaded)){
-			this.setEnabled(false);
+			this.setEnabled(false, true);
 			if(this.entity.getDamage()>=this.getMaxModuleDamage()){
 				this.dropItem();
 			}
 		}
 		else{
 			if(!chunkLoaded || !hasEntity){
+				/*  
+				 * Stop the updates on chunk unload.
+				 * A chunk reload should reinitialize the entity and reactivate the updates.
+				 */
 				RemoteExtenderRegister.removeRemoteUpdate(this);
 			}
-			API.network.updateWirelessNetwork(this);
+			this.posX=(int) entity.posX;
+			this.posY=(int) entity.posY;
+			this.posZ=(int) (entity.posZ-1);
+			if(this.maxWlanStrength>0) API.network.updateWirelessNetwork(this);
 		}
 	}
 
 	@Override
 	public World world() {
-		return entity.worldObj;
+		return worldObj;
 	}
 
 	@Override
@@ -263,7 +269,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		nbt.setBoolean(OCMinecart.MODID+":rc_enabled", enabled);
 		if(enabled){
 			NBTTagCompound rc = new NBTTagCompound();
-			rc.setString("rc_uuid", this.uuid);
+			rc.setString("rc_address", this.address);
 			rc.setBoolean("rc_respbroadcast", this.respbroadcast);
 			rc.setInteger("rc_respport", this.respport);
 			rc.setInteger("rc_cmdport", this.cmdport);
@@ -284,6 +290,9 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 
 	@Override
 	public void loadNBTData(NBTTagCompound nbt) {
+		boolean hasEntity = worldObj.getLoadedEntityList().contains(this.entity);
+		if(!hasEntity && this.worldObj != entity.worldObj) return;
+		
 		if(nbt.hasKey(OCMinecart.MODID+":rc_enabled"))
 			enabled = nbt.getBoolean(OCMinecart.MODID+":rc_enabled");
 		else 
@@ -291,12 +300,12 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		
 		if(nbt.hasKey(OCMinecart.MODID+":rc_settings") && this.enabled){
 			NBTTagCompound rc = nbt.getCompoundTag(OCMinecart.MODID+":rc_settings");
-			if(rc.hasKey("rc_uuid")) this.uuid = rc.getString("rc_uuid");
+			if(rc.hasKey("rc_address")) this.address = rc.getString("rc_address");
 			if(rc.hasKey("rc_respbroadcast")) this.respbroadcast = rc.getBoolean("rc_respbroadcast");
 			if(rc.hasKey("rc_respport")) this.respport = rc.getInteger("rc_respport");
 			if(rc.hasKey("rc_cmdport")) this.cmdport = rc.getInteger("rc_cmdport");
 			if(rc.hasKey("rc_maxwlan")) this.maxWlanStrength = rc.getInteger("rc_maxwlan");
-			if(rc.hasKey("rc_curwlan")) this.cmdport = rc.getInteger("rc_curwlan");
+			if(rc.hasKey("rc_curwlan")) this.curWlanStrength = rc.getInteger("rc_curwlan");
 			if(rc.hasKey("rc_dropitem")){
 				NBTTagCompound dropnbt = rc.getCompoundTag("rc_dropitem");
 				drop=ItemStack.loadItemStackFromNBT(dropnbt);
@@ -307,20 +316,25 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		}
 		
 		if(this.enabled){
-			API.network.joinWirelessNetwork(this);
+			if(this.maxWlanStrength>0) API.network.joinWirelessNetwork(this);
 			RemoteExtenderRegister.addRemoteUpdate(this);
 		}
 		else{
 			API.network.leaveWirelessNetwork(this);
-			RemoteExtenderRegister.removeRemoteUpdate(this);
+			RemoteExtenderRegister.removeRemoteUpdate(this);	// Just to make sure nothing bad happens
 		}
 	}
 
 	@Override
 	public void init(Entity entity, World world) {
 		if(!(entity instanceof EntityMinecart)) return;
+		if(RemoteExtenderRegister.containsEntity(entity.getUniqueID())) return;
 		this.entity = (EntityMinecart)entity;
 		this.worldObj = world;
+		this.posX=(int) entity.posX;
+		this.posY=(int) entity.posY;
+		this.posZ=(int) (entity.posZ-1);
+		this.uuid=UUID.randomUUID().toString();
 	}
 	
 	public boolean inRange(WirelessEndpoint w, double range){
@@ -331,7 +345,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	}
 	
 	public String getAddress(){
-		return (this.enabled) ? this.uuid : null;
+		return (this.enabled) ? this.address : null;
 	}
 	
 	protected void loadModuleNBT(NBTTagCompound nbt){};
@@ -360,6 +374,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		return this.entity;
 	}
 	
+	//Max damage the cart/locomotive can have.
 	public int getMaxModuleDamage(){
 		return 40;
 	}
@@ -381,6 +396,10 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	}
 
 	public void setMaxWlanStrength(int maxWlanStrength) {
+		if(this.maxWlanStrength>1 && maxWlanStrength<1 && this.enabled)
+			API.network.leaveWirelessNetwork(this);
+		else if(this.maxWlanStrength<1 && maxWlanStrength>1 && this.enabled)
+			API.network.joinWirelessNetwork(this);
 		this.maxWlanStrength = maxWlanStrength;
 		this.curWlanStrength=Math.min(this.curWlanStrength, this.maxWlanStrength);
 	}

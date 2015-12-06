@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 
 import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.item.EntityMinecart;
@@ -60,38 +61,61 @@ public class RemoteExtenderRegister {
 	
 	
 	public static boolean addRemoteUpdate(RemoteCartExtender ext){
-		synchronized(updater){
-			removeExistingRemote(ext.getAddress());
-			if(updater.contains(ext)) return false;
-			updater.add(ext);
-			return true;
-		}
+		if(updater.contains(ext) || containsUUID(ext.getUUID()) || containsEntity(ext.entity.getUniqueID())) return false;
+		updater.add(ext);
+		return true;
 	}
 	
-	public static void removeExistingRemote(String uuid){
-			if(updater.isEmpty() || uuid == null) return;
-			ArrayList<Integer> marked = new ArrayList<Integer>();
-			for(int i=0;i<updater.size();i+=1){
-				if(updater.get(i).getAddress()!=null && updater.get(i).getAddress().equals(uuid)){
-					marked.add(i);
-				}
+	public static boolean containsUUID(String uuid){
+		if(updater.isEmpty() || uuid == null) return false;
+		for(int i=0;i<updater.size();i+=1){
+			if(updater.get(i).getUUID()!=null && updater.get(i).getUUID().equals(uuid) ){
+				return true;
 			}
-			if(marked.isEmpty()) return;
-			for(int i=0;i<marked.size();i+=1){
-				updater.remove(marked.get(i));
+		}
+		return false;
+	}
+	
+	public static boolean containsEntity(UUID uuid){
+		if(updater.isEmpty() || uuid == null) return false;
+		for(int i=0;i<updater.size();i+=1){
+			if(updater.get(i).entity!=null && updater.get(i).entity.getUniqueID().equals(uuid) ){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static void removeRemote(String uuid){
+			if(updater.isEmpty() || uuid == null) return;
+			ArrayList<RemoteCartExtender> backup = (ArrayList<RemoteCartExtender>) updater.clone();
+			updater.clear();
+			for(RemoteCartExtender e: backup){
+				if(e.isEnabled() && e.getUUID()!=uuid)
+					updater.add(e);
 			}
 	}
 	
 	public static boolean removeRemoteUpdate(RemoteCartExtender ext){
 		if(!updater.contains(ext)) return false;
-		removeExistingRemote(ext.getAddress());
 		updater.remove(ext);
 		return true;
 	}
 	
 	public static void serverTick(){
+		ArrayList<Integer> marked = new ArrayList<Integer>();
 		for(int i=0;i<updater.size();i+=1){
-			updater.get(i).update();
+			if(updater.get(i).isEnabled())
+				updater.get(i).update();
+			else
+				marked.add(i);
+		}
+		
+		if(!marked.isEmpty()){
+			for(int i=0;i<marked.size();i+=1){
+				updater.remove(marked.get(i));
+				System.out.println("Remove");
+			}
 		}
 	}
 	

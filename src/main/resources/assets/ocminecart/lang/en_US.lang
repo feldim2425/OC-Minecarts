@@ -38,7 +38,7 @@ tooltip.ocminecart.tier3=(Tier 3)
 tooltip.ocminecart.tier4=(Creative)
 
 #Tooltip for Items (item descriptions)
-tooltip.ocminecart.remotemodule.desc=You can install this item by right clicking a compatible cart. It allows to control Locomotives
+tooltip.ocminecart.remotemodule.desc=You can install this item by right clicking a compatible cart. It allows you to control Locomotives
 tooltip.ocminecart.remoteanalyzer.desc=Right Click on a cart with a remote module to get informations like address, ports, ... Press Control + Shift to copy the address
 tooltip.ocminecart.linkingupgrade.desc=Provides the "cartlinking" component. Allows computer carts to link and unlink other minecarts to the train.
 
