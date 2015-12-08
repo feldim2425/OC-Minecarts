@@ -89,6 +89,7 @@ public class GuiButtonClick implements IMessage {
 						String pw = message.dat.getString("password");
 						int stat = (module.editableByPlayer(ctx.getServerHandler().playerEntity ,true)) ? 1 : 2;
 						if(pw==null || pw.length()>10) stat=2;
+						if(stat==1) module.setPassword(pw);
 						((RemoteModuleContainer)c).sendPassState(ctx.getServerHandler().playerEntity, stat);
 					}
 					else if(message.buttonid==1){

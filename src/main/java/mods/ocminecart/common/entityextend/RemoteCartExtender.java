@@ -1,15 +1,21 @@
 package mods.ocminecart.common.entityextend;
 
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+
+import org.apache.commons.codec.digest.Md5Crypt;
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.network.Packet;
 import li.cil.oc.api.network.WirelessEndpoint;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.util.ItemUtil;
+import mods.ocminecart.common.util.StringUtil;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -43,6 +49,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	private String uuid;
 	private String address;
 	private String owner = null;
+	private byte[] password = null;
 	private boolean lock = true;
 	private ItemStack drop = null;
 	private int maxWlanStrength=4;
@@ -199,8 +206,6 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			return "response_broadcast([value:boolean]):boolean -- if the value is true it will respond with private messages.";
 		else if(cmd.equals("wlan_strength"))
 			return "wlan_strength([value:number]):number,number -- get/set the current and get the max. wireless strength.";
-		else if(cmd.equals("login"))
-			return "login(password:string):boolean -- login when a password is set (200 ticks timeout after every command).";
 		return null;
 	}
 	
@@ -239,7 +244,12 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(packet.ttl()<0 || !inRange(sender,curWlanStrength)) return;
 		if(!(packet.destination()==null || packet.destination().equals(this.uuid)) || !(this.cmdport==-1 || packet.port()==this.cmdport))
 			return;
-		if(!(packet.data()[0] instanceof byte[])) return;
+		if(!(packet.data()[0] instanceof byte[]) || (!(packet.data()[1] instanceof byte[]) && this.hasPassword())) return;
+		if(this.hasPassword()){
+			String passw = new String((byte[])packet.data()[1],Charsets.UTF_8);
+			if(passw.length()<=2 || !passw.substring(0, 2).equals("::") 
+					|| !this.isCorrectPassword(passw.substring(2, passw.length()))) return;
+		}
 		this.nextAddr = packet.source();
 		this.nextResp = packet.port();
 		String cmd = new String((byte[])packet.data()[0],Charsets.UTF_8);
@@ -248,17 +258,18 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	}
 	
 	private Object[] processPacket(Object[] data){
-		if(data.length-1<1) return new Object[]{};
-		Object[] res = new Object[data.length-1];
-		for(int i=1;i<data.length;i+=1)
+		int dataoffset = (this.hasPassword()) ? 2 : 1;
+		if(data.length-dataoffset<1) return new Object[]{};
+		Object[] res = new Object[data.length-dataoffset];
+		for(int i=dataoffset;i<data.length;i+=1)
 		{
 			if(data[i] instanceof byte[])
 			{
-				res[i-1] = new String((byte[]) data[i], Charsets.UTF_8);
+				res[i-dataoffset] = new String((byte[]) data[i], Charsets.UTF_8);
 			}
 			else
 			{
-				res[i-1] = data[i];
+				res[i-dataoffset] = data[i];
 			}
 		}
 		return res;
@@ -273,6 +284,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			rc.setBoolean("rc_respbroadcast", this.respbroadcast);
 			rc.setInteger("rc_respport", this.respport);
 			rc.setInteger("rc_cmdport", this.cmdport);
+			if(password!=null) rc.setByteArray("rc_password", this.password);
 			rc.setInteger("rc_maxwlan", this.maxWlanStrength);
 			rc.setInteger("rc_curwlan", this.curWlanStrength);
 			if(owner!=null) rc.setString("rc_owner", this.owner);
@@ -304,6 +316,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			if(rc.hasKey("rc_respbroadcast")) this.respbroadcast = rc.getBoolean("rc_respbroadcast");
 			if(rc.hasKey("rc_respport")) this.respport = rc.getInteger("rc_respport");
 			if(rc.hasKey("rc_cmdport")) this.cmdport = rc.getInteger("rc_cmdport");
+			if(rc.hasKey("rc_password")) this.password = rc.getByteArray("rc_password");
 			if(rc.hasKey("rc_maxwlan")) this.maxWlanStrength = rc.getInteger("rc_maxwlan");
 			if(rc.hasKey("rc_curwlan")) this.curWlanStrength = rc.getInteger("rc_curwlan");
 			if(rc.hasKey("rc_dropitem")){
@@ -402,6 +415,26 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			API.network.joinWirelessNetwork(this);
 		this.maxWlanStrength = maxWlanStrength;
 		this.curWlanStrength=Math.min(this.curWlanStrength, this.maxWlanStrength);
+	}
+	
+	public void setPassword(String password){
+		if(password==null || password.length()<1){
+			this.password=null;
+			return;
+		}
+		this.password=StringUtil.getMD5Array(password);
+	}
+	
+	public boolean hasPassword(){
+		return this.password!=null;
+	}
+	
+	public boolean isCorrectPassword(String password){
+		if(this.password==null) return true;
+		byte[] pass = StringUtil.getMD5Array(password);
+		String hex1 = StringUtil.byteToHex(this.password);
+		String hex2 = StringUtil.byteToHex(pass);
+		return hex1.equals(hex2);
 	}
 
 	public int getCurWlanStrength() {

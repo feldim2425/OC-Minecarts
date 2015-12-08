@@ -2,8 +2,6 @@ package mods.ocminecart.common.entityextend;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 import java.util.UUID;
 
 import mods.ocminecart.OCMinecart;
