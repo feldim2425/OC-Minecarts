@@ -10,3 +10,9 @@ But they can send messages via cable if the cart stands on a [networkrail](../bl
 
 
 If you break the cart, it drops the inventory of the cart and a computer cart will keep its internal components.
+
+#### Emblems
+You can attach railcraft emblems to the computercart. Just craft it together with an emblem.
+If you already attached an emblem to the cart, you can also change it with the same method, but you won't get back the emblem.
+You can remove the emblem by placing the cart in the crafting table with a crowbar.
+The crowbar will not get damaged but you will lose the emblem.
