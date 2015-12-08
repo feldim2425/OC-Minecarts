@@ -207,7 +207,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(this.world().isRemote) return;
 		boolean hasEntity = worldObj.getLoadedEntityList().contains(this.entity);
 		boolean chunkLoaded = worldObj.getChunkFromBlockCoords((int)entity.posX, (int)entity.posZ).isChunkLoaded;
-		if(this.entity.isDead || this.entity.getDamage()>=this.getMaxModuleDamage() || (!hasEntity && chunkLoaded)){
+		if(this.entity.isDead || this.entity.getDamage()>=this.getMaxModuleDamage()){
 			this.setEnabled(false, true);
 			if(this.entity.getDamage()>=this.getMaxModuleDamage()){
 				this.dropItem();
@@ -239,20 +239,30 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(!(packet.destination()==null || packet.destination().equals(this.uuid)) || !(this.cmdport==-1 || packet.port()==this.cmdport))
 			return;
 		if(!(packet.data()[0] instanceof byte[]) || (!(packet.data()[1] instanceof byte[]) && this.hasPassword())) return;
+		
+		boolean usePassword = false;
 		if(this.hasPassword()){
 			String passw = new String((byte[])packet.data()[1],Charsets.UTF_8);
 			if(passw.length()<=2 || !passw.substring(0, 2).equals("::") 
 					|| !this.isCorrectPassword(passw.substring(2, passw.length()))) return;
+			usePassword=true;
 		}
+		else if(packet.data()[1] instanceof byte[]){
+			String passw = new String((byte[])packet.data()[1],Charsets.UTF_8);
+			if(passw.length()<=2 || !passw.substring(0, 2).equals("::"))
+				usePassword=true;
+		}
+		
 		this.nextAddr = packet.source();
 		this.nextResp = packet.port();
+		
 		String cmd = new String((byte[])packet.data()[0],Charsets.UTF_8);
-		Object[] data = (this.getCommands().contains(cmd))? this.processPacket(packet.data()) : new Object[]{};
+		Object[] data = (this.getCommands().contains(cmd))? this.processPacket(packet.data(), usePassword) : new Object[]{};
 		this.processCommand((this.getCommands().contains(cmd))? cmd : null, data);
 	}
 	
-	private Object[] processPacket(Object[] data){
-		int dataoffset = (this.hasPassword()) ? 2 : 1;
+	private Object[] processPacket(Object[] data, boolean hasPassword){
+		int dataoffset = (hasPassword) ? 2 : 1;
 		if(data.length-dataoffset<1) return new Object[]{};
 		Object[] res = new Object[data.length-dataoffset];
 		for(int i=dataoffset;i<data.length;i+=1)
