@@ -1,14 +1,9 @@
 package mods.ocminecart.common.entityextend;
 
-import java.io.UnsupportedEncodingException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-
-import org.apache.commons.codec.digest.Md5Crypt;
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.network.Packet;
@@ -25,7 +20,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.IExtendedEntityProperties;
 
 import com.google.common.base.Charsets;
