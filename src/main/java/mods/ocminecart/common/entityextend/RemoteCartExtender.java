@@ -249,7 +249,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		}
 		else if(packet.data()[1] instanceof byte[]){
 			String passw = new String((byte[])packet.data()[1],Charsets.UTF_8);
-			if(passw.length()<=2 || !passw.substring(0, 2).equals("::"))
+			if(passw.length()>=2 || passw.substring(0, 2).equals("::"))
 				usePassword=true;
 		}
 		

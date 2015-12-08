@@ -23,6 +23,13 @@ For removing the remote module left-click on the cart. More information on the [
 
 Example call: `modem.broadcast(2, "<command>", <arg1>, <arg2>, ...)`
 
+If you set a password in the config gui, the argument 1 has to be "::<the password>" and argument 2 acts as argument 1.
+
+Example: `modem.broadcast(2, "<command>", "::password", <arg1>, <arg2>, ...)`
+
+The "::" indicates that you want to authenticate with a password. If there is no password set but you send one, the password will get ignored and argument 2 will also act like argument 1 (like in the 2. example)
+
+
 Standard functions:
 `doc([function name or "-t":sting]):string`   Returns:
 *  The documentation of the given command
