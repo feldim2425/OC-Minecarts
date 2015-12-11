@@ -13,14 +13,9 @@ public class ComponentCheck {
 		for(int i=0;i<inventory.getSizeInventory();i+=1){
 			Item drv = Driver.driverFor(inventory.getStackInSlot(i));
 			if(drv!=null){
-				switch(drv.slot(inventory.getStackInSlot(i))){
-				case Slot.CPU:
-					hasCPU=true;
-					break;
-				case Slot.Memory:
-					hasRAM=true;
-					break;
-				}
+				String type = drv.slot(inventory.getStackInSlot(i));
+				if(type == Slot.CPU) hasCPU=true;
+				else if(type == Slot.Memory) hasRAM=true;
 			}
 		}
 		

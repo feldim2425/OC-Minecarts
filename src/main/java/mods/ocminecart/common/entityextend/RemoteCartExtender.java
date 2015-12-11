@@ -124,21 +124,21 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		}
 		else if(cmd.equals("response_port")){
 			boolean isValid = args.length>=1 && (args[0] instanceof Double);
-			int port = (isValid) ? (int)(double)args[0] : 0; //Double is a Class and have to be converted to a double (type)
+			int port = (isValid) ? (int)(double)(Double)args[0] : 0; //Double is a Class and have to be converted to a double (type)
 			port = Math.max(-1, port);
 			if(isValid) this.respport = port;
 			this.sendPacket(new Object[]{this.respport}, this.getRespPort(), this.getRespAddress());
 		}
 		else if(cmd.equals("command_port")){
 			boolean isValid = args.length>=1 && (args[0] instanceof Double);
-			int port = (isValid) ? (int)(double)args[0] : 0;
+			int port = (isValid) ? (int)(double)(Double)args[0] : 0;
 			port = Math.max(-1, port);
 			if(isValid) this.cmdport = port;
 			this.sendPacket(new Object[]{this.cmdport}, this.getRespPort(), this.getRespAddress());
 		}
 		else if(cmd.equals("response_broadcast")){
 			boolean isValid = args.length>=1 && (args[0] instanceof Boolean);
-			boolean value = (isValid) ? (boolean)args[0] : false;
+			boolean value = (isValid) ? (Boolean)args[0] : false;
 			if(isValid) this.respbroadcast = value;
 			this.sendPacket(new Object[]{this.respbroadcast}, this.getRespPort(), this.getRespAddress());
 		}

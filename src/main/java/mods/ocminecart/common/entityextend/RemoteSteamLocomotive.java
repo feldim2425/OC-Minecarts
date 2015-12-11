@@ -19,7 +19,7 @@ public class RemoteSteamLocomotive extends RemoteCartExtender {
 		EntityLocomotiveSteamSolid loco = (EntityLocomotiveSteamSolid) this.entity;
 		if(cmd.equals("speed")){
 			if(args.length>0 && args[0] instanceof Double){
-				int speed = (int)(double)args[0];
+				int speed = (int)(double)(Double)args[0];
 				speed = -speed+3;
 				speed = Math.max(0, Math.min(4, speed));
 				loco.setSpeed(LocoSpeed.VALUES[speed]);
@@ -28,7 +28,7 @@ public class RemoteSteamLocomotive extends RemoteCartExtender {
 		}
 		else if(cmd.equals("mode")){
 			if(args.length>0 && args[0] instanceof Double){
-				int mode = (int)(double)args[0];
+				int mode = (int)(double)(Double)args[0];
 				mode = -mode+2;
 				mode = Math.max(0, Math.min(2, mode));
 				loco.setMode(LocoMode.VALUES[mode]);
