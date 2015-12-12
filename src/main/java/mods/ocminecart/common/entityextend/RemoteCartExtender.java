@@ -67,6 +67,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	public final void setEnabled(boolean state) { this.setEnabled(state,false); }
 	
 	public final void setEnabled(boolean state, boolean force) {
+		if(this.uuid==null) return; //Invalid Remote Module Extender
 		if(this.enabled != state || force){
 			this.enabled = state;
 			if(state){
@@ -75,7 +76,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			}
 			else{
 				API.network.leaveWirelessNetwork(this);
-				RemoteExtenderRegister.removeRemote(this.uuid);
+				RemoteExtenderRegister.removeRemoteUpdate(this);
 			}
 			this.changeEnabled();
 		}
@@ -174,7 +175,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	protected final void sendPacket(Object[] msg, int port, String des){
 		if(this.getRespPort()<0) return;
-		Packet packet = API.network.newPacket(uuid, des, port, msg);
+		Packet packet = API.network.newPacket(address, des, port, msg);
 		API.network.sendWirelessPacket(this, this.curWlanStrength, packet);
 	}
 	
@@ -236,7 +237,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	@Override
 	public void receivePacket(Packet packet, WirelessEndpoint sender){
 		if(packet.ttl()<0 || !inRange(sender,curWlanStrength)) return;
-		if(!(packet.destination()==null || packet.destination().equals(this.uuid)) || !(this.cmdport==-1 || packet.port()==this.cmdport))
+		if(!(packet.destination()==null || packet.destination().equals(this.address)) || !(this.cmdport==-1 || packet.port()==this.cmdport))
 			return;
 		if(!(packet.data()[0] instanceof byte[]) || (!(packet.data()[1] instanceof byte[]) && this.hasPassword())) return;
 		
@@ -329,12 +330,21 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			}
 			if(rc.hasKey("rc_owner")) this.owner=rc.getString("rc_owner");
 			if(rc.hasKey("rc_locked")) this.lock=rc.getBoolean("rc_locked");
+			
+			this.posX=(int) entity.posX;
+			this.posY=(int) entity.posY;
+			this.posZ=(int) (entity.posZ-1);
+			
 			this.loadModuleNBT(rc);
 		}
 		
 		if(this.enabled){
 			if(this.maxWlanStrength>0) API.network.joinWirelessNetwork(this);
-			RemoteExtenderRegister.addRemoteUpdate(this);
+			boolean c = RemoteExtenderRegister.addRemoteUpdate(this);
+			if(!c){
+				RemoteExtenderRegister.removeRemoteUpdate(this.entity);
+				c = RemoteExtenderRegister.addRemoteUpdate(this);
+			}
 		}
 		else{
 			API.network.leaveWirelessNetwork(this);
@@ -348,9 +358,6 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(RemoteExtenderRegister.containsEntity(entity.getUniqueID())) return;
 		this.entity = (EntityMinecart)entity;
 		this.worldObj = world;
-		this.posX=(int) entity.posX;
-		this.posY=(int) entity.posY;
-		this.posZ=(int) (entity.posZ-1);
 		this.uuid=UUID.randomUUID().toString();
 	}
 	
@@ -369,7 +376,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	protected void writeModuleNBT(NBTTagCompound nbt){}
 
 	public void onAnalyzeModule(EntityPlayer p) {
-		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Address: "+EnumChatFormatting.RESET+this.uuid));
+		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Address: "+EnumChatFormatting.RESET+this.address));
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Response Port: "+EnumChatFormatting.RESET+this.respport));
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Command Port: "+EnumChatFormatting.RESET+this.cmdport));
 		p.addChatComponentMessage(new ChatComponentText(EnumChatFormatting.LIGHT_PURPLE+"Boradcast Response: "+EnumChatFormatting.RESET+this.respbroadcast));
@@ -413,9 +420,9 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	}
 
 	public void setMaxWlanStrength(int maxWlanStrength) {
-		if(this.maxWlanStrength>1 && maxWlanStrength<1 && this.enabled)
+		if(this.maxWlanStrength>=1 && maxWlanStrength<1 && this.enabled)
 			API.network.leaveWirelessNetwork(this);
-		else if(this.maxWlanStrength<1 && maxWlanStrength>1 && this.enabled)
+		else if(this.maxWlanStrength<1 && maxWlanStrength>=1 && this.enabled)
 			API.network.joinWirelessNetwork(this);
 		this.maxWlanStrength = maxWlanStrength;
 		this.curWlanStrength=Math.min(this.curWlanStrength, this.maxWlanStrength);

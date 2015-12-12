@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
+import li.cil.oc.api.API;
 import mods.ocminecart.OCMinecart;
 import net.minecraft.entity.item.EntityMinecart;
 import cpw.mods.fml.common.Loader;
@@ -59,7 +60,8 @@ public class RemoteExtenderRegister {
 	
 	
 	public static boolean addRemoteUpdate(RemoteCartExtender ext){
-		if(updater.contains(ext) || containsUUID(ext.getUUID()) || containsEntity(ext.entity.getUniqueID())) return false;
+		System.out.println(updater.contains(ext)+" . "+containsUUID(ext.getUUID())+" . "+containsEntity(ext.entity.getUniqueID()));
+		if(updater.contains(ext) || containsUUID(ext.getUUID())) return false;
 		updater.add(ext);
 		return true;
 	}
@@ -84,19 +86,30 @@ public class RemoteExtenderRegister {
 		return false;
 	}
 	
-	public static void removeRemote(String uuid){
+	public static void removeRemoteUpdate(String uuid){
 			if(updater.isEmpty() || uuid == null) return;
-			ArrayList<RemoteCartExtender> backup = (ArrayList<RemoteCartExtender>) updater.clone();
-			updater.clear();
-			for(RemoteCartExtender e: backup){
-				if(e.isEnabled() && e.getUUID()!=uuid)
-					updater.add(e);
+			for(int i=0; i<updater.size(); i++){
+				RemoteCartExtender e = updater.get(i);
+				if(!e.isEnabled() || e.getUUID()==uuid){
+					e.setEnabled(false,true);
+				}
 			}
 	}
+	
+	public static void removeRemoteUpdate(EntityMinecart entity){
+		if(updater.isEmpty() || entity == null) return;
+		for(int i=0; i<updater.size(); i++){
+			RemoteCartExtender e = updater.get(i);
+			if(!e.isEnabled() || e.entity.getUniqueID() == entity.getUniqueID()){
+				e.setEnabled(false,true);
+			}
+		}
+}
 	
 	public static boolean removeRemoteUpdate(RemoteCartExtender ext){
 		if(!updater.contains(ext)) return false;
 		updater.remove(ext);
+		API.network.leaveWirelessNetwork(ext);
 		return true;
 	}
 	
