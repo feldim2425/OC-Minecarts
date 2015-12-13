@@ -84,7 +84,7 @@ public class EventHandler {
 	}
 	
 	@SubscribeEvent
-	public void onServerLoad(WorldEvent.Load event){
+	public void onWorldLoad(WorldEvent.Load event){
 		if(event.world.isRemote) return;
 		RemoteExtenderRegister.reinit();
 	}

@@ -60,20 +60,9 @@ public class RemoteExtenderRegister {
 	
 	
 	public static boolean addRemoteUpdate(RemoteCartExtender ext){
-		System.out.println(updater.contains(ext)+" . "+containsUUID(ext.getUUID())+" . "+containsEntity(ext.entity.getUniqueID()));
-		if(updater.contains(ext) || containsUUID(ext.getUUID())) return false;
+		if(updater.contains(ext)) return false;
 		updater.add(ext);
 		return true;
-	}
-	
-	public static boolean containsUUID(String uuid){
-		if(updater.isEmpty() || uuid == null) return false;
-		for(int i=0;i<updater.size();i+=1){
-			if(updater.get(i).getUUID()!=null && updater.get(i).getUUID().equals(uuid) ){
-				return true;
-			}
-		}
-		return false;
 	}
 	
 	public static boolean containsEntity(UUID uuid){
@@ -86,16 +75,6 @@ public class RemoteExtenderRegister {
 		return false;
 	}
 	
-	public static void removeRemoteUpdate(String uuid){
-			if(updater.isEmpty() || uuid == null) return;
-			for(int i=0; i<updater.size(); i++){
-				RemoteCartExtender e = updater.get(i);
-				if(!e.isEnabled() || e.getUUID()==uuid){
-					e.setEnabled(false,true);
-				}
-			}
-	}
-	
 	public static void removeRemoteUpdate(EntityMinecart entity){
 		if(updater.isEmpty() || entity == null) return;
 		for(int i=0; i<updater.size(); i++){
@@ -104,12 +83,12 @@ public class RemoteExtenderRegister {
 				e.setEnabled(false,true);
 			}
 		}
-}
+	}
 	
 	public static boolean removeRemoteUpdate(RemoteCartExtender ext){
 		if(!updater.contains(ext)) return false;
 		updater.remove(ext);
-		API.network.leaveWirelessNetwork(ext);
+		API.network.leaveWirelessNetwork(ext); //Sometimes it doesn't leave the network (Dimension changing)
 		return true;
 	}
 	

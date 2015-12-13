@@ -34,13 +34,13 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	private int posY;
 	private int posZ;
 	
+	private boolean valid = false;
 	protected boolean enabled=false;
 	protected boolean respbroadcast = true;
 	private int nextResp = -1;
 	private String nextAddr = null;
 	protected int respport = 1;
 	protected int cmdport = 2;
-	private String uuid;
 	private String address;
 	private String owner = null;
 	private byte[] password = null;
@@ -67,7 +67,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	public final void setEnabled(boolean state) { this.setEnabled(state,false); }
 	
 	public final void setEnabled(boolean state, boolean force) {
-		if(this.uuid==null) return; //Invalid Remote Module Extender
+		if(!valid) return;
 		if(this.enabled != state || force){
 			this.enabled = state;
 			if(state){
@@ -80,10 +80,6 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			}
 			this.changeEnabled();
 		}
-	}
-	
-	public String getUUID(){
-		return this.uuid;
 	}
 	
 	public final boolean isEnabled() {
@@ -342,7 +338,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			if(this.maxWlanStrength>0) API.network.joinWirelessNetwork(this);
 			boolean c = RemoteExtenderRegister.addRemoteUpdate(this);
 			if(!c){
-				RemoteExtenderRegister.removeRemoteUpdate(this.entity);
+				RemoteExtenderRegister.removeRemoteUpdate(this.entity); //if it failed remove existing Remotes from the entity
 				c = RemoteExtenderRegister.addRemoteUpdate(this);
 			}
 		}
@@ -358,7 +354,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(RemoteExtenderRegister.containsEntity(entity.getUniqueID())) return;
 		this.entity = (EntityMinecart)entity;
 		this.worldObj = world;
-		this.uuid=UUID.randomUUID().toString();
+		this.valid=true;
 	}
 	
 	public boolean inRange(WirelessEndpoint w, double range){
