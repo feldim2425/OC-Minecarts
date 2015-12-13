@@ -29,6 +29,7 @@ public class Settings {
 	public static double LinkingLinkCost;
 	public static double LinkingUnlinkDelay;
 	public static double LinkingUnlinkCost;
+	public static int[] RemoteRange;
 	
 	public static boolean GeneralFixCartBox; //Config Value -> cartboxfix
 	
@@ -61,7 +62,7 @@ public class Settings {
 		ComputerCartETrackBuf = OCMinecart.config.get("computercart", "trackchargebuffer", 1000 , "[Railcraft] Charge buffer for the computer cart (EU) [default: 1000]").getDouble(1000);
 		ComputerCartETrackLoss = OCMinecart.config.get("computercart", "chargebufferloss", 0.1 , "[Railcraft] Charge buffer loss per tick (EU) [default: 0.1]").getDouble(0.1);
 		ComputerCartETrackLoad = OCMinecart.config.get("computercart", "maxtrackcharge", 16 , "[Railcraft] Max. Energy a cart can take from the charge buffer per tick (EU) [default: 16]").getDouble(16);
-		
+				
 		// networkrail
 		NetRailPowerTransfer= OCMinecart.config.get("networkrail", "transferspeed",150 , "Energy that a network rail can transfer per tick [default: 100]").getInt(150);
 		
@@ -73,6 +74,8 @@ public class Settings {
 		LinkingLinkCost= OCMinecart.config.get("upgrades", "linkingcost", 0.5 , "Energy the Linking Upgrade will take when linked successful [default: 0.5]").getDouble(0.5);
 		LinkingUnlinkDelay= OCMinecart.config.get("upgrades", "unlinkdelay", 0.2 , "Pause time when unlinklink two carts with a Linking Upgrade (also when unsuccessful). in seconds [default: 0.3]").getDouble(0.3);
 		LinkingLinkDelay= OCMinecart.config.get("upgrades", "unlinkcost", 0.5 , "Energy the Linking Upgrade will take when unlinked successful [default: 0.4]").getDouble(0.4);
+		
+		RemoteRange = OCMinecart.config.get("upgrades", "remoterange", new int[]{4,64,256}, "Wireless range for the remote modules (Tier 1,2,3)").getIntList();
 	}
 	
 	private static void confComments(){
@@ -96,5 +99,13 @@ public class Settings {
 		computercart.add("trackchargebuffer");
 		computercart.add("chargebufferloss");
 		OCMinecart.config.setCategoryPropertyOrder("computercart", computercart);
+		
+		ArrayList<String> upgrades = new ArrayList<String>();
+		upgrades.add("remoterange");
+		upgrades.add("linkingdelay");
+		upgrades.add("linkingcost");
+		upgrades.add("unlinkdelay");
+		upgrades.add("unlinkcost");
+		OCMinecart.config.setCategoryPropertyOrder("upgrades", upgrades);
 	}
 }

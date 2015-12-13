@@ -26,7 +26,7 @@ import com.google.common.base.Charsets;
 
 public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedEntityProperties{
 	
-	public final static String PROP_ID = OCMinecart.MODID+"RCcart";
+	public final static String PROP_ID = OCMinecart.MODID+".RCcart";
 	
 	protected EntityMinecart entity;
 	private World worldObj;
@@ -110,13 +110,9 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 				doc = (doc == null || doc == "") ? "No documentation available" : doc;
 				this.sendPacket(new Object[]{doc}, this.getRespPort(), this.getRespAddress());
 			}
-			else if((a1!=null && a1.equals("-t")) || a1==null)
-			{
-				this.sendPacket(new Object[]{this.getCmdList(true)}, this.getRespPort(), this.getRespAddress());
-			}
 			else
 			{
-				this.sendPacket(new Object[]{this.getCmdList(false)}, this.getRespPort(), this.getRespAddress());
+				this.sendPacket(new Object[]{this.getCmdList()}, this.getRespPort(), this.getRespAddress());
 			}
 		}
 		else if(cmd.equals("response_port")){
@@ -148,7 +144,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 			
 	}
 	
-	private String getCmdList(boolean compress){
+	private String getCmdList(){
 		Iterator<String> it = this.getCommands().iterator();
 		String st = "{";
 		while(it.hasNext())

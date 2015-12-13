@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.Settings;
 import mods.ocminecart.common.assemble.util.TooltipUtil;
 import mods.ocminecart.common.entityextend.RemoteCartExtender;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
@@ -102,11 +103,11 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	public int getRangeByTier(int tier){
 		switch(tier){
 		case 1:
-			return 64;
+			return Settings.RemoteRange[1];
 		case 2:
-			return 256;
+			return Settings.RemoteRange[2];
 		default:
-			return 4;
+			return Settings.RemoteRange[0];
 		}
 	}
 
