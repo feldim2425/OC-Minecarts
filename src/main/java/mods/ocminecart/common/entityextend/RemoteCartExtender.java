@@ -277,7 +277,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		nbt.setBoolean(OCMinecart.MODID+":rc_enabled", enabled);
 		if(enabled){
 			NBTTagCompound rc = new NBTTagCompound();
-			rc.setString("rc_address", this.address);
+			if(this.address!=null)rc.setString("rc_address", this.address);
 			rc.setBoolean("rc_respbroadcast", this.respbroadcast);
 			rc.setInteger("rc_respport", this.respport);
 			rc.setInteger("rc_cmdport", this.cmdport);
@@ -310,6 +310,8 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(nbt.hasKey(OCMinecart.MODID+":rc_settings") && this.enabled){
 			NBTTagCompound rc = nbt.getCompoundTag(OCMinecart.MODID+":rc_settings");
 			if(rc.hasKey("rc_address")) this.address = rc.getString("rc_address");
+			else if(rc.hasKey("rc_uuid")) this.address = rc.getString("rc_uuid");
+			
 			if(rc.hasKey("rc_respbroadcast")) this.respbroadcast = rc.getBoolean("rc_respbroadcast");
 			if(rc.hasKey("rc_respport")) this.respport = rc.getInteger("rc_respport");
 			if(rc.hasKey("rc_cmdport")) this.cmdport = rc.getInteger("rc_cmdport");
