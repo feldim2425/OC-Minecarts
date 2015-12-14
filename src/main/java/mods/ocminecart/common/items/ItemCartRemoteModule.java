@@ -29,6 +29,7 @@ import net.minecraft.world.World;
 
 import org.lwjgl.input.Keyboard;
 
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -36,12 +37,14 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	
 	private IIcon icons[] = new IIcon[3];
+	public static int[] range;
 	
 	public ItemCartRemoteModule(){
 		super();
 		this.setMaxStackSize(64);
 		this.setUnlocalizedName(OCMinecart.MODID+".remotemodule");
 		this.setHasSubtypes(true);
+		if(FMLCommonHandler.instance().getEffectiveSide().isServer()) range = Settings.RemoteRange;
 	}
 	
 	 public boolean doesSneakBypassUse(World world, int x, int y, int z, EntityPlayer player){ return true; }
@@ -103,11 +106,11 @@ public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	public int getRangeByTier(int tier){
 		switch(tier){
 		case 1:
-			return Settings.RemoteRange[1];
+			return range[1];
 		case 2:
-			return Settings.RemoteRange[2];
+			return range[2];
 		default:
-			return Settings.RemoteRange[0];
+			return range[0];
 		}
 	}
 

@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.network.message.ComputercartInventoryUpdate;
+import mods.ocminecart.network.message.ConfigSyncMessage;
 import mods.ocminecart.network.message.EntitySyncData;
 import mods.ocminecart.network.message.EntitySyncRequest;
 import mods.ocminecart.network.message.GuiButtonClick;
@@ -33,6 +34,7 @@ public class ModNetwork {
 		channel.registerMessage(EntitySyncData.Handler.class, EntitySyncData.class, id++, Side.CLIENT);
 		channel.registerMessage(UpdateRunning.Handler.class, UpdateRunning.class, id++, Side.CLIENT);
 		channel.registerMessage(ItemUseMessage.Handler.class, ItemUseMessage.class, id++, Side.CLIENT);
+		channel.registerMessage(ConfigSyncMessage.Handler.class, ConfigSyncMessage.class, id++, Side.CLIENT);
 	}
 	
 	public static void sendToNearPlayers(IMessage msg, TileEntity entity){

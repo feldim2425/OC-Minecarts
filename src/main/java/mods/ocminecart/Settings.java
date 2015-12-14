@@ -75,7 +75,7 @@ public class Settings {
 		LinkingUnlinkDelay= OCMinecart.config.get("upgrades", "unlinkdelay", 0.2 , "Pause time when unlinklink two carts with a Linking Upgrade (also when unsuccessful). in seconds [default: 0.3]").getDouble(0.3);
 		LinkingLinkDelay= OCMinecart.config.get("upgrades", "unlinkcost", 0.5 , "Energy the Linking Upgrade will take when unlinked successful [default: 0.4]").getDouble(0.4);
 		
-		RemoteRange = OCMinecart.config.get("upgrades", "remoterange", new int[]{4,64,256}, "Wireless range for the remote modules (Tier 1,2,3)").getIntList();
+		RemoteRange = OCMinecart.config.get("upgrades", "remoterange", new int[]{4,64,256}, "Wireless range for the remote modules (Tier 1,2,3) [default: {4,64,256}]").getIntList();
 	}
 	
 	private static void confComments(){

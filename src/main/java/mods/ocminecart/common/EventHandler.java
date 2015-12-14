@@ -1,11 +1,16 @@
 package mods.ocminecart.common;
 
+import mods.ocminecart.Settings;
 import mods.ocminecart.client.SlotIcons;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
 import mods.ocminecart.common.items.interfaces.ItemEntityInteract;
 import mods.ocminecart.common.recipe.event.CraftingHandler;
+import mods.ocminecart.network.ModNetwork;
+import mods.ocminecart.network.message.ConfigSyncMessage;
 import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityEvent.EntityConstructing;
@@ -15,6 +20,7 @@ import net.minecraftforge.event.world.WorldEvent;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
+import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -75,6 +81,13 @@ public class EventHandler {
 		if(ticks<2) return;
 		ticks=0;
 		RemoteExtenderRegister.serverTick();
+	}
+	
+	@SubscribeEvent
+	public void onPlayerLogin(PlayerLoggedInEvent event){
+		NBTTagCompound config = new NBTTagCompound();
+		config.setIntArray("remoterange", Settings.RemoteRange);
+		ModNetwork.channel.sendTo(new ConfigSyncMessage(config), (EntityPlayerMP)event.player);
 	}
 	
 	@SubscribeEvent
