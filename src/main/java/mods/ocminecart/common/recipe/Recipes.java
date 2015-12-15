@@ -26,6 +26,8 @@ public class Recipes {
 		ItemAPI items  = API.items;
 		
 		RecipeSorter.register(OCMinecart.MODID + ":romcrafting", RomCrafting.class , Category.SHAPELESS, "after:minecraft:shaped");
+		if(Loader.isModLoaded("Railcraft"))
+			RecipeSorter.register(OCMinecart.MODID + ":emblemcrafting", EmblemCrafting.class , Category.SHAPELESS, "after:minecraft:shaped");
 		
 		GameRegistry.addShapedRecipe(new ItemStack(Item.getItemFromBlock(ModBlocks.block_NetworkRailBase),1), 
 				"CSC",

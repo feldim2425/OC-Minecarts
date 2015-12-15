@@ -47,9 +47,9 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		if(Loader.isModLoaded("Railcraft") && FMLCommonHandler.instance().getEffectiveSide().isServer())
 			charge = new ChargeHandler(this, ChargeHandler.Type.USER, Settings.ComputerCartETrackBuf, Settings.ComputerCartETrackLoss);
 		
-		this.dataWatcher.addObject(3, (byte)0);
-		this.dataWatcher.addObject(4, 0.0F);
-		this.dataWatcher.addObject(5, "");
+		this.dataWatcher.addObject(3, (byte)0); // Booleans (is Locked, Break enabled)
+		this.dataWatcher.addObject(4, 0.0F);  //Engine speed
+		this.dataWatcher.addObject(5, "");	//Emblem id [Railcraft]
 		// Free DataWatcher 6-16, 23-32
 	}
 	
@@ -249,7 +249,7 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 	}
 	
 	@Optional.Method(modid="Railcraft")		
-	public ResourceLocation getEmblemIcon(){	//Optional.Method because of speed (used in the renderer)
+	public ResourceLocation getEmblemIcon(){
 		String id = this.dataWatcher.getWatchableObjectString(5);
 		if(id==null || id=="") return null;
 		return EmblemToolsClient.packageManager.getEmblemTextureLocation(id);
