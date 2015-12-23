@@ -198,7 +198,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 	
 	public void update() {
 		if(this.world().isRemote) return;
-		boolean hasEntity = worldObj.getLoadedEntityList().contains(this.entity);
+		boolean hasEntity = worldObj.loadedEntityList.contains(this.entity);
 		boolean chunkLoaded = worldObj.getChunkFromBlockCoords((int)entity.posX, (int)entity.posZ).isChunkLoaded;
 		if(this.entity.isDead || this.entity.getDamage()>=this.getMaxModuleDamage()){
 			this.setEnabled(false, true);
@@ -299,7 +299,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 
 	@Override
 	public void loadNBTData(NBTTagCompound nbt) {
-		boolean hasEntity = worldObj.getLoadedEntityList().contains(this.entity);
+		boolean hasEntity = worldObj.loadedEntityList.contains(this.entity);
 		if(!hasEntity && this.worldObj != entity.worldObj) return;
 		
 		if(nbt.hasKey(OCMinecart.MODID+":rc_enabled"))
