@@ -73,6 +73,7 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 			if(this.charge!=null) this.charge.writeToNBT(rctag);
 			String emblem = this.dataWatcher.getWatchableObjectString(5);
 			if(emblem!=null && emblem!="") rctag.setString("emblem_id", emblem);
+			else rctag.removeTag("emblem_id");
 			tag.setTag("railcraft", rctag);
 		}
 		nbt.setTag("advcart", tag);
@@ -89,7 +90,10 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 				NBTTagCompound rctag = tag.getCompoundTag("railcraft");
 				this.dataWatcher.updateObject(3, BitUtil.setBit(rctag.getBoolean("locked"), this.dataWatcher.getWatchableObjectByte(3), 1));
 				if(this.charge!=null) this.charge.readFromNBT(rctag);
-				if(rctag.hasKey("emblem_id")) this.dataWatcher.updateObject(5, rctag.getString("emblem_id"));
+				if(rctag.hasKey("emblem_id")){
+					String id= rctag.getString("emblem_id");
+					this.dataWatcher.updateObject(5, (id==null)?"":id);
+				}
 			}
 		}
 	}
@@ -251,7 +255,7 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 	@Optional.Method(modid="Railcraft")		
 	public ResourceLocation getEmblemIcon(){
 		String id = this.dataWatcher.getWatchableObjectString(5);
-		if(id==null || id=="") return null;
+		if(id==null || id.length()<1) return null;
 		return EmblemToolsClient.packageManager.getEmblemTextureLocation(id);
 	}
 
