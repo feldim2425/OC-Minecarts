@@ -231,7 +231,7 @@ public abstract class RemoteCartExtender implements WirelessEndpoint, IExtendedE
 		if(packet.ttl()<0 || !inRange(sender,curWlanStrength)) return;
 		if(!(packet.destination()==null || packet.destination().equals(this.address)) || !(this.cmdport==-1 || packet.port()==this.cmdport))
 			return;
-		if(!(packet.data()[0] instanceof byte[]) || (!(packet.data()[1] instanceof byte[]) && this.hasPassword())) return;
+		if(!(packet.data()[0] instanceof byte[]) || ((packet.data().length<2 || !(packet.data()[1] instanceof byte[])) && this.hasPassword())) return;
 		
 		boolean usePassword = false;
 		if(this.hasPassword()){
