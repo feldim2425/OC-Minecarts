@@ -3,7 +3,7 @@ package mods.ocminecart.common.driver;
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.Items;
 import li.cil.oc.api.driver.EnvironmentAware;
-import li.cil.oc.api.driver.EnvironmentHost;
+import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.HostAware;
 import li.cil.oc.api.network.Environment;

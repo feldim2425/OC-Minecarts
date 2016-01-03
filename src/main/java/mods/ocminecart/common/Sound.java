@@ -3,7 +3,7 @@ package mods.ocminecart.common;
 import java.util.HashMap;
 import java.util.Map;
 
-import li.cil.oc.api.driver.EnvironmentHost;
+import li.cil.oc.api.network.EnvironmentHost;
 import mods.ocminecart.Settings;
 
 public class Sound {

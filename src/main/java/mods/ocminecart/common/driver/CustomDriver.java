@@ -5,7 +5,7 @@ import java.util.Iterator;
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
-import li.cil.oc.api.driver.EnvironmentHost;
+import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.HostAware;
 import mods.ocminecart.Settings;
