@@ -10,8 +10,8 @@ import java.util.UUID;
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.Manual;
-import li.cil.oc.api.component.Keyboard;
-import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.internal.Keyboard;
+import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Inventory;
 import li.cil.oc.api.driver.item.Slot;

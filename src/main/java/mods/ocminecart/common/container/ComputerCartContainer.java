@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
 import mods.ocminecart.common.container.slots.ContainerSlot;
 import mods.ocminecart.common.minecart.ComputerCart;

@@ -2,7 +2,7 @@ package mods.ocminecart.common.driver;
 
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.Items;
-import li.cil.oc.api.driver.EnvironmentAware;
+import li.cil.oc.api.driver.EnvironmentProvider;
 import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.HostAware;
@@ -13,7 +13,7 @@ import mods.ocminecart.common.minecart.IComputerCart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class DriverCraftingUpgrade implements Item, HostAware, EnvironmentAware {
+public class DriverCraftingUpgrade implements Item, HostAware,EnvironmentProvider {
 
 	@Override
 	public boolean worksWith(ItemStack stack) {
@@ -52,7 +52,7 @@ public class DriverCraftingUpgrade implements Item, HostAware, EnvironmentAware 
 	}
 
 	@Override
-	public Class<? extends Environment> providedEnvironment(ItemStack stack) {
+	public Class<?> getEnvironment(ItemStack stack) {
 		return CraftingUpgradeCC.class;
 	}
 

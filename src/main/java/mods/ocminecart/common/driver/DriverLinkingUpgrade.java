@@ -1,8 +1,8 @@
 package mods.ocminecart.common.driver;
 
-import li.cil.oc.api.driver.EnvironmentAware;
-import li.cil.oc.api.network.EnvironmentHost;
+import li.cil.oc.api.driver.EnvironmentProvider;
 import li.cil.oc.api.driver.Item;
+import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.driver.item.HostAware;
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.network.Environment;
@@ -14,12 +14,7 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class DriverLinkingUpgrade implements Item, HostAware, EnvironmentAware {
-
-	@Override
-	public Class<? extends Environment> providedEnvironment(ItemStack stack) {
-		return LinkingUpgrade.class;
-	}
+public class DriverLinkingUpgrade implements Item, HostAware {
 
 	@Override
 	public boolean worksWith(ItemStack stack, Class<? extends EnvironmentHost> host) {

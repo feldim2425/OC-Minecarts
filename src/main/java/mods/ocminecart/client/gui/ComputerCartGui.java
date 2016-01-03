@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import li.cil.oc.api.component.TextBuffer;
+import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.client.KeyBindings;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
@@ -87,7 +87,6 @@ public class ComputerCartGui extends GuiContainer {
 	private SliderButton invslider = null;
 	
 	private boolean[] disSlot = new boolean[16];
-	private boolean guiSizeChange = false;
 	private int offset = 0;
 	
 //-------Init functions-------//
@@ -120,7 +119,7 @@ public class ComputerCartGui extends GuiContainer {
 		this.updateSlots();
 		
 		BufferRenderer.init(Minecraft.getMinecraft().renderEngine);
-		this.guiSizeChange=true;
+		boolean guiSizeChange = true;
 		
 		this.txtHeight = (this.textbuffer!=null) ? this.textbuffer.getHeight() : 0;
 		this.txtWidth = (this.textbuffer!=null) ? this.textbuffer.getWidth() : 0;

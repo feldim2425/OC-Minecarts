@@ -2,7 +2,7 @@ package mods.ocminecart.common.driver;
 
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.Items;
-import li.cil.oc.api.driver.EnvironmentAware;
+import li.cil.oc.api.driver.EnvironmentProvider;
 import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.HostAware;
@@ -14,7 +14,7 @@ import mods.ocminecart.common.minecart.IComputerCart;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class DriverInventoryController implements Item, HostAware, EnvironmentAware {
+public class DriverInventoryController implements Item, HostAware, EnvironmentProvider {
 
 	@Override
 	public boolean worksWith(ItemStack stack, Class<? extends EnvironmentHost> host) {
@@ -46,7 +46,7 @@ public class DriverInventoryController implements Item, HostAware, EnvironmentAw
 	}
 
 	@Override
-	public Class<? extends Environment> providedEnvironment(ItemStack stack) {
+	public Class<?> getEnvironment(ItemStack stack) {
 		if(stack!= null && Items.get("inventoryControllerUpgrade").createItemStack(1).isItemEqual(stack))
 			return UpgradeInventoryController.Drone.class;
 		return null;
