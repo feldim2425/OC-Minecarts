@@ -104,7 +104,7 @@ public class ComputerCartController implements ManagedEnvironment{
 	
 	@Callback(doc="function(speed:number):number -- Set the engine speed.")
 	public Object[] setEngineSpeed(Context context, Arguments arguments){
-		double speed = Math.min(arguments.checkDouble(0), this.cart.getMaxCartSpeedOnRail());
+		double speed = Math.max(Math.min(arguments.checkDouble(0), this.cart.getMaxCartSpeedOnRail()), 0);
 		this.cart.setEngineState(speed);
 		return new Object[]{speed};
 	}
