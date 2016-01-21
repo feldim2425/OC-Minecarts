@@ -20,7 +20,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Optional;
 
-//Is the Base for a solid, self powered cart with a break.
+//Is the Base for a solid, self powered cart with a brake.
 //Later I will add the Railcraft integration here
 @Optional.InterfaceList({
 	@Optional.Interface(iface = "mods.railcraft.api.carts.IEnergyTransfer", modid = "Railcraft") ,
