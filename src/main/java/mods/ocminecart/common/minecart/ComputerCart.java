@@ -838,8 +838,8 @@ public class ComputerCart extends AdvCart implements MachineHost, Analyzable, IS
 	protected void setInventorySpace(int invsize) { this.invsize = invsize; }
 	public int getInventorySpace() { return this.invsize; }
 	
-	public boolean getBreakState(){ return this.getBreak(); }
-	public void setBreakState(boolean state){ this.setBreak(state);}
+	public boolean getBrakeState(){ return this.getBrake(); }
+	public void setBrakeState(boolean state){ this.setBrake(state);}
 	
 	public double getEngineState(){ return this.getEngine(); }
 	public void setEngineState(double speed){ this.setEngine(speed); }

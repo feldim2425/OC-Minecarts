@@ -47,26 +47,26 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		if(Loader.isModLoaded("Railcraft") && FMLCommonHandler.instance().getEffectiveSide().isServer())
 			charge = new ChargeHandler(this, ChargeHandler.Type.USER, Settings.ComputerCartETrackBuf, Settings.ComputerCartETrackLoss);
 		
-		this.dataWatcher.addObject(3, (byte)0); // Booleans (is Locked, Break enabled)
+		this.dataWatcher.addObject(3, (byte)0); // Booleans (is Locked, Brake enabled)
 		this.dataWatcher.addObject(4, 0.0F);  //Engine speed
 		this.dataWatcher.addObject(5, "");	//Emblem id [Railcraft]
 		// Free DataWatcher 6-16, 23-32
 	}
 	
-	protected final void setBreak(boolean b){ 
+	protected final void setBrake(boolean b){ 
 		this.dataWatcher.updateObject(3, BitUtil.setBit(b, this.dataWatcher.getWatchableObjectByte(3), 0));
 	}
-	protected final boolean getBreak(){ return BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0); }
+	protected final boolean getBrake(){ return BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0); }
 	protected final void setEngine(double d){ this.dataWatcher.updateObject(4, (float)d); }
 	protected final double getEngine(){ return this.dataWatcher.getWatchableObjectFloat(4); }
 	public final boolean isLocked(){ return BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1); }
-	public final boolean isEngineActive(){ return this.getEngine()!=0 && !this.isLocked() && !this.getBreak() && this.onRail(); }
+	public final boolean isEngineActive(){ return this.getEngine()!=0 && !this.isLocked() && !this.getBrake() && this.onRail(); }
 	
 	public void writeEntityToNBT(NBTTagCompound nbt){
 		super.writeEntityToNBT(nbt);
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setDouble("enginespeed", this.dataWatcher.getWatchableObjectFloat(4));
-		tag.setBoolean("break", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0));
+		tag.setBoolean("brake", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 0));
 		if(Loader.isModLoaded("Railcraft")){
 			NBTTagCompound rctag = new NBTTagCompound();
 			rctag.setBoolean("locked", BitUtil.getBit(this.dataWatcher.getWatchableObjectByte(3), 1));
@@ -84,8 +84,8 @@ public abstract class AdvCart extends EntityMinecart implements IEnergyTransfer,
 		if(nbt.hasKey("advcart")){
 			NBTTagCompound tag = (NBTTagCompound) nbt.getTag("advcart");
 			if(tag.hasKey("enginespeed")) this.dataWatcher.updateObject(4, (float)tag.getDouble("enginespeed"));
-			if(tag.hasKey("break")) 
-				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("break"), this.dataWatcher.getWatchableObjectByte(3), 0));
+			if(tag.hasKey("brake")) 
+				this.dataWatcher.updateObject(3, BitUtil.setBit(tag.getBoolean("brake"), this.dataWatcher.getWatchableObjectByte(3), 0));
 			if(tag.hasKey("railcraft") && Loader.isModLoaded("Railcraft")){
 				NBTTagCompound rctag = tag.getCompoundTag("railcraft");
 				this.dataWatcher.updateObject(3, BitUtil.setBit(rctag.getBoolean("locked"), this.dataWatcher.getWatchableObjectByte(3), 1));

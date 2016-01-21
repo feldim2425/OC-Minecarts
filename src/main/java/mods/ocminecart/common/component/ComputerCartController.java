@@ -73,19 +73,19 @@ public class ComputerCartController implements ManagedEnvironment{
 	
 	/*--------Component-Functions-Cart--------*/
 	
-	@Callback(doc="function(set:boolean):boolen, string -- Enable/Disable the break. String for errors")
-	public Object[] setBreak(Context context, Arguments arguments){
+	@Callback(doc="function(set:boolean):boolen, string -- Enable/Disable the brake. String for errors")
+	public Object[] setBrake(Context context, Arguments arguments){
 		boolean state = arguments.checkBoolean(0);
 		if(this.cart.getSpeed() > this.cart.getMaxCartSpeedOnRail() && state){
-			return new Object[]{this.cart.getBreakState(), "too fast"};
+			return new Object[]{this.cart.getBrakeState(), "too fast"};
 		}
-		this.cart.setBreakState(state);
+		this.cart.setBrakeState(state);
 		return new Object[]{state, null};
 	}
 	
-	@Callback(direct = true,doc="function():boolean -- Get the status of the break.")
-	public Object[] getBreak(Context context, Arguments arguments){
-		return new Object[]{this.cart.getBreakState()};
+	@Callback(direct = true,doc="function():boolean -- Get the status of the brake.")
+	public Object[] getBrake(Context context, Arguments arguments){
+		return new Object[]{this.cart.getBrakeState()};
 	}
 	
 	@Callback(direct = true,doc="function():number -- Get engine speed")
