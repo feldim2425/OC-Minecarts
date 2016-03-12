@@ -18,12 +18,12 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = OCMinecart.MODID, name=OCMinecart.NAME, version=OCMinecart.VERSION, dependencies = "required-after:OpenComputers@[1.5.14,);"
+@Mod(modid = OCMinecart.MODID, name=OCMinecart.NAME, version=OCMinecart.VERSION, dependencies = "required-after:OpenComputers@[1.6.0,);"
 		+ "after:Waila;"
 		+ "after:Railcraft@[9.7.0.0,)")
 public class OCMinecart {
 	public static final String MODID = "ocminecart";
-	public static final String VERSION = "1.1";
+	public static final String VERSION = "1.3";
 	public static final String NAME = "OC-Minecarts";
 	
 	@Instance(OCMinecart.MODID)
