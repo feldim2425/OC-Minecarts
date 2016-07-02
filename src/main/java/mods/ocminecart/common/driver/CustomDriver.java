@@ -1,8 +1,5 @@
 package mods.ocminecart.common.driver;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import li.cil.oc.api.API;
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.EnvironmentHost;
@@ -11,6 +8,9 @@ import li.cil.oc.api.driver.item.HostAware;
 import mods.ocminecart.Settings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /* 
  * This is the best way I found to override the OC Item Drivers for the computer cart

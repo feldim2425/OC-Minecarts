@@ -1,13 +1,12 @@
 package mods.ocminecart.common.tileentity;
 
+import appeng.api.movable.IMovableTile;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Optional;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import li.cil.oc.api.Network;
-import li.cil.oc.api.network.Analyzable;
-import li.cil.oc.api.network.Connector;
-import li.cil.oc.api.network.Environment;
-import li.cil.oc.api.network.Message;
-import li.cil.oc.api.network.Node;
-import li.cil.oc.api.network.SidedEnvironment;
-import li.cil.oc.api.network.Visibility;
+import li.cil.oc.api.network.*;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.util.IPlugable;
@@ -25,11 +24,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.ForgeDirection;
-import appeng.api.movable.IMovableTile;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Optional;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @Optional.Interface(iface="appeng.api.movable.IMovableTile", modid="appliedenergistics2", striprefs=true)
 public class NetworkRailBaseTile extends TileEntity implements ISidedInventory, SidedEnvironment, IPlugable, Analyzable, IMovableTile{

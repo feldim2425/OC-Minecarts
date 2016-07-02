@@ -1,7 +1,5 @@
 package mods.ocminecart.interaction.waila;
 
-import java.util.List;
-
 import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaEntityAccessor;
 import mcp.mobius.waila.api.IWailaEntityProvider;
@@ -13,6 +11,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class ComputerCartDataProvider implements IWailaEntityProvider {
 

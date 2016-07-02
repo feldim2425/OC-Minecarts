@@ -1,12 +1,10 @@
 package mods.ocminecart.client.gui;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import codechicken.lib.vec.Rectangle4i;
+import codechicken.nei.ItemPanel;
+import codechicken.nei.LayoutManager;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.client.KeyBindings;
@@ -40,16 +38,12 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import codechicken.lib.vec.Rectangle4i;
-import codechicken.nei.ItemPanel;
-import codechicken.nei.LayoutManager;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
+import java.util.*;
+import java.util.Map.Entry;
 
 //I used the code from OpenComputer's Robot GUI to make this class (ImageButton, Buffer renderer, Mouse & Keyboard handler, ...)
 //Credits to Sangar

@@ -1,7 +1,6 @@
 package mods.ocminecart.common.component;
 
-import java.util.HashMap;
-
+import cpw.mods.fml.common.Loader;
 import li.cil.oc.api.Network;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -15,7 +14,8 @@ import mods.ocminecart.interaction.railcraft.RailcraftUtils;
 import mods.railcraft.api.carts.CartTools;
 import mods.railcraft.api.carts.ILinkageManager;
 import net.minecraft.entity.item.EntityMinecart;
-import cpw.mods.fml.common.Loader;
+
+import java.util.HashMap;
 
 public class LinkingUpgrade extends ManagedEnvironment{
 	

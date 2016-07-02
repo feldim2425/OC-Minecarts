@@ -1,8 +1,5 @@
 package mods.ocminecart.client.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.client.gui.widget.GuiUtil;
 import mods.ocminecart.common.container.RemoteModuleContainer;
@@ -16,9 +13,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RemoteModuleGui extends GuiContainer {
 	private GuiTextField pass;

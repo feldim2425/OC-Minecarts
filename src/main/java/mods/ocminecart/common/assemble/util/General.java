@@ -1,7 +1,5 @@
 package mods.ocminecart.common.assemble.util;
 
-import java.util.HashMap;
-
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
@@ -11,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
+
+import java.util.HashMap;
 
 public class General {
 	public static Object[] validate(IInventory inventory, int maxcomplexity){

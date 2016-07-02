@@ -1,11 +1,11 @@
 package mods.ocminecart.common.disassemble;
 
+import cpw.mods.fml.common.registry.GameRegistry;
+import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.GameRegistry.UniqueIdentifier;
 
 //Standard Template for all Items of this mod.
 public class StandardTemplate {

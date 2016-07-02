@@ -1,8 +1,8 @@
 package mods.ocminecart.common.items;
 
+import cpw.mods.fml.common.registry.GameRegistry;
 import mods.ocminecart.OCMinecart;
 import net.minecraft.item.Item;
-import cpw.mods.fml.common.registry.GameRegistry;
 
 public class ModItems {
 	

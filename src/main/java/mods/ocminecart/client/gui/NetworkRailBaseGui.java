@@ -1,7 +1,10 @@
 package mods.ocminecart.client.gui;
 
-import java.util.Iterator;
-
+import codechicken.lib.vec.Rectangle4i;
+import codechicken.nei.ItemPanel;
+import codechicken.nei.LayoutManager;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.Optional;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.container.NetworkRailBaseContainer;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
@@ -19,14 +22,9 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.StatCollector;
-
 import org.lwjgl.opengl.GL11;
 
-import codechicken.lib.vec.Rectangle4i;
-import codechicken.nei.ItemPanel;
-import codechicken.nei.LayoutManager;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.Optional;
+import java.util.Iterator;
 
 public class NetworkRailBaseGui extends GuiContainer{
 	

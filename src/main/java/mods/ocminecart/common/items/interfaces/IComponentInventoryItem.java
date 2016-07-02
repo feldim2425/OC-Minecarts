@@ -1,8 +1,8 @@
 package mods.ocminecart.common.items.interfaces;
 
-import java.util.Map;
-
 import net.minecraft.item.ItemStack;
+
+import java.util.Map;
 
 public interface IComponentInventoryItem {
 	

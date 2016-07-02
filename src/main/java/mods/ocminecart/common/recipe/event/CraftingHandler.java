@@ -1,11 +1,11 @@
 package mods.ocminecart.common.recipe.event;
 
+import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
+import net.minecraft.item.ItemStack;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import net.minecraft.item.ItemStack;
-import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 
 public class CraftingHandler {
 	private static ArrayList<ICraftingToolHandler> handlers = new ArrayList<ICraftingToolHandler>();

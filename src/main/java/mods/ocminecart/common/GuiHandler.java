@@ -1,5 +1,6 @@
 package mods.ocminecart.common;
 
+import cpw.mods.fml.common.network.IGuiHandler;
 import mods.ocminecart.client.gui.ComputerCartGui;
 import mods.ocminecart.client.gui.NetworkRailBaseGui;
 import mods.ocminecart.client.gui.RemoteModuleGui;
@@ -14,7 +15,6 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.network.IGuiHandler;
 
 public class GuiHandler implements IGuiHandler{
 

@@ -1,9 +1,6 @@
 package mods.ocminecart.common.inventory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-
+import cpw.mods.fml.common.FMLCommonHandler;
 import li.cil.oc.api.API;
 import li.cil.oc.api.driver.EnvironmentAware;
 import li.cil.oc.api.driver.Item;
@@ -24,7 +21,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import cpw.mods.fml.common.FMLCommonHandler;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 // This Class is just a Java rewrite of li.cil.oc.common.inventory.ComponentInventory and Inventory (Credits to Sangar)
 public abstract class ComponetInventory implements IInventory, Environment{

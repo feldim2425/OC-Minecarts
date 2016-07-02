@@ -1,24 +1,18 @@
 package mods.ocminecart.network;
 
-import java.util.Iterator;
-
-import mods.ocminecart.OCMinecart;
-import mods.ocminecart.network.message.ComputercartInventoryUpdate;
-import mods.ocminecart.network.message.ConfigSyncMessage;
-import mods.ocminecart.network.message.EntitySyncData;
-import mods.ocminecart.network.message.EntitySyncRequest;
-import mods.ocminecart.network.message.GuiButtonClick;
-import mods.ocminecart.network.message.ItemUseMessage;
-import mods.ocminecart.network.message.UpdateRunning;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.server.management.ServerConfigurationManager;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import cpw.mods.fml.relauncher.Side;
+import mods.ocminecart.OCMinecart;
+import mods.ocminecart.network.message.*;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.management.ServerConfigurationManager;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.World;
+
+import java.util.Iterator;
 
 public class ModNetwork {
 	

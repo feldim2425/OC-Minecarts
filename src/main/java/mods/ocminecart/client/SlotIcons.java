@@ -1,12 +1,12 @@
 package mods.ocminecart.client;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import li.cil.oc.api.driver.item.Slot;
 import mods.ocminecart.Settings;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.util.IIcon;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SlotIcons {
 	

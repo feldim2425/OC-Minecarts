@@ -1,8 +1,9 @@
 package mods.ocminecart.common.items;
 
-import java.util.List;
-import java.util.Random;
-
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.assemble.util.TooltipUtil;
@@ -26,13 +27,10 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-
 import org.lwjgl.input.Keyboard;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.List;
+import java.util.Random;
 
 public class ItemCartRemoteModule extends Item implements ItemEntityInteract{
 	

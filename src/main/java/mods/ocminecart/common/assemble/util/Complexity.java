@@ -1,13 +1,13 @@
 package mods.ocminecart.common.assemble.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-
 import li.cil.oc.api.Driver;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.common.Tier;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Complexity {
 	public static int calculate(Iterable<ItemStack> components){

@@ -1,14 +1,14 @@
 package mods.ocminecart.client.gui.widget;
 
-import java.util.Iterator;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.Iterator;
 
 public abstract class ComponentSlot extends Slot{
 	

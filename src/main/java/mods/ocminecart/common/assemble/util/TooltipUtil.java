@@ -1,10 +1,10 @@
 package mods.ocminecart.common.assemble.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TooltipUtil {
 	

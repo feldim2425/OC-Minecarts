@@ -1,7 +1,7 @@
 package mods.ocminecart.common.items;
 
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.assemble.util.TooltipUtil;
 import mods.ocminecart.common.entityextend.RemoteExtenderRegister;
@@ -22,11 +22,9 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-
 import org.lwjgl.input.Keyboard;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import java.util.List;
 
 public class ItemRemoteAnalyzer extends Item implements ItemEntityInteract{
 	

@@ -1,7 +1,6 @@
 package mods.ocminecart.common.component;
 
-import java.util.ArrayList;
-
+import cpw.mods.fml.common.FMLCommonHandler;
 import li.cil.oc.api.Network;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -18,7 +17,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
+
+import java.util.ArrayList;
 
 /*
  * Copy from li.cil.oc.server.component.CraftingUpgrade

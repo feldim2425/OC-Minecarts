@@ -1,9 +1,7 @@
 package mods.ocminecart.common.container;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import li.cil.oc.api.component.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
 import mods.ocminecart.common.container.slots.ContainerSlot;
@@ -14,8 +12,10 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ICrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class ComputerCartContainer extends Container {
 	

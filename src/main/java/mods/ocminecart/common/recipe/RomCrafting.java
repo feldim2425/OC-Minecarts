@@ -1,13 +1,13 @@
 package mods.ocminecart.common.recipe;
 
-import java.util.Map;
-
 import li.cil.oc.api.Items;
 import mods.ocminecart.common.items.interfaces.IComponentInventoryItem;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.world.World;
+
+import java.util.Map;
 
 public class RomCrafting implements IRecipe{
 	

@@ -1,14 +1,13 @@
 package mods.ocminecart.client.gui.widget;
 
-import java.util.List;
-
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
+
+import java.util.List;
 
 public class GuiUtil {
 	

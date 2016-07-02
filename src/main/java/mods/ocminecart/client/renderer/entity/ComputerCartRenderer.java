@@ -1,5 +1,6 @@
 package mods.ocminecart.client.renderer.entity;
 
+import cpw.mods.fml.common.Loader;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.client.Minecraft;
@@ -9,10 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
-
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.common.Loader;
 
 public class ComputerCartRenderer extends Render {
 	

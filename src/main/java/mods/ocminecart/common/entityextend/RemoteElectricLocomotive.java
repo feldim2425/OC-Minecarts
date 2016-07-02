@@ -1,10 +1,10 @@
 package mods.ocminecart.common.entityextend;
 
-import java.util.List;
-
 import mods.railcraft.common.carts.EntityLocomotive.LocoMode;
 import mods.railcraft.common.carts.EntityLocomotive.LocoSpeed;
 import mods.railcraft.common.carts.EntityLocomotiveElectric;
+
+import java.util.List;
 
 public class RemoteElectricLocomotive extends RemoteCartExtender{
 	@Override
