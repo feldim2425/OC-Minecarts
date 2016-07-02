@@ -1,16 +1,10 @@
 package mods.ocminecart.common.component;
 
-import java.util.ArrayList;
-
 import li.cil.oc.api.API;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
-import li.cil.oc.api.network.Component;
-import li.cil.oc.api.network.ManagedEnvironment;
-import li.cil.oc.api.network.Message;
-import li.cil.oc.api.network.Node;
-import li.cil.oc.api.network.Visibility;
+import li.cil.oc.api.network.*;
 import mods.ocminecart.Settings;
 import mods.ocminecart.common.minecart.ComputerCart;
 import mods.ocminecart.common.util.InventoryUtil;
@@ -23,6 +17,8 @@ import net.minecraftforge.common.util.ForgeDirection;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidHandler;
 import net.minecraftforge.fluids.IFluidTank;
+
+import java.util.ArrayList;
 
 
 public class ComputerCartController implements ManagedEnvironment{

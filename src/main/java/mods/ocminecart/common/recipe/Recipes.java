@@ -1,6 +1,8 @@
 package mods.ocminecart.common.recipe;
 
 
+import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.registry.GameRegistry;
 import li.cil.oc.api.API;
 import li.cil.oc.api.detail.ItemAPI;
 import mods.ocminecart.OCMinecart;
@@ -17,8 +19,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.RecipeSorter;
 import net.minecraftforge.oredict.RecipeSorter.Category;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
 public class Recipes {

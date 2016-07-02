@@ -1,7 +1,6 @@
 package mods.ocminecart.common.items;
 
-import java.util.List;
-
+import cpw.mods.fml.common.Loader;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.assemble.util.TooltipUtil;
 import net.minecraft.client.Minecraft;
@@ -11,10 +10,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
-
 import org.lwjgl.input.Keyboard;
 
-import cpw.mods.fml.common.Loader;
+import java.util.List;
 
 public class ItemLinkingUpgrade extends Item{
 	

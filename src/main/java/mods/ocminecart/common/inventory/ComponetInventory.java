@@ -1,11 +1,8 @@
 package mods.ocminecart.common.inventory;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
-
+import cpw.mods.fml.common.FMLCommonHandler;
 import li.cil.oc.api.API;
-import li.cil.oc.api.driver.EnvironmentAware;
+import li.cil.oc.api.driver.EnvironmentProvider;
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.api.driver.item.Slot;
@@ -24,10 +21,13 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import cpw.mods.fml.common.FMLCommonHandler;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 // This Class is just a Java rewrite of li.cil.oc.common.inventory.ComponentInventory and Inventory (Credits to Sangar)
-public abstract class ComponetInventory implements IInventory, Environment{
+public abstract class ComponetInventory implements IInventory, Environment {
 	
 	protected MachineHost host;
 	private ItemStack[] slots;
@@ -226,7 +226,7 @@ public abstract class ComponetInventory implements IInventory, Environment{
 			if(this.getStackInSlot(i)!=null){
 				Item drv = CustomDriver.driverFor(this.getStackInSlot(i), this.host.getClass());
 				//Unfortunately it's not possible to make 'instanceof' with a Scala class and I'am lazy. So I check the Environment class.
-				if((drv instanceof EnvironmentAware) && ((EnvironmentAware)drv).providedEnvironment(this.getStackInSlot(i)) == Screen.class){
+				if((drv instanceof EnvironmentProvider) && ((EnvironmentProvider)drv).getEnvironment(this.getStackInSlot(i)) == Screen.class){
 					NBTTagCompound tag = this.dataTag(drv, this.getStackInSlot(i));
 					
 					Set<String> tags = tag.func_150296_c();

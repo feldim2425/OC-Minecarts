@@ -1,11 +1,11 @@
 package mods.ocminecart.common.inventory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import mods.ocminecart.common.minecart.ComputerCart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ComputercartInventory extends Inventory {
 	

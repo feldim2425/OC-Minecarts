@@ -1,15 +1,14 @@
 package mods.ocminecart.common.assemble;
 
-import java.util.ArrayList;
-
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.common.Tier;
 import mods.ocminecart.common.assemble.util.General;
 import mods.ocminecart.common.items.ModItems;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.ArrayList;
 
 public class ComputerCartT4Template {
 	

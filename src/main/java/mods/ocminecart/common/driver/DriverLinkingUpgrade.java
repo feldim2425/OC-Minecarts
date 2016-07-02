@@ -1,11 +1,9 @@
 package mods.ocminecart.common.driver;
 
-import li.cil.oc.api.driver.EnvironmentProvider;
 import li.cil.oc.api.driver.Item;
-import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.driver.item.HostAware;
 import li.cil.oc.api.driver.item.Slot;
-import li.cil.oc.api.network.Environment;
+import li.cil.oc.api.network.EnvironmentHost;
 import li.cil.oc.api.network.ManagedEnvironment;
 import mods.ocminecart.common.component.LinkingUpgrade;
 import mods.ocminecart.common.items.ItemLinkingUpgrade;

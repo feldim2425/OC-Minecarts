@@ -1,11 +1,11 @@
 package mods.ocminecart.common.recipe.event;
 
-import java.util.List;
-
 import mods.ocminecart.common.items.ModItems;
 import mods.railcraft.api.core.items.IToolCrowbar;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+
+import java.util.List;
 
 public class EmblemCraftingEvent implements ICraftingToolHandler {
 

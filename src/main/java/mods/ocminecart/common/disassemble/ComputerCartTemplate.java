@@ -1,14 +1,14 @@
 package mods.ocminecart.common.disassemble;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map.Entry;
-
 import li.cil.oc.common.Tier;
 import mods.ocminecart.common.items.ItemComputerCart;
 import mods.ocminecart.common.items.ModItems;
 import mods.ocminecart.common.util.ComputerCartData;
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 public class ComputerCartTemplate {
 	

@@ -1,5 +1,7 @@
 package mods.ocminecart.common.blocks;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.tileentity.NetworkRailBaseTile;
 import net.minecraft.block.BlockContainer;
@@ -12,8 +14,6 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class NetworkRailBase extends BlockContainer {
 	

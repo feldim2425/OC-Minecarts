@@ -1,12 +1,7 @@
 package mods.ocminecart.common.util;
 
 import li.cil.oc.api.Persistable;
-import li.cil.oc.api.network.Component;
-import li.cil.oc.api.network.ComponentConnector;
-import li.cil.oc.api.network.Connector;
-import li.cil.oc.api.network.Environment;
-import li.cil.oc.api.network.Message;
-import li.cil.oc.api.network.Node;
+import li.cil.oc.api.network.*;
 import net.minecraft.nbt.NBTTagCompound;
 
 public class Plug implements Environment, Persistable{

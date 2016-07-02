@@ -1,8 +1,6 @@
 package mods.ocminecart.interaction.railcraft;
 
-import java.util.HashMap;
-import java.util.List;
-
+import cpw.mods.fml.common.Loader;
 import mods.ocminecart.common.util.RotationHelper;
 import mods.railcraft.api.carts.CartTools;
 import mods.railcraft.api.carts.ILinkageManager;
@@ -11,7 +9,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.Loader;
+
+import java.util.HashMap;
+import java.util.List;
 
 public class RailcraftUtils {
 	

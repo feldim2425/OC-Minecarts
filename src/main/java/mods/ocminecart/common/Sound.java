@@ -1,10 +1,10 @@
 package mods.ocminecart.common;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import li.cil.oc.api.network.EnvironmentHost;
 import mods.ocminecart.Settings;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Sound {
 	private static Map<EnvironmentHost,Map<String,Float>> globalTimeouts = new HashMap<EnvironmentHost,Map<String, Float>>();
