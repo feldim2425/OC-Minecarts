@@ -1,7 +1,5 @@
 package mods.ocminecart.common.util;
 
-import java.util.ArrayList;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -9,6 +7,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import java.util.ArrayList;
 
 public class InventoryUtil {
 
@@ -30,8 +30,8 @@ public class InventoryUtil {
 		if(entity instanceof IInventory){
 			for(int i=0;i<taccess.length && moved<1;i+=1){
 				ItemStack filter = target.getStackInSlot(taccess[i]);
-				num=Math.min(num, spaceforItem(filter,target,taccess));
-				ItemStack mov = suckInventory(filter, (IInventory) entity, num, access);
+				int num2 =Math.min(num, spaceforItem(filter,target,taccess));
+				ItemStack mov = suckInventory(filter, (IInventory) entity, num2, access);
 				if(mov!=null && mov.stackSize>0){
 					moved = mov.stackSize;
 					int[] slots = sortAccessible(target, taccess, mov);
@@ -46,24 +46,25 @@ public class InventoryUtil {
 	
 	public static ItemStack suckInventory(ItemStack filter,IInventory inv, int maxnum, ForgeDirection access) {
 		int[] slots = getAccessible(inv,access);
-		int maxcount = maxnum;
 		ItemStack pulled = null;
-		for(int i=0;i<inv.getSizeInventory();i+=1){
+		for(int i=0;i<inv.getSizeInventory() && maxnum>0;i+=1){
 			ItemStack slot = inv.getStackInSlot(slots[i]);
 			if(slot != null && (filter==null || (filter!=null && filter.isItemEqual(slot)))){
 				if(!(!(inv instanceof ISidedInventory) || ((inv instanceof ISidedInventory) && ((ISidedInventory)inv).canInsertItem(slots[i], slot, access.ordinal()))))
 					continue;
 				int stacksize = slot.stackSize;
 				if(filter==null) filter = slot.copy();
-				if(maxcount>=stacksize){
+				if(maxnum>=stacksize){
 					ItemStack stack = slot.copy();
 					inv.setInventorySlotContents(slots[i], null);
 					if(pulled == null) pulled = stack;
 					else pulled = ItemUtil.sumItemStacks(stack, pulled, false);
+					maxnum-=stacksize;
 				}
 				else{
-					if(pulled == null) pulled = slot.splitStack(maxcount);
-					else pulled = ItemUtil.sumItemStacks( slot.splitStack(maxcount), pulled, false);
+					if(pulled == null) pulled = slot.splitStack(maxnum);
+					else pulled = ItemUtil.sumItemStacks( slot.splitStack(maxnum), pulled, false);
+					maxnum = 0;
 				}
 			}
 		}
