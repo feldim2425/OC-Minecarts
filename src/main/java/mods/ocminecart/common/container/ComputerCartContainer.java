@@ -198,11 +198,11 @@ public class ComputerCartContainer extends Container {
         	ICrafting craft = (ICrafting) this.crafters.get(i);
         	
         	if(this.entity.getCurEnergy() != this.sEnergy){
-        		craft.sendProgressBarUpdate(this, 0, (int) (this.entity.getCurEnergy()*10));
+        		craft.sendProgressBarUpdate(this, 0, (int) (this.entity.getCurEnergy()));
         	}
         	
         	if(this.entity.getMaxEnergy() != this.smaxEnergy){
-        		craft.sendProgressBarUpdate(this, 1, (int) (this.entity.getMaxEnergy()*10));
+        		craft.sendProgressBarUpdate(this, 1, (int) (this.entity.getMaxEnergy()));
         	}
         	
         	if(this.entity.getInventorySpace() != this.sizeinv){
