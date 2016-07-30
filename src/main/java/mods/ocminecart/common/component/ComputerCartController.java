@@ -171,9 +171,9 @@ public class ComputerCartController implements ManagedEnvironment{
 		int slot = args.optInteger(0, -1);
 		int num = 0;
 		slot = (args.count() > 0) ? slot-1 : this.cart.selectedSlot();
-		if(slot > 0 && slot <= this.cart.getInventorySpace()){
-			if(this.cart.mainInventory().getStackInSlot(slot-1)!=null){
-				num = this.cart.mainInventory().getStackInSlot(slot-1).stackSize;
+		if(slot >= 0 && slot < this.cart.getInventorySpace()){
+			if(this.cart.mainInventory().getStackInSlot(slot)!=null){
+				num = this.cart.mainInventory().getStackInSlot(slot).stackSize;
 			}
 		}
 		else{
