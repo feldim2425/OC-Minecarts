@@ -21,9 +21,9 @@ public class RemoteModuleContainer extends Container{
 	private ArrayList<EntityPlayer> toBan;
 	
 	@SideOnly(Side.CLIENT)
-	public int passstate = 0;
+	public int passstate;
 	@SideOnly(Side.CLIENT)
-	public boolean perm = false;
+	public boolean perm;
 
 	public boolean locked = false;
 	
@@ -35,6 +35,10 @@ public class RemoteModuleContainer extends Container{
 		super();
 		
 		if(IS_SERVER) toBan = new ArrayList<EntityPlayer>();
+		else{
+			passstate = 0;
+			perm = false;
+		}
 		
 		this.cart=cart;
 		this.module = RemoteExtenderRegister.getExtender(cart); 
