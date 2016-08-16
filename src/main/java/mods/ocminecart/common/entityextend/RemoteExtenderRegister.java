@@ -104,7 +104,6 @@ public class RemoteExtenderRegister {
 		if(!marked.isEmpty()){
 			for(int i=0;i<marked.size();i+=1){
 				updater.remove(marked.get(i));
-				System.out.println("Remove");
 			}
 		}
 	}
