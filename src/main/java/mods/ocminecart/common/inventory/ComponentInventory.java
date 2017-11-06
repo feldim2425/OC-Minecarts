@@ -1,15 +1,17 @@
 package mods.ocminecart.common.inventory;
 
 import li.cil.oc.api.driver.Item;
+import li.cil.oc.api.driver.item.Container;
+import li.cil.oc.api.internal.Keyboard;
+import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Message;
 import li.cil.oc.api.network.Node;
-import li.cil.oc.common.component.TextBuffer;
-import li.cil.oc.integration.opencomputers.DriverScreen;
+import li.cil.oc.integration.opencomputers.DriverKeyboard$;
+import li.cil.oc.integration.opencomputers.DriverScreen$;
 import li.cil.oc.server.component.GraphicsCard;
-import li.cil.oc.server.component.Keyboard;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.driver.CustomDriverRegistry;
 import mods.ocminecart.utils.ItemStackUtil;
@@ -21,6 +23,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
+import org.apache.commons.lang3.tuple.Pair;
+import scala.tools.cmd.gen.AnyVals;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -30,14 +34,22 @@ public class ComponentInventory implements IInventory, Environment {
 
 	private final ItemStack slots[];
 	private final MachineHost host;
+	private final Map<Integer, Integer> containerSlots;
 
 	private final List<ManagedEnvironment> updatingComponents = new LinkedList<>();
 	private final ManagedEnvironment[] components;
 
-	public ComponentInventory(MachineHost host, int size) {
+	public ComponentInventory(MachineHost host, int size, int[] containerSlots) {
 		this.host = host;
 		this.slots = new ItemStack[size];
 		this.components = new ManagedEnvironment[size];
+		this.containerSlots = new HashMap<>();
+		if(containerSlots.length % 2 != 0){
+			throw new IllegalArgumentException("containerSlots requires a even number of entries");
+		}
+		for(int i=0; i<containerSlots.length; i+=2){
+			this.containerSlots.put(containerSlots[i], containerSlots[i+1]);
+		}
 		clear();
 	}
 
@@ -220,7 +232,7 @@ public class ComponentInventory implements IInventory, Environment {
 			ManagedEnvironment env = this.components[i];
 			Item drv = CustomDriverRegistry.driverFor(stack);
 			if(env!=null){
-				if(drv.getClass().equals(DriverScreen.class)){
+				if(drv.getClass().equals(DriverScreen$.class)){
 					NbtUtil.clearTag(CustomDriverRegistry.dataTag(drv, stack));
 				}
 				else {
@@ -324,7 +336,26 @@ public class ComponentInventory implements IInventory, Environment {
 
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return false;
+		if(this.containerSlots.containsKey(index)){
+			ItemStack containerStack = getStackInSlot(this.containerSlots.get(index));
+			if(ItemStackUtil.isStackEmpty(containerStack)){
+				return false;
+			}
+			Item cDriver = CustomDriverRegistry.driverFor(containerStack);
+			if(!(cDriver instanceof Container)){
+				return false;
+			}
+			Item drv = CustomDriverRegistry.driverFor(stack);
+			if(drv == null || DriverKeyboard$.class.isAssignableFrom(drv.getClass()) || DriverScreen$.class.isAssignableFrom(drv.getClass())){
+				return false;
+			}
+
+			return drv.slot(stack).equals(((Container) cDriver).providedSlot(containerStack)) || drv.slot(stack).equals(li.cil.oc.api.driver.item.Slot.Any) && drv.tier(stack) <= ((Container) cDriver).providedTier(containerStack);
+		}
+		else {
+
+			return true;
+		}
 	}
 
 	@Override

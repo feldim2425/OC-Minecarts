@@ -27,6 +27,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ import java.util.List;
 
 public class EntityComputerCart extends EntityMinecart implements MachineHost, Analyzable, ISyncObject {
 
-	private ComponentInventory compInventory = new ComponentInventory(this, 24);
+	private ComponentInventory compInventory = new ComponentInventory(this, 24, new int[]{20, 0, 21, 1, 22, 2});
 	private Machine machine;
 	private int tier;
 	private boolean setup = false;

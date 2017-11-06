@@ -56,10 +56,7 @@ public class SlotComponent extends Slot {
         } else if (this.type.equals(li.cil.oc.api.driver.item.Slot.Any) && this.tier == Integer.MAX_VALUE) {
             return true;
         }
-
-        Item drv = CustomDriverRegistry.driverFor(stack);
-        return drv != null && (drv.slot(stack).equals(this.type) || drv.slot(stack).equals(li.cil.oc.api.driver.item.Slot.Any)) && drv.tier(stack) <= this.tier && this.inventory.isItemValidForSlot(this.slotNumber, stack);
-
+        return this.inventory.isItemValidForSlot(this.getSlotIndex(), stack);
     }
 
     @Override

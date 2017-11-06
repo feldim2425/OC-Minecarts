@@ -5,15 +5,24 @@ import li.cil.oc.client.KeyBindings;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
 import mods.ocminecart.client.render.gui.BufferRenderer;
 import mods.ocminecart.client.texture.ResourceTexture;
+import mods.ocminecart.client.texture.SlotIcons;
 import mods.ocminecart.common.container.ContainerComputerCart;
+import mods.ocminecart.common.container.slots.SlotComponent;
+import mods.ocminecart.common.driver.CustomDriverRegistry;
 import mods.ocminecart.common.entity.EntityComputerCart;
 import mods.ocminecart.integration.jei.JeiAdapter;
+import mods.ocminecart.utils.ContainerUtil;
+import mods.ocminecart.utils.ItemStackUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Slot;
+import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -21,6 +30,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GuiComputerCart extends GuiContainer {
 
@@ -37,6 +47,7 @@ public class GuiComputerCart extends GuiContainer {
 	private TextBuffer screen;
 	private boolean keyboard;
 	private Map<Integer, Character> pressedKeys = new HashMap<Integer, Character>();
+	private int currentSlot = -1;
 
 	public GuiComputerCart(EntityComputerCart entityComputerCart, EntityPlayer player) {
 		super(new ContainerComputerCart(entityComputerCart, player));
@@ -88,7 +99,23 @@ public class GuiComputerCart extends GuiContainer {
 		Minecraft.getMinecraft().getTextureManager().bindTexture((screen==null)? ResourceTexture.OC_GUI_ROBOT_NS.location : ResourceTexture.OC_GUI_ROBOT.location );
 		this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
-		//this.renderGuiSlots();
+		this.renderGuiSlots();
+	}
+
+	private void renderGuiSlots() {
+		this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		GlStateManager.enableBlend();
+		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		for(Slot slot : this.inventorySlots.inventorySlots){
+			if(ItemStackUtil.isStackEmpty(slot.getStack()) && (slot instanceof SlotComponent)){
+				TextureAtlasSprite typeicon = SlotIcons.fromType(((SlotComponent) slot).getSlotType());
+				if(typeicon!=null) {
+					this.drawTexturedModalRect(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
+				}
+			}
+		}
+		this.drawTexturedModalRect(this.guiLeft+170,this.guiTop+this.ySize-24, SlotIcons.fromTier(-1), 16, 16);
+		GlStateManager.disableBlend();
 	}
 
 	@Override
@@ -108,6 +135,73 @@ public class GuiComputerCart extends GuiContainer {
 	}
 
 	private void renderHighlights(int mx, int my) {
+		Slot slot = ContainerUtil.findSlotAt(mx-this.guiLeft, my-this.guiTop, inventorySlots.inventorySlots);
+		if(slot!=null){
+			if(slot instanceof SlotComponent){
+				GlStateManager.disableDepth();
+				GlStateManager.disableLighting();
+				this.zLevel += 100;
+
+				for(Slot slot2 : this.inventorySlots.inventorySlots){
+					if(slot2.getHasStack() && slot.isItemValid(slot2.getStack())){
+						this.drawGradientRect(slot2.xDisplayPosition, slot2.yDisplayPosition, slot2.xDisplayPosition + 16, slot2.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
+					}
+				}
+
+				this.zLevel -= 100;
+				GlStateManager.enableDepth();
+				GlStateManager.enableLighting();
+
+				if (slot.slotNumber != currentSlot) {
+					JeiAdapter.drawHighlights(JeiAdapter.getVisibleStacks().stream().filter((stack) -> slot.isItemValid(stack)).collect(Collectors.toList()));
+				}
+			}
+			else if(slot.getHasStack()){
+				ItemStack stack = slot.getStack();
+				GlStateManager.disableDepth();
+				GlStateManager.disableLighting();
+				this.zLevel += 100;
+
+				for(Slot slot2 : this.inventorySlots.inventorySlots){
+					if(slot2 instanceof SlotComponent){
+						if(slot2.isItemValid(stack)){
+							this.drawGradientRect(slot2.xDisplayPosition, slot2.yDisplayPosition, slot2.xDisplayPosition + 16, slot2.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
+						}
+					}
+				}
+
+				this.zLevel -= 100;
+				GlStateManager.enableDepth();
+				GlStateManager.enableLighting();
+			}
+			currentSlot = slot.slotNumber;
+			return;
+		}
+		else {
+			if (currentSlot != -1) {
+				JeiAdapter.drawHighlights(Collections.emptyList());
+			}
+			currentSlot = -1;
+		}
+
+		ItemStack jeiStack = JeiAdapter.getStackUnderMouse();
+		if(!ItemStackUtil.isStackEmpty(jeiStack)){
+			GlStateManager.disableDepth();
+			GlStateManager.disableLighting();
+			this.zLevel += 100;
+
+			for(Slot slot2 : this.inventorySlots.inventorySlots){
+				if(slot2 instanceof SlotComponent){
+					if(slot2.isItemValid(jeiStack)){
+						this.drawGradientRect(slot2.xDisplayPosition, slot2.yDisplayPosition, slot2.xDisplayPosition + 16, slot2.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
+					}
+				}
+			}
+
+			this.zLevel -= 100;
+			GlStateManager.enableDepth();
+			GlStateManager.enableLighting();
+		}
 	}
 
 	private void drawBufferLayer(){

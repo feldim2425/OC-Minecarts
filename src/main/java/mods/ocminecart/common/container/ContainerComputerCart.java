@@ -5,6 +5,7 @@ import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.integration.opencomputers.DriverKeyboard;
+import li.cil.oc.integration.opencomputers.DriverKeyboard$;
 import mods.ocminecart.common.container.slots.SlotComponent;
 import mods.ocminecart.common.driver.CustomDriverRegistry;
 import mods.ocminecart.common.entity.EntityComputerCart;
@@ -63,7 +64,7 @@ public class ContainerComputerCart extends Container {
 			}
 
 			Item driver = CustomDriverRegistry.driverFor(stack, EntityComputerCart.class);
-			if(driver != null && DriverKeyboard.class.isAssignableFrom(driver.getClass())){
+			if(driver != null && DriverKeyboard$.class.isAssignableFrom(driver.getClass())){
 				return true;
 			}
 		}
