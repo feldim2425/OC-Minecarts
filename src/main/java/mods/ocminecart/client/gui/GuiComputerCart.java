@@ -68,10 +68,8 @@ public class GuiComputerCart extends GuiContainer {
 		super.initGui();
 
 		this.offset = (this.screen!=null) ? ContainerComputerCart.DELTA : 0;
-		//this.updateSlots();
 
 		BufferRenderer.init(Minecraft.getMinecraft().renderEngine);
-		boolean guiSizeChange = true;
 
 		BufferRenderer.compileBackground((int)this.bufferRenderWidth, (int)this.bufferRenderHeight, true);
 		if(this.screen!=null) {

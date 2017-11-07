@@ -18,15 +18,13 @@ import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.messages.MessageNbtSyncRequest;
 import mods.ocminecart.utils.ItemStackUtil;
 import mods.ocminecart.utils.NBTTypes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,13 +40,14 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		@Override
 		protected void addedItem(int slot) {
 			super.addedItem(slot);
-			if(EntityComputerCart.this.world().isRemote){
+			if(!EntityComputerCart.this.world().isRemote){
 				Container cDriver = getContainer(slot);
 				if(cDriver == null){
 					return;
 				}
-				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
 
+				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
+					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_insert")), SoundCategory.BLOCKS ,1,1);
 				}
 			}
 		}
@@ -56,13 +55,13 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		@Override
 		protected void removedItem(int slot) {
 			super.removedItem(slot);
-			if(EntityComputerCart.this.world().isRemote){
+			if(!EntityComputerCart.this.world().isRemote){
 				Container cDriver = getContainer(slot);
 				if(cDriver == null){
 					return;
 				}
 				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
-
+					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_eject")), SoundCategory.BLOCKS ,1,1);
 				}
 			}
 		}
