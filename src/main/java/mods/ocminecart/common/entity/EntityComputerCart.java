@@ -1,6 +1,8 @@
 package mods.ocminecart.common.entity;
 
 import li.cil.oc.api.API;
+import li.cil.oc.api.driver.item.Container;
+import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.machine.Machine;
 import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Analyzable;
@@ -36,7 +38,36 @@ import java.util.List;
 
 public class EntityComputerCart extends EntityMinecart implements MachineHost, Analyzable, ISyncObject {
 
-	private ComponentInventory compInventory = new ComponentInventory(this, 24, new int[]{20, 0, 21, 1, 22, 2});
+	private ComponentInventory compInventory = new ComponentInventory(this, 24, new int[]{20, 0, 21, 1, 22, 2}){
+		@Override
+		protected void addedItem(int slot) {
+			super.addedItem(slot);
+			if(EntityComputerCart.this.world().isRemote){
+				Container cDriver = getContainer(slot);
+				if(cDriver == null){
+					return;
+				}
+				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
+
+				}
+			}
+		}
+
+		@Override
+		protected void removedItem(int slot) {
+			super.removedItem(slot);
+			if(EntityComputerCart.this.world().isRemote){
+				Container cDriver = getContainer(slot);
+				if(cDriver == null){
+					return;
+				}
+				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
+
+				}
+			}
+		}
+	};
+
 	private Machine machine;
 	private int tier;
 	private boolean setup = false;
@@ -215,6 +246,13 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		if (this.worldObj.getGameRules().getBoolean("doEntityDrops"))
 		{
 			List<ItemStack> drop = new ArrayList<>();
+
+			for(int cslot : compInventory.getContainerSlotConnections().keySet()){
+				ItemStack compStack = compInventory.removeStackFromSlot(cslot);
+				if(!ItemStackUtil.isStackEmpty(compStack)){
+					drop.add(compStack);
+				}
+			}
 
 			ItemStack cartItemStack = new ItemStack(ModItems.Items.COMPUTER_CART.get(), 1);
 			((ItemComputerCart) cartItemStack.getItem()).setData(cartItemStack, getData());

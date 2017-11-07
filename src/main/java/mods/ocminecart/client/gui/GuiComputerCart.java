@@ -3,6 +3,8 @@ package mods.ocminecart.client.gui;
 import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.client.KeyBindings;
 import li.cil.oc.client.renderer.TextBufferRenderCache;
+import mods.ocminecart.client.gui.widgets.EnergyBar;
+import mods.ocminecart.client.gui.widgets.OnOffButton;
 import mods.ocminecart.client.render.gui.BufferRenderer;
 import mods.ocminecart.client.texture.ResourceTexture;
 import mods.ocminecart.client.texture.SlotIcons;
@@ -48,6 +50,8 @@ public class GuiComputerCart extends GuiContainer {
 	private boolean keyboard;
 	private Map<Integer, Character> pressedKeys = new HashMap<Integer, Character>();
 	private int currentSlot = -1;
+	private int offset;
+	private OnOffButton btPower;
 
 	public GuiComputerCart(EntityComputerCart entityComputerCart, EntityPlayer player) {
 		super(new ContainerComputerCart(entityComputerCart, player));
@@ -63,6 +67,7 @@ public class GuiComputerCart extends GuiContainer {
 
 		super.initGui();
 
+		this.offset = (this.screen!=null) ? ContainerComputerCart.DELTA : 0;
 		//this.updateSlots();
 
 		BufferRenderer.init(Minecraft.getMinecraft().renderEngine);
@@ -74,9 +79,9 @@ public class GuiComputerCart extends GuiContainer {
 			this.txtWidth = this.screen.getWidth();
 		}
 
-		/*this.btPower = new ImageButton(0, this.guiLeft+5, 5+this.guiTop+offset, 18, 18, null, textureOnOffButton, true);
+		this.btPower = new OnOffButton(0, this.guiLeft+5, 5+this.guiTop+offset);
 
-		this.buttonList.add(this.btPower);*/
+		this.buttonList.add(this.btPower);
 
 		Keyboard.enableRepeatEvents(true);
 	}
@@ -131,7 +136,11 @@ public class GuiComputerCart extends GuiContainer {
 			this.bufferscale = Math.min(scaleX, scaleY);
 		}
 
+		EnergyBar.drawBar(26, 8 + offset, 12, 140, 150, (double)((ContainerComputerCart)this.inventorySlots).getEnergy() / ((ContainerComputerCart)this.inventorySlots).getMaxEnergy(), ResourceTexture.OC_GUI_POWERBAR.location);
+
 		this.renderHighlights(mx, my);
+
+		EnergyBar.renderTooltip(26, 8 + offset, 12 ,140 ,this.guiLeft, this.guiTop, this.width, this.height, mx-this.guiLeft, my-this.guiTop, ((ContainerComputerCart)this.inventorySlots).getEnergy() , ((ContainerComputerCart)this.inventorySlots).getMaxEnergy());
 	}
 
 	private void renderHighlights(int mx, int my) {
@@ -143,7 +152,7 @@ public class GuiComputerCart extends GuiContainer {
 				this.zLevel += 100;
 
 				for(Slot slot2 : this.inventorySlots.inventorySlots){
-					if(slot2.getHasStack() && slot.isItemValid(slot2.getStack())){
+					if(!slot.equals(slot2) && slot2.getHasStack() && slot.isItemValid(slot2.getStack())){
 						this.drawGradientRect(slot2.xDisplayPosition, slot2.yDisplayPosition, slot2.xDisplayPosition + 16, slot2.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
 					}
 				}

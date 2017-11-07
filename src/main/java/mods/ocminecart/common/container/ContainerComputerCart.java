@@ -3,6 +3,7 @@ package mods.ocminecart.common.container;
 
 import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.internal.TextBuffer;
+import li.cil.oc.api.network.Connector;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.integration.opencomputers.DriverKeyboard;
 import li.cil.oc.integration.opencomputers.DriverKeyboard$;
@@ -14,6 +15,7 @@ import mods.ocminecart.utils.ItemStackUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
@@ -26,6 +28,9 @@ public class ContainerComputerCart extends Container {
 
 	private EntityComputerCart computerCart;
 	private EntityPlayer player;
+
+	private int energy = 0;
+	private int maxEnergy = 0;
 
 	private boolean hasScreen;
 
@@ -94,5 +99,51 @@ public class ContainerComputerCart extends Container {
 				this.addSlotToContainer(new Slot(inventory, j+i*9+9, x+j*18, y+i*18));
 			}
 		}
+	}
+
+	@Override
+	public void addListener(IContainerListener listener) {
+		super.addListener(listener);
+
+		listener.sendProgressBarUpdate(this, 0, this.energy);
+		listener.sendProgressBarUpdate(this, 1, this.maxEnergy);
+	}
+
+	@Override
+	public void detectAndSendChanges() {
+		super.detectAndSendChanges();
+
+		int maxEnergy = (int) ((Connector)computerCart.machine().node()).localBufferSize();
+		int energy = (int) ((Connector)computerCart.machine().node()).localBuffer();
+
+		for(IContainerListener listener : this.listeners){
+			if(this.energy != energy){
+				listener.sendProgressBarUpdate(this, 0, energy);
+			}
+			if(this.maxEnergy != maxEnergy){
+				listener.sendProgressBarUpdate(this, 1, maxEnergy);
+			}
+		}
+	}
+
+	@Override
+	public void updateProgressBar(int id, int data) {
+		super.updateProgressBar(id, data);
+		switch (id){
+			case 0:
+				this.energy = data;
+				break;
+			case 1:
+				this.maxEnergy = data;
+				break;
+		}
+	}
+
+	public int getEnergy() {
+		return energy;
+	}
+
+	public int getMaxEnergy() {
+		return maxEnergy;
 	}
 }

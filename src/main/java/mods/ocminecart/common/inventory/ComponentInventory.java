@@ -97,7 +97,7 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
-	private void connectItem(int slot) {
+	protected void connectItem(int slot) {
 		ItemStack stack = slots[slot];
 		if (stack != null && this.components[slot] == null) {//&& this.isComponentSlot(slot, stack)){
 			Item drv = CustomDriverRegistry.driverFor(stack, host.getClass());
@@ -120,7 +120,7 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
-	private void connectNode(Node node) {
+	protected void connectNode(Node node) {
 		if (this.node() != null && node != null) {
 			this.node().connect(node);
 
@@ -142,7 +142,7 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
-	private void disconnectItem(int slot) {
+	protected void disconnectItem(int slot) {
 		if (this.components[slot] != null && !this.host.world().isRemote) {
 			ManagedEnvironment component = this.components[slot];
 			this.components[slot] = null;
@@ -152,6 +152,18 @@ public class ComponentInventory implements IInventory, Environment {
 			component.node().remove();
 			this.save(component, CustomDriverRegistry.driverFor(this.slots[slot]), this.slots[slot]);
 			component.node().remove();
+		}
+	}
+
+	protected void addedItem(int slot){
+		if(!this.host.world().isRemote && this.host.machine().node() != null) {
+			connectItem(slot);
+		}
+	}
+
+	protected void removedItem(int slot){
+		if(!this.host.world().isRemote) {
+			disconnectItem(slot);
 		}
 	}
 
@@ -165,6 +177,10 @@ public class ComponentInventory implements IInventory, Environment {
 		for(ManagedEnvironment env : updatingComponents){
 			env.update();
 		}
+	}
+
+	public Map<Integer, Integer> getContainerSlotConnections(){
+		return Collections.unmodifiableMap(this.containerSlots);
 	}
 
 	public int getComponentSlot(String address){
@@ -181,6 +197,18 @@ public class ComponentInventory implements IInventory, Environment {
 			return components[slot];
 		}
 		return null;
+	}
+
+	public Container getContainer(int slot){
+		if(!containerSlots.containsKey(slot)){
+			return null;
+		}
+		ItemStack containerStack = getStackInSlot(this.containerSlots.get(slot));
+		if(ItemStackUtil.isStackEmpty(containerStack)){
+			return null;
+		}
+		Item driver = CustomDriverRegistry.driverFor(containerStack);
+		return (driver instanceof Container) ? (Container) driver : null;
 	}
 
 	//===== NBT READ/WRITE ====//
@@ -283,7 +311,7 @@ public class ComponentInventory implements IInventory, Environment {
 		if (index < slots.length) {
 			ItemStack stack = slots[index];
 			if (!ItemStackUtil.isStackEmpty(stack)) {
-				disconnectItem(index);
+				removedItem(index);
 			}
 			slots[index] = ItemStackUtil.getEmptyStack();
 			return stack;
@@ -296,7 +324,7 @@ public class ComponentInventory implements IInventory, Environment {
 		if (index < slots.length) {
 			ItemStack currentStack = slots[index];
 			if (!ItemStackUtil.isStackEmpty(currentStack)) {
-				disconnectItem(index);
+				removedItem(index);
 			}
 
 			if (ItemStackUtil.isStackEmpty(stack)) {
@@ -307,6 +335,7 @@ public class ComponentInventory implements IInventory, Environment {
 					stack.stackSize = 1;
 				}
 				slots[index] = stack;
+				addedItem(index);
 				connectItem(index);
 			}
 		}
@@ -337,20 +366,17 @@ public class ComponentInventory implements IInventory, Environment {
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
 		if(this.containerSlots.containsKey(index)){
+			Container cDriver = getContainer(index);
+			if(cDriver == null){
+				return false;
+			}
 			ItemStack containerStack = getStackInSlot(this.containerSlots.get(index));
-			if(ItemStackUtil.isStackEmpty(containerStack)){
-				return false;
-			}
-			Item cDriver = CustomDriverRegistry.driverFor(containerStack);
-			if(!(cDriver instanceof Container)){
-				return false;
-			}
-			Item drv = CustomDriverRegistry.driverFor(stack);
+			Item drv = CustomDriverRegistry.driverFor(stack, host.getClass());
 			if(drv == null || DriverKeyboard$.class.isAssignableFrom(drv.getClass()) || DriverScreen$.class.isAssignableFrom(drv.getClass())){
 				return false;
 			}
 
-			return drv.slot(stack).equals(((Container) cDriver).providedSlot(containerStack)) || drv.slot(stack).equals(li.cil.oc.api.driver.item.Slot.Any) && drv.tier(stack) <= ((Container) cDriver).providedTier(containerStack);
+			return drv.slot(stack).equals(cDriver.providedSlot(containerStack)) || drv.slot(stack).equals(li.cil.oc.api.driver.item.Slot.Any) && drv.tier(stack) <= cDriver.providedTier(containerStack);
 		}
 		else {
 
@@ -375,7 +401,7 @@ public class ComponentInventory implements IInventory, Environment {
 	public void clear() {
 		for (int i = 0; i < this.slots.length; i++) {
 			if (!ItemStackUtil.isStackEmpty(slots[i])) {
-				disconnectItem(i);
+				removedItem(i);
 			}
 			slots[i] = ItemStackUtil.getEmptyStack();
 		}
