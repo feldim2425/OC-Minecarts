@@ -90,6 +90,7 @@ public final class BufferRenderer {
 
 	public static void drawBackground() {
 		if (textureManager != null) {
+			textureManager.bindTexture(ResourceTexture.OC_GUI_BORDER.location);
 			GL11.glCallList(displayLists);
 		}
 	}

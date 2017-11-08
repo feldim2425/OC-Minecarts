@@ -283,6 +283,16 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
+	public List<ItemStack> internalComponents(){
+		LinkedList<ItemStack> list = new LinkedList<>();
+		for(int i = 0;i<slots.length ;i++){
+			if(components[i]!=null){
+				list.add(slots[i]);
+			}
+		}
+		return list;
+	}
+
 	//===== INVENTORY ====//
 
 	@Override

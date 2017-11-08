@@ -13,9 +13,13 @@ import mods.ocminecart.common.container.slots.SlotComponent;
 import mods.ocminecart.common.driver.CustomDriverRegistry;
 import mods.ocminecart.common.entity.EntityComputerCart;
 import mods.ocminecart.integration.jei.JeiAdapter;
+import mods.ocminecart.network.IEventContainer;
+import mods.ocminecart.network.ModNetwork;
+import mods.ocminecart.network.messages.MessageGuiEvent;
 import mods.ocminecart.utils.ContainerUtil;
 import mods.ocminecart.utils.ItemStackUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -25,6 +29,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -279,5 +284,15 @@ public class GuiComputerCart extends GuiContainer {
 				code == Keyboard.KEY_RSHIFT ||
 				code == Keyboard.KEY_LMETA ||
 				code == Keyboard.KEY_RMETA;
+	}
+
+	@Override
+	protected void actionPerformed(GuiButton button) throws IOException {
+		super.actionPerformed(button);
+		if(button.id == 0){
+			NBTTagCompound data = new NBTTagCompound();
+			data.setInteger("button", 0);
+			ModNetwork.getWrapper().sendToServer(new MessageGuiEvent((IEventContainer) this.inventorySlots, data));
+		}
 	}
 }

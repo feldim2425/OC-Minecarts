@@ -11,15 +11,19 @@ import mods.ocminecart.common.container.slots.SlotComponent;
 import mods.ocminecart.common.driver.CustomDriverRegistry;
 import mods.ocminecart.common.entity.EntityComputerCart;
 import mods.ocminecart.common.inventory.ComponentInventory;
+import mods.ocminecart.network.IEventContainer;
 import mods.ocminecart.utils.ItemStackUtil;
+import mods.ocminecart.utils.NBTTypes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
-public class ContainerComputerCart extends Container {
+public class ContainerComputerCart extends Container implements IEventContainer{
 
 	public static final int YSIZE_SCR = 256;
 	public static final int YSIZE_NOSCR = 108;
@@ -145,5 +149,17 @@ public class ContainerComputerCart extends Container {
 
 	public int getMaxEnergy() {
 		return maxEnergy;
+	}
+
+	@Override
+	public void onClientEvent(NBTTagCompound eventData, EntityPlayerMP player) {
+		if(eventData.hasKey("button", NBTTypes.INT.getTypeID())){
+			if(this.computerCart.machine().isRunning()){
+				this.computerCart.machine().stop();
+			}
+			else {
+				this.computerCart.machine().start();
+			}
+		}
 	}
 }

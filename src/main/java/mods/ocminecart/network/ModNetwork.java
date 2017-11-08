@@ -2,6 +2,7 @@ package mods.ocminecart.network;
 
 
 import mods.ocminecart.OCMinecart;
+import mods.ocminecart.network.messages.MessageGuiEvent;
 import mods.ocminecart.network.messages.MessageNbtSyncRequest;
 import mods.ocminecart.network.messages.MessageNbtSyncResponse;
 import net.minecraft.server.management.PlayerList;
@@ -23,6 +24,7 @@ public class ModNetwork {
 
 		wrapper.registerMessage(MessageNbtSyncRequest.Handler.class, MessageNbtSyncRequest.class, ++id, Side.SERVER);
 		wrapper.registerMessage(MessageNbtSyncResponse.Handler.class, MessageNbtSyncResponse.class, ++id, Side.CLIENT);
+		wrapper.registerMessage(MessageGuiEvent.Handler.class, MessageGuiEvent.class, ++id, Side.SERVER);
 	}
 
 	public static void sendToNearPlayers(IMessage msg, BlockPos pos, World world) {

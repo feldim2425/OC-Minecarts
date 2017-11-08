@@ -24,6 +24,9 @@ import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -35,6 +38,8 @@ import java.util.List;
 
 
 public class EntityComputerCart extends EntityMinecart implements MachineHost, Analyzable, ISyncObject {
+
+	public static final DataParameter<Boolean> PARAM_MACHINE_RUNNING = EntityDataManager.createKey(EntityComputerCart.class, DataSerializers.BOOLEAN);
 
 	private ComponentInventory compInventory = new ComponentInventory(this, 24, new int[]{20, 0, 21, 1, 22, 2}){
 		@Override
@@ -93,6 +98,8 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 			this.machine.setCostPerTick(0);
 			((Connector) this.machine.node()).setLocalBufferSize(1000);
 		}
+
+		this.dataManager.register(PARAM_MACHINE_RUNNING, false);
 	}
 
 	@Override
@@ -110,8 +117,12 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 				wireUp();
 			}
 			else {
-				machine.update();
 				compInventory.updateComponents();
+				machine.update();
+			}
+
+			if(machine.isRunning() != dataManager.get(PARAM_MACHINE_RUNNING)){
+				dataManager.set(PARAM_MACHINE_RUNNING, machine.isRunning());
 			}
 		}
 	}
@@ -143,7 +154,9 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	}
 
 	private void wireUp(){
-		API.network.joinNewNetwork(machine.node());
+		if(machine().node().network()==null) {
+			API.network.joinNewNetwork(machine.node());
+		}
 		compInventory.connectAllComponents();
 	}
 
@@ -178,6 +191,8 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		if(compound.hasKey("components", NBTTypes.TAG_COMPOUND.getTypeID())){
 			compInventory.readFromNBT(compound.getCompoundTag("components"));
 		}
+
+		wireUp();
 	}
 
 	@Override
@@ -213,10 +228,11 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 
 	@Override
 	public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, @Nullable ItemStack stack, EnumHand hand) {
-		if(!this.worldObj.isRemote && machine.canInteract(player.getName())){
+		if(!this.worldObj.isRemote && !player.isSneaking() && machine.canInteract(player.getName())){
 			player.openGui(OCMinecart.getInstance(), 0 ,this.worldObj, this.getEntityId(), 0, 0);
+			return EnumActionResult.SUCCESS;
 		}
-		return EnumActionResult.SUCCESS;
+		return EnumActionResult.PASS;
 	}
 
 	public ComponentInventory getComponentInventory(){
@@ -230,7 +246,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 
 	@Override
 	public Iterable<ItemStack> internalComponents() {
-		return null;
+		return compInventory.internalComponents();
 	}
 
 	@Override
@@ -279,7 +295,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 
 	@Override
 	public Node[] onAnalyze(EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
-		return new Node[0];
+		return new Node[]{this.machine().node()};
 	}
 
 	@Override
@@ -308,7 +324,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	}
 
 	public boolean isRunning() {
-		return true;
+		return dataManager.get(PARAM_MACHINE_RUNNING);
 	}
 
 	public int getLightColor() {
