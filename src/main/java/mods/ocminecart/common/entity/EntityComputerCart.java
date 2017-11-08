@@ -16,6 +16,7 @@ import mods.ocminecart.common.item.data.DataComputerCart;
 import mods.ocminecart.network.ISyncObject;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.messages.MessageNbtSyncRequest;
+import mods.ocminecart.network.messages.MessageNbtSyncResponse;
 import mods.ocminecart.utils.ItemStackUtil;
 import mods.ocminecart.utils.NBTTypes;
 import net.minecraft.client.Minecraft;
@@ -68,6 +69,14 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
 					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_eject")), SoundCategory.BLOCKS ,1,1);
 				}
+			}
+		}
+
+		@Override
+		public void markDirty() {
+			super.markDirty();
+			if(!EntityComputerCart.this.world().isRemote){
+				ModNetwork.getWrapper().sendToServer(new MessageNbtSyncResponse(EntityComputerCart.this));
 			}
 		}
 	};
