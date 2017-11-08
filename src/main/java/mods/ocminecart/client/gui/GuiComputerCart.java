@@ -90,6 +90,12 @@ public class GuiComputerCart extends GuiContainer {
 	}
 
 	@Override
+	public void updateScreen() {
+		super.updateScreen();
+		this.btPower.setState(((ContainerComputerCart)this.inventorySlots).getComputerCart().isRunning());
+	}
+
+	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		if (this.screen != null){
@@ -252,7 +258,7 @@ public class GuiComputerCart extends GuiContainer {
 	public void handleKeyboardInput() throws IOException {
 		int code = Keyboard.getEventKey();
 
-		if (this.screen != null && this.keyboard && code != Keyboard.KEY_ESCAPE && code != Keyboard.KEY_F11) {
+		if (this.screen != null && this.keyboard && code != Keyboard.KEY_ESCAPE && code != Keyboard.KEY_F11 && code != Keyboard.KEY_F2) {
 			if (Keyboard.getEventKeyState()) {
 					char ch = Keyboard.getEventCharacter();
 					if (!pressedKeys.containsKey(code) || !ignoreRepeat(ch, code)) {

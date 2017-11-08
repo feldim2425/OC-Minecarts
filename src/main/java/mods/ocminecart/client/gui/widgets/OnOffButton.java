@@ -38,10 +38,14 @@ public class OnOffButton extends GuiButton {
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer vertexbuffer = tessellator.getBuffer();
         vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        vertexbuffer.pos(x, y2 , 0.0D).tex(u, v2).endVertex();
+        vertexbuffer.pos(x, y2, 0.0D).tex(u, v2).endVertex();
         vertexbuffer.pos(x2, y2, 0.0D).tex(u2, v2).endVertex();
         vertexbuffer.pos(x2, y, 0.0D).tex(u2, v).endVertex();
-        vertexbuffer.pos(x,y, 0.0D).tex(u, v).endVertex();
+        vertexbuffer.pos(x, y, 0.0D).tex(u, v).endVertex();
         tessellator.draw();
     }
+
+	public void setState(boolean state) {
+		this.state = state;
+	}
 }
