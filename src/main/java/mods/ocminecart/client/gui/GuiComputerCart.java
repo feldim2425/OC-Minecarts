@@ -122,7 +122,13 @@ public class GuiComputerCart extends GuiContainer {
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 		for(Slot slot : this.inventorySlots.inventorySlots){
 			if(ItemStackUtil.isStackEmpty(slot.getStack()) && (slot instanceof SlotComponent)){
-				TextureAtlasSprite typeicon = SlotIcons.fromType(((SlotComponent) slot).getSlotType());
+				TextureAtlasSprite typeicon;
+				if(!slot.canBeHovered()){
+					typeicon = SlotIcons.fromTier(-1);
+				}
+				else {
+					typeicon = SlotIcons.fromType(((SlotComponent) slot).getSlotType());
+				}
 				if(typeicon!=null) {
 					this.drawTexturedModalRect(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
 				}
