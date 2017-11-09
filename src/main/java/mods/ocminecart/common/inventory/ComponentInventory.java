@@ -75,8 +75,29 @@ public class ComponentInventory implements IInventory, Environment {
 
 	public void connectAllComponents() {
 		for (int i = 0; i < this.slots.length; i++) {
-			if (!ItemStackUtil.isStackEmpty(slots[i])) {
-				connectItem(i);
+			if (!ItemStackUtil.isStackEmpty(slots[i]) && this.components[i] == null) {
+					Item drv = CustomDriverRegistry.driverFor(slots[i], host.getClass());
+					if (drv != null) {
+						ManagedEnvironment env = drv.createEnvironment(slots[i], host);
+						if (env != null) {
+							try {
+								env.load(CustomDriverRegistry.dataTag(drv, slots[i]));
+							} catch (Throwable e) {
+								OCMinecart.getLogger().warn("An item component of type" + env.getClass().getName() + " (provided by driver " + drv.getClass().getName() + ") threw an error while loading.", e);
+							}
+							this.components[i] = env;
+							if (env.canUpdate() && !this.updatingComponents.contains(env)) {
+								this.updatingComponents.add(env);
+							}
+							this.save(env, drv, slots[i]);
+						}
+					}
+			}
+		}
+
+		for (int i = 0; i < this.slots.length; i++) {
+			if(this.components[i]!=null){
+				this.connectNode(this.components[i].node());
 			}
 		}
 	}
@@ -99,7 +120,7 @@ public class ComponentInventory implements IInventory, Environment {
 
 	protected void connectItem(int slot) {
 		ItemStack stack = slots[slot];
-		if (stack != null && this.components[slot] == null) {//&& this.isComponentSlot(slot, stack)){
+		if (!ItemStackUtil.isStackEmpty(stack) && this.components[slot] == null) {//&& this.isComponentSlot(slot, stack)){
 			Item drv = CustomDriverRegistry.driverFor(stack, host.getClass());
 			if (drv != null) {
 				ManagedEnvironment env = drv.createEnvironment(stack, host);
@@ -109,8 +130,8 @@ public class ComponentInventory implements IInventory, Environment {
 					} catch (Throwable e) {
 						OCMinecart.getLogger().warn("An item component of type" + env.getClass().getName() + " (provided by driver " + drv.getClass().getName() + ") threw an error while loading.", e);
 					}
-					this.components[slot] = env;
 					this.connectNode(env.node());
+					this.components[slot] = env;
 					if (env.canUpdate() && !this.updatingComponents.contains(env)) {
 						this.updatingComponents.add(env);
 					}
@@ -185,7 +206,7 @@ public class ComponentInventory implements IInventory, Environment {
 
 	public int getComponentSlot(String address){
 		for (int i = 0; i < components.length; i++) {
-			if(address.equals(components[i].node().address())){
+			if(components[i] != null && address.equals(components[i].node().address())){
 				return i;
 			}
 		}
