@@ -194,6 +194,11 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	protected void readEntityFromNBT(NBTTagCompound compound) {
 		super.readEntityFromNBT(compound);
 
+		if(this.worldObj.isRemote)
+		{
+			return;
+		}
+
 		if(compound.hasKey("tier", NBTTypes.INT.getTypeID())){
 			tier = compound.getInteger("tier");
 		}
@@ -212,6 +217,12 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound compound) {
 		super.writeEntityToNBT(compound);
+
+		if(this.worldObj.isRemote)
+		{
+			return;
+		}
+
 		compound.setInteger("tier", tier);
 
 		NBTTagCompound nbtCompInv = new NBTTagCompound();

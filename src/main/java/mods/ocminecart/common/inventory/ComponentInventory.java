@@ -118,25 +118,32 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
+	private boolean loadEnv(int slot){
+		Item drv = CustomDriverRegistry.driverFor(slots[slot], host.getClass());
+		if (drv != null) {
+			ManagedEnvironment env = drv.createEnvironment(slots[slot], host);
+			if (env != null) {
+				try {
+					env.load(CustomDriverRegistry.dataTag(drv, slots[slot]));
+				} catch (Throwable e) {
+					OCMinecart.getLogger().warn("An item component of type" + env.getClass().getName() + " (provided by driver " + drv.getClass().getName() + ") threw an error while loading.", e);
+				}
+				this.components[slot] = env;
+				if (env.canUpdate() && !this.updatingComponents.contains(env)) {
+					this.updatingComponents.add(env);
+				}
+				this.save(env, drv, slots[slot]);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	protected void connectItem(int slot) {
 		ItemStack stack = slots[slot];
 		if (!ItemStackUtil.isStackEmpty(stack) && this.components[slot] == null) {//&& this.isComponentSlot(slot, stack)){
-			Item drv = CustomDriverRegistry.driverFor(stack, host.getClass());
-			if (drv != null) {
-				ManagedEnvironment env = drv.createEnvironment(stack, host);
-				if (env != null) {
-					try {
-						env.load(CustomDriverRegistry.dataTag(drv, stack));
-					} catch (Throwable e) {
-						OCMinecart.getLogger().warn("An item component of type" + env.getClass().getName() + " (provided by driver " + drv.getClass().getName() + ") threw an error while loading.", e);
-					}
-					this.connectNode(env.node());
-					this.components[slot] = env;
-					if (env.canUpdate() && !this.updatingComponents.contains(env)) {
-						this.updatingComponents.add(env);
-					}
-					this.save(env, drv, stack);
-				}
+			if(loadEnv(slot)){
+				this.connectNode(components[slot].node());
 			}
 		}
 	}
@@ -267,6 +274,7 @@ public class ComponentInventory implements IInventory, Environment {
 				if(slot < this.slots.length) {
 					this.slots[slot] = stack;
 				}
+				loadEnv(slot);
 			}
 		}
 	}
