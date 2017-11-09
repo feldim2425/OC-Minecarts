@@ -1,6 +1,7 @@
 package mods.ocminecart;
 
 import mods.ocminecart.common.CommonProxy;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -27,10 +28,14 @@ public class OCMinecart {
 	@SidedProxy(serverSide = "mods.ocminecart.common.CommonProxy", clientSide = "mods.ocminecart.client.ClientProxy")
 	private static CommonProxy proxy;
 
+	private static Configuration config;
 	private static Logger logger = LogManager.getLogger(OCMinecart.NAME);
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		config = new Configuration(event.getSuggestedConfigurationFile());
+		ConfigSettings.init();
+
 		proxy.preInit();
 	}
 
@@ -52,4 +57,7 @@ public class OCMinecart {
 		return logger;
 	}
 
+	public static Configuration getConfig(){
+		return config;
+	}
 }

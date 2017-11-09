@@ -3,6 +3,7 @@ package mods.ocminecart.common.recipes.assembler;
 
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.common.Tier;
+import mods.ocminecart.ConfigSettings;
 import mods.ocminecart.common.item.ItemComputerCart;
 import mods.ocminecart.common.item.ModItems;
 import mods.ocminecart.common.item.data.DataComputerCart;
@@ -37,12 +38,12 @@ public class ComputerCartAssembler {
 		DataComputerCart data = new DataComputerCart();
 		data.setComponents(comp);
 		data.setTier(inventory.getStackInSlot(0).getMetadata());
-		data.setEnergy(1000);//Settings.ComputerCartCreateEnergy);
+		data.setEnergy((float) ConfigSettings.cart_energy_start);
 
 		((ItemComputerCart)ModItems.Items.COMPUTER_CART.get()).setData(stack,data);
 
 
-		int energy = 0;//(tier<3) ? Settings.ComputerCartBaseCost+Settings.ComputerCartComplexityCost * Complexity.calculate(inventory) : 0;
+		int energy = (data.getTier() < 3) ? ConfigSettings.cart_basecost + ConfigSettings.cart_costmult * AssemblerUtils.calculateFromAssemblerInv(inventory) : 0;
 		return new Object[]{stack, energy};
 	}
 

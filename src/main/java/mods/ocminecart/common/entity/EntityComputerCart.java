@@ -8,6 +8,7 @@ import li.cil.oc.api.machine.MachineHost;
 import li.cil.oc.api.network.Analyzable;
 import li.cil.oc.api.network.Connector;
 import li.cil.oc.api.network.Node;
+import mods.ocminecart.ConfigSettings;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.inventory.ComponentInventory;
 import mods.ocminecart.common.item.ItemComputerCart;
@@ -53,7 +54,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 				}
 
 				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
-					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_insert")), SoundCategory.BLOCKS ,1,1);
+					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_insert")), SoundCategory.BLOCKS , ConfigSettings.oc_soundvol,1);
 				}
 			}
 		}
@@ -67,7 +68,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 					return;
 				}
 				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
-					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_eject")), SoundCategory.BLOCKS ,1,1);
+					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_eject")), SoundCategory.BLOCKS , ConfigSettings.oc_soundvol,1);
 				}
 			}
 		}
@@ -103,9 +104,8 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		super.entityInit();
 		if (!this.worldObj.isRemote) {
 			machine = li.cil.oc.api.Machine.create(this);
-			//TODO: Add Settings
-			this.machine.setCostPerTick(0);
-			((Connector) this.machine.node()).setLocalBufferSize(1000);
+			this.machine.setCostPerTick(ConfigSettings.cart_energy_usage);
+			((Connector) this.machine.node()).setLocalBufferSize(ConfigSettings.cart_energy_buffer);
 		}
 
 		this.dataManager.register(PARAM_MACHINE_RUNNING, false);
@@ -126,8 +126,13 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 				wireUp();
 			}
 			else {
-				compInventory.updateComponents();
-				machine.update();
+				if(machine.isRunning()) {
+					machine.update();
+					compInventory.updateComponents();
+				}
+				if(this.tier > 2){
+					((Connector) this.machine.node()).changeBuffer(999999);
+				}
 			}
 
 			if(machine.isRunning() != dataManager.get(PARAM_MACHINE_RUNNING)){
@@ -163,9 +168,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	}
 
 	private void wireUp(){
-		if(machine().node().network()==null) {
-			API.network.joinNewNetwork(machine.node());
-		}
+		API.network.joinNewNetwork(machine.node());
 		compInventory.connectAllComponents();
 	}
 
@@ -194,11 +197,13 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		if(compound.hasKey("tier", NBTTypes.INT.getTypeID())){
 			tier = compound.getInteger("tier");
 		}
-		if(compound.hasKey("machine", NBTTypes.TAG_COMPOUND.getTypeID())){
-			machine.load(compound.getCompoundTag("machine"));
-		}
 		if(compound.hasKey("components", NBTTypes.TAG_COMPOUND.getTypeID())){
 			compInventory.readFromNBT(compound.getCompoundTag("components"));
+		}
+
+		machine.onHostChanged();
+		if(compound.hasKey("machine", NBTTypes.TAG_COMPOUND.getTypeID())){
+			machine.load(compound.getCompoundTag("machine"));
 		}
 
 		wireUp();
@@ -209,14 +214,14 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		super.writeEntityToNBT(compound);
 		compound.setInteger("tier", tier);
 
-		NBTTagCompound nbtMachine = new NBTTagCompound();
-		machine.save(nbtMachine);
-		compound.setTag("machine", nbtMachine);
-
 		NBTTagCompound nbtCompInv = new NBTTagCompound();
 		compInventory.saveAllComponents();
 		compInventory.writeToNBT(nbtCompInv);
 		compound.setTag("components", nbtCompInv);
+
+        NBTTagCompound nbtMachine = new NBTTagCompound();
+        machine.save(nbtMachine);
+        compound.setTag("machine", nbtMachine);
 	}
 
 	@Override
