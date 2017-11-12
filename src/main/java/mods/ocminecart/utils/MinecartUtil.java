@@ -11,6 +11,9 @@ import net.minecraft.util.math.Vec3d;
 
 public final class MinecartUtil {
 
+	private MinecartUtil() {
+	}
+
 	public static Vec3d correctMinecartPosition(BlockPos pos, IBlockState state) {
 		double deltaY = 1D / 16D;
 		if ((state.getBlock() instanceof BlockRailBase) && state.getValue(((BlockRailBase) state.getBlock()).getShapeProperty()).isAscending()) {
@@ -20,23 +23,9 @@ public final class MinecartUtil {
 		return new Vec3d(pos.getX() + 0.5D, pos.getY() + deltaY, pos.getZ() + 0.5D);
 	}
 
-	public static EnumFacing calculateFacing(Entity entity){
+	public static EnumFacing calculateFacing(Entity entity) {
 		Vec2f vec = entity.getPitchYaw();
-
-		float yaw = (vec.y + 360f) % 360f;
-
-		if(yaw > 45f){
-			return EnumFacing.UP;
-		}
-		else if(yaw < 360f-45f){
-			return EnumFacing.DOWN;
-		}
-		else {
-			float pitch = (vec.x + 360f) % 360f;
-			return EnumFacing.getHorizontal((int) ((pitch + 45f) / 90f));
-		}
-	}
-
-	private MinecartUtil() {
+		float yaw = (vec.y + 360f - 90f) % 360f;
+		return EnumFacing.getHorizontal((int) Math.floor((yaw + 45f) / 90f + 0.5f));
 	}
 }
