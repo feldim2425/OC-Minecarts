@@ -1,6 +1,7 @@
 package mods.ocminecart.common.entity;
 
 import li.cil.oc.api.API;
+import li.cil.oc.api.Manual;
 import li.cil.oc.api.driver.item.Container;
 import li.cil.oc.api.driver.item.Slot;
 import li.cil.oc.api.machine.Machine;
@@ -11,9 +12,11 @@ import li.cil.oc.api.network.Node;
 import mods.ocminecart.ConfigSettings;
 import mods.ocminecart.OCMinecart;
 import mods.ocminecart.common.inventory.ComponentInventory;
+import mods.ocminecart.common.inventory.ComputerCartInventory;
 import mods.ocminecart.common.item.ItemComputerCart;
 import mods.ocminecart.common.item.ModItems;
 import mods.ocminecart.common.item.data.DataComputerCart;
+import mods.ocminecart.common.tanks.ComputerCartMultiTank;
 import mods.ocminecart.network.ISyncObject;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.messages.MessageNbtSyncRequest;
@@ -42,6 +45,10 @@ import java.util.List;
 public class EntityComputerCart extends EntityMinecart implements MachineHost, Analyzable, ISyncObject {
 
 	public static final DataParameter<Boolean> PARAM_MACHINE_RUNNING = EntityDataManager.createKey(EntityComputerCart.class, DataSerializers.BOOLEAN);
+	public static final DataParameter<Integer> PARAM_LIGHT_COLOR = EntityDataManager.createKey(EntityComputerCart.class, DataSerializers.VARINT);
+
+	private ComputerCartInventory mainInv = new ComputerCartInventory(this);
+	private ComputerCartMultiTank multiTank = new ComputerCartMultiTank(this);
 
 	private ComponentInventory compInventory = new ComponentInventory(this, 24, new int[]{20, 0, 21, 1, 22, 2}){
 		@Override
@@ -77,6 +84,8 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		public void markDirty() {
 			super.markDirty();
 			if(!EntityComputerCart.this.world().isRemote){
+				mainInv.recalculateSize();
+				multiTank.reloadTanks();
 				ModNetwork.getWrapper().sendToServer(new MessageNbtSyncResponse(EntityComputerCart.this));
 			}
 		}
@@ -109,6 +118,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		}
 
 		this.dataManager.register(PARAM_MACHINE_RUNNING, false);
+		this.dataManager.register(PARAM_LIGHT_COLOR, 0xffffff);
 	}
 
 	@Override
@@ -202,8 +212,17 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		if(compound.hasKey("tier", NBTTypes.INT.getTypeID())){
 			tier = compound.getInteger("tier");
 		}
+		if(compound.hasKey("lightColor", NBTTypes.INT.getTypeID())){
+			this.dataManager.set(PARAM_LIGHT_COLOR, compound.getInteger("lightColor"));
+		}
 		if(compound.hasKey("components", NBTTypes.TAG_COMPOUND.getTypeID())){
 			compInventory.readFromNBT(compound.getCompoundTag("components"));
+		}
+		if(compound.hasKey("maininv", NBTTypes.TAG_COMPOUND.getTypeID())){
+			mainInv.readFromNBT(compound.getCompoundTag("maininv"));
+		}
+		if(compound.hasKey("tanks", NBTTypes.TAG_COMPOUND.getTypeID())){
+			multiTank.readFromNBT(compound.getCompoundTag("tanks"));
 		}
 
 		machine.onHostChanged();
@@ -211,6 +230,8 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 			machine.load(compound.getCompoundTag("machine"));
 		}
 
+		multiTank.reloadTanks();
+		mainInv.recalculateSize();
 		wireUp();
 	}
 
@@ -224,11 +245,16 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		}
 
 		compound.setInteger("tier", tier);
+		compound.setInteger("lightColor", dataManager.get(PARAM_LIGHT_COLOR));
 
 		NBTTagCompound nbtCompInv = new NBTTagCompound();
 		compInventory.saveAllComponents();
 		compInventory.writeToNBT(nbtCompInv);
 		compound.setTag("components", nbtCompInv);
+
+		NBTTagCompound nbtMainInv = new NBTTagCompound();
+		mainInv.writeToNBT(nbtMainInv);
+		compound.setTag("maininv", nbtMainInv);
 
         NBTTagCompound nbtMachine = new NBTTagCompound();
         machine.save(nbtMachine);
@@ -253,15 +279,35 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 
 	@Override
 	public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, @Nullable ItemStack stack, EnumHand hand) {
-		if(!this.worldObj.isRemote && !player.isSneaking() && machine.canInteract(player.getName())){
-			player.openGui(OCMinecart.getInstance(), 0 ,this.worldObj, this.getEntityId(), 0, 0);
+		if(!player.isSneaking() || (ItemStackUtil.isStackEmpty(player.getHeldItem(EnumHand.MAIN_HAND)) && ItemStackUtil.isStackEmpty(player.getHeldItem(EnumHand.OFF_HAND)))){
+			if(!this.worldObj.isRemote && machine.canInteract(player.getName())){
+				player.openGui(OCMinecart.getInstance(), 0, this.worldObj, this.getEntityId(), 0, 0);
+			}
 			return EnumActionResult.SUCCESS;
 		}
+
+		if(player.isSneaking() && !ItemStackUtil.isStackEmpty(stack) && stack.isItemEqual(API.items.get("manual").createItemStack(1))){
+			if(this.worldObj.isRemote){
+				Manual.navigate(OCMinecart.MOD_ID+"/%LANGUAGE%/item/cart.md");
+				Manual.openFor(player);
+			}
+			player.swingArm(hand);
+			return EnumActionResult.SUCCESS;
+		}
+
 		return EnumActionResult.PASS;
 	}
 
 	public ComponentInventory getComponentInventory(){
 		return compInventory;
+	}
+
+	public ComputerCartInventory getMainInventory(){
+		return mainInv;
+	}
+
+	public ComputerCartMultiTank getMutliTank(){
+		return multiTank;
 	}
 
 	@Override
@@ -353,6 +399,10 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	}
 
 	public int getLightColor() {
-		return 0xffffff;
+		return dataManager.get(PARAM_LIGHT_COLOR);
+	}
+
+	public void setLightColor(int lightColor) {
+		dataManager.set(PARAM_LIGHT_COLOR, lightColor);
 	}
 }

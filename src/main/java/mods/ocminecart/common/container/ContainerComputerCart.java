@@ -117,6 +117,10 @@ public class ContainerComputerCart extends Container implements IEventContainer{
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
 
+		if(computerCart.worldObj.isRemote){
+			return;
+		}
+
 		int maxEnergy = (int) ((Connector)computerCart.machine().node()).localBufferSize();
 		int energy = (int) ((Connector)computerCart.machine().node()).localBuffer();
 
