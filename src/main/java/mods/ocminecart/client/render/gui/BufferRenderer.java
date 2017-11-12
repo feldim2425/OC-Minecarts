@@ -17,13 +17,16 @@ public final class BufferRenderer {
 	private static TextureManager textureManager;
 	private static int displayLists = 0;
 
+	private BufferRenderer() {
+	}
+
 	public static synchronized void init(TextureManager tm) {
 		textureManager = tm;
 		displayLists = GLAllocation.generateDisplayLists(2);
 	}
 
 	public static void compileBackground(int bufferWidth, int bufferHeight, boolean forRobot) {
-		if(textureManager == null){
+		if (textureManager == null) {
 			return;
 		}
 
@@ -121,8 +124,5 @@ public final class BufferRenderer {
 		GL11.glVertex3d(x + w, y, 0);
 		GL11.glTexCoord2d(u1d, v1d);
 		GL11.glVertex3d(x, y, 0);
-	}
-
-	private BufferRenderer(){
 	}
 }

@@ -10,18 +10,18 @@ import net.minecraft.world.World;
 
 public class ManualPathProvider implements PathProvider {
 
-	private static final String PATH_PREFIX = OCMinecart.MOD_ID+"/%LANGUAGE%/";
+	private static final String PATH_PREFIX = OCMinecart.MOD_ID + "/%LANGUAGE%/";
 
 	@Override
 	public String pathFor(ItemStack stack) {
-		if(stack==null) return null;
+		if (stack == null) return null;
 		Item item = stack.getItem();
 
-		if(item.equals(ModItems.Items.COMPUTER_CART_CASE.get())){
-			return PATH_PREFIX+"item/cartcase.md";
+		if (item.equals(ModItems.Items.COMPUTER_CART_CASE.get())) {
+			return PATH_PREFIX + "item/cartcase.md";
 		}
-		else if(item.equals(ModItems.Items.COMPUTER_CART.get())){
-			return PATH_PREFIX+"item/cart.md";
+		else if (item.equals(ModItems.Items.COMPUTER_CART.get())) {
+			return PATH_PREFIX + "item/cart.md";
 		}
 		//else if(item == ModItems.item_CartRemoteModule) return PATH_PREFIX+"item/remote.md";
 		//else if(item == ModItems.item_CartRemoteAnalyzer) return PATH_PREFIX+"item/remoteanalyzer.md";

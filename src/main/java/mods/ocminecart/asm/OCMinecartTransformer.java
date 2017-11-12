@@ -20,7 +20,8 @@ public class OCMinecartTransformer implements IClassTransformer {
 			ClassNode node = ASMUtil.readClass(basicClass, ClassReader.EXPAND_FRAMES);
 			transformWorld(node);
 			return ASMUtil.writeClass(node, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-		} else if (transformedName.equals("net.minecraft.entity.item.EntityMinecart")) {
+		}
+		else if (transformedName.equals("net.minecraft.entity.item.EntityMinecart")) {
 			ClassNode node = ASMUtil.readClass(basicClass, ClassReader.EXPAND_FRAMES);
 			transformEntityMinecart(node);
 			return ASMUtil.writeClass(node, ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);

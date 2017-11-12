@@ -5,7 +5,6 @@ import li.cil.oc.api.driver.Item;
 import li.cil.oc.api.internal.TextBuffer;
 import li.cil.oc.api.network.Connector;
 import li.cil.oc.api.network.ManagedEnvironment;
-import li.cil.oc.integration.opencomputers.DriverKeyboard;
 import li.cil.oc.integration.opencomputers.DriverKeyboard$;
 import mods.ocminecart.common.container.slots.SlotComponent;
 import mods.ocminecart.common.driver.CustomDriverRegistry;
@@ -23,7 +22,7 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class ContainerComputerCart extends Container implements IEventContainer{
+public class ContainerComputerCart extends Container implements IEventContainer {
 
 	public static final int YSIZE_SCR = 256;
 	public static final int YSIZE_NOSCR = 108;
@@ -46,34 +45,34 @@ public class ContainerComputerCart extends Container implements IEventContainer{
 
 		ComponentInventory compInv = computerCart.getComponentInventory();
 
-		this.addSlotToContainer(new SlotComponent(compInv, 20 , 188,232 - ((this.hasScreen) ? 0 : DELTA), compInv.getStackInSlot(0)));
-		this.addSlotToContainer(new SlotComponent(compInv, 21 , 206,232 - ((this.hasScreen) ? 0 : DELTA), compInv.getStackInSlot(1)));
-		this.addSlotToContainer(new SlotComponent(compInv, 22 , 224,232 - ((this.hasScreen) ? 0 : DELTA), compInv.getStackInSlot(2)));
+		this.addSlotToContainer(new SlotComponent(compInv, 20, 188, 232 - ((this.hasScreen) ? 0 : DELTA), compInv.getStackInSlot(0)));
+		this.addSlotToContainer(new SlotComponent(compInv, 21, 206, 232 - ((this.hasScreen) ? 0 : DELTA), compInv.getStackInSlot(1)));
+		this.addSlotToContainer(new SlotComponent(compInv, 22, 224, 232 - ((this.hasScreen) ? 0 : DELTA), compInv.getStackInSlot(2)));
 
-		addPlayerInv(6, 174 - ((this.hasScreen) ? 0 : DELTA) ,player.inventory);
+		addPlayerInv(6, 174 - ((this.hasScreen) ? 0 : DELTA), player.inventory);
 	}
 
-	public TextBuffer findScreen(){
+	public TextBuffer findScreen() {
 		ComponentInventory compInv = this.computerCart.getComponentInventory();
-		for(int i=0; i<compInv.getSizeInventory(); i++){
+		for (int i = 0; i < compInv.getSizeInventory(); i++) {
 			ManagedEnvironment environment = compInv.getComponent(i);
-			if(environment instanceof TextBuffer){
+			if (environment instanceof TextBuffer) {
 				return (TextBuffer) environment;
 			}
 		}
 		return null;
 	}
 
-	public boolean hasKeyboard(){
+	public boolean hasKeyboard() {
 		ComponentInventory compInv = this.computerCart.getComponentInventory();
-		for(int i=0; i<compInv.getSizeInventory(); i++){
+		for (int i = 0; i < compInv.getSizeInventory(); i++) {
 			ItemStack stack = compInv.getStackInSlot(i);
-			if(ItemStackUtil.isStackEmpty(stack)){
+			if (ItemStackUtil.isStackEmpty(stack)) {
 				continue;
 			}
 
 			Item driver = CustomDriverRegistry.driverFor(stack, EntityComputerCart.class);
-			if(driver != null && DriverKeyboard$.class.isAssignableFrom(driver.getClass())){
+			if (driver != null && DriverKeyboard$.class.isAssignableFrom(driver.getClass())) {
 				return true;
 			}
 		}
@@ -90,17 +89,17 @@ public class ContainerComputerCart extends Container implements IEventContainer{
 
 	@Override
 	public boolean canInteractWith(EntityPlayer playerIn) {
-		return !computerCart.isDead && playerIn.worldObj.equals(computerCart.worldObj) && playerIn.getDistanceSqToEntity(this.computerCart) <= (16*16);
+		return !computerCart.isDead && playerIn.worldObj.equals(computerCart.worldObj) && playerIn.getDistanceSqToEntity(this.computerCart) <= (16 * 16);
 	}
 
-	private void addPlayerInv(int x,int y, InventoryPlayer inventory){
-		for(int i=0;i<9;i++){
-			this.addSlotToContainer(new Slot(inventory, i, x+i*18, y+58));
+	private void addPlayerInv(int x, int y, InventoryPlayer inventory) {
+		for (int i = 0; i < 9; i++) {
+			this.addSlotToContainer(new Slot(inventory, i, x + i * 18, y + 58));
 		}
 
-		for(int i=0;i<3;i++){
-			for(int j=0;j<9;j++){
-				this.addSlotToContainer(new Slot(inventory, j+i*9+9, x+j*18, y+i*18));
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 9; j++) {
+				this.addSlotToContainer(new Slot(inventory, j + i * 9 + 9, x + j * 18, y + i * 18));
 			}
 		}
 	}
@@ -117,18 +116,18 @@ public class ContainerComputerCart extends Container implements IEventContainer{
 	public void detectAndSendChanges() {
 		super.detectAndSendChanges();
 
-		if(computerCart.worldObj.isRemote){
+		if (computerCart.worldObj.isRemote) {
 			return;
 		}
 
-		int maxEnergy = (int) ((Connector)computerCart.machine().node()).localBufferSize();
-		int energy = (int) ((Connector)computerCart.machine().node()).localBuffer();
+		int maxEnergy = (int) ((Connector) computerCart.machine().node()).localBufferSize();
+		int energy = (int) ((Connector) computerCart.machine().node()).localBuffer();
 
-		for(IContainerListener listener : this.listeners){
-			if(this.energy != energy){
+		for (IContainerListener listener : this.listeners) {
+			if (this.energy != energy) {
 				listener.sendProgressBarUpdate(this, 0, energy);
 			}
-			if(this.maxEnergy != maxEnergy){
+			if (this.maxEnergy != maxEnergy) {
 				listener.sendProgressBarUpdate(this, 1, maxEnergy);
 			}
 		}
@@ -137,7 +136,7 @@ public class ContainerComputerCart extends Container implements IEventContainer{
 	@Override
 	public void updateProgressBar(int id, int data) {
 		super.updateProgressBar(id, data);
-		switch (id){
+		switch (id) {
 			case 0:
 				this.energy = data;
 				break;
@@ -157,8 +156,8 @@ public class ContainerComputerCart extends Container implements IEventContainer{
 
 	@Override
 	public void onClientEvent(NBTTagCompound eventData, EntityPlayerMP player) {
-		if(eventData.hasKey("button", NBTTypes.INT.getTypeID())){
-			if(this.computerCart.machine().isRunning()){
+		if (eventData.hasKey("button", NBTTypes.INT.getTypeID())) {
+			if (this.computerCart.machine().isRunning()) {
 				this.computerCart.machine().stop();
 			}
 			else {

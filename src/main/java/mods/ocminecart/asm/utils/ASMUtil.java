@@ -8,6 +8,10 @@ import org.objectweb.asm.tree.ClassNode;
 
 public final class ASMUtil {
 
+	private ASMUtil() {
+
+	}
+
 	public static ClassNode readClass(byte[] clazz, int flags) {
 		ClassNode node = new ClassNode();
 		ClassReader reader = new ClassReader(clazz);
@@ -67,9 +71,5 @@ public final class ASMUtil {
 		}
 		while (node != null && node.getOpcode() != opcode);
 		return node;
-	}
-
-	private ASMUtil() {
-
 	}
 }

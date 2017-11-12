@@ -10,7 +10,6 @@ import mods.ocminecart.client.texture.ResourceTexture;
 import mods.ocminecart.client.texture.SlotIcons;
 import mods.ocminecart.common.container.ContainerComputerCart;
 import mods.ocminecart.common.container.slots.SlotComponent;
-import mods.ocminecart.common.driver.CustomDriverRegistry;
 import mods.ocminecart.common.entity.EntityComputerCart;
 import mods.ocminecart.integration.jei.JeiAdapter;
 import mods.ocminecart.network.IEventContainer;
@@ -45,8 +44,8 @@ public class GuiComputerCart extends GuiContainer {
 	private final double maxBufferHeight = 140.0;
 	private final double bufferRenderWidth = Math.min(maxBufferWidth, TextBufferRenderCache.renderer().charRenderWidth() * 50);
 	private final double bufferRenderHeight = Math.min(maxBufferHeight, TextBufferRenderCache.renderer().charRenderHeight() * 16);
-	private final int bufferX = (int)(8 + (this.maxBufferWidth - this.bufferRenderWidth) /2);
-	private final int bufferY = (int)(8 + (this.maxBufferHeight - this.bufferRenderHeight) /2);
+	private final int bufferX = (int) (8 + (this.maxBufferWidth - this.bufferRenderWidth) / 2);
+	private final int bufferY = (int) (8 + (this.maxBufferHeight - this.bufferRenderHeight) / 2);
 	private double bufferscale;
 	private int txtWidth;
 	private int txtHeight;
@@ -63,26 +62,26 @@ public class GuiComputerCart extends GuiContainer {
 	}
 
 	@Override
-	public void initGui(){
-		screen = ((ContainerComputerCart)inventorySlots).findScreen();
-		keyboard = ((ContainerComputerCart)inventorySlots).hasKeyboard();
+	public void initGui() {
+		screen = ((ContainerComputerCart) inventorySlots).findScreen();
+		keyboard = ((ContainerComputerCart) inventorySlots).hasKeyboard();
 
-		this.ySize= (screen == null) ? ContainerComputerCart.YSIZE_NOSCR :ContainerComputerCart.YSIZE_SCR;
-		this.xSize= ContainerComputerCart.XSIZE;
+		this.ySize = (screen == null) ? ContainerComputerCart.YSIZE_NOSCR : ContainerComputerCart.YSIZE_SCR;
+		this.xSize = ContainerComputerCart.XSIZE;
 
 		super.initGui();
 
-		this.offset = (this.screen!=null) ? ContainerComputerCart.DELTA : 0;
+		this.offset = (this.screen != null) ? ContainerComputerCart.DELTA : 0;
 
 		BufferRenderer.init(Minecraft.getMinecraft().renderEngine);
 
-		BufferRenderer.compileBackground((int)this.bufferRenderWidth, (int)this.bufferRenderHeight, true);
-		if(this.screen!=null) {
+		BufferRenderer.compileBackground((int) this.bufferRenderWidth, (int) this.bufferRenderHeight, true);
+		if (this.screen != null) {
 			this.txtHeight = this.screen.getHeight();
 			this.txtWidth = this.screen.getWidth();
 		}
 
-		this.btPower = new OnOffButton(0, this.guiLeft+5, 5+this.guiTop+offset);
+		this.btPower = new OnOffButton(0, this.guiLeft + 5, 5 + this.guiTop + offset);
 
 		this.buttonList.add(this.btPower);
 
@@ -92,13 +91,13 @@ public class GuiComputerCart extends GuiContainer {
 	@Override
 	public void updateScreen() {
 		super.updateScreen();
-		this.btPower.setState(((ContainerComputerCart)this.inventorySlots).getComputerCart().isRunning());
+		this.btPower.setState(((ContainerComputerCart) this.inventorySlots).getComputerCart().isRunning());
 	}
 
 	@Override
 	public void onGuiClosed() {
 		super.onGuiClosed();
-		if (this.screen != null){
+		if (this.screen != null) {
 			for (Map.Entry<Integer, Character> e : pressedKeys.entrySet()) {
 				this.screen.keyUp(e.getValue(), e.getKey(), null);
 			}
@@ -110,7 +109,7 @@ public class GuiComputerCart extends GuiContainer {
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 
-		Minecraft.getMinecraft().getTextureManager().bindTexture((screen==null)? ResourceTexture.OC_GUI_ROBOT_NS.location : ResourceTexture.OC_GUI_ROBOT.location );
+		Minecraft.getMinecraft().getTextureManager().bindTexture((screen == null) ? ResourceTexture.OC_GUI_ROBOT_NS.location : ResourceTexture.OC_GUI_ROBOT.location);
 		this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
 
 		this.renderGuiSlots();
@@ -120,54 +119,54 @@ public class GuiComputerCart extends GuiContainer {
 		this.mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.enableBlend();
 		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		for(Slot slot : this.inventorySlots.inventorySlots){
-			if(ItemStackUtil.isStackEmpty(slot.getStack()) && (slot instanceof SlotComponent)){
+		for (Slot slot : this.inventorySlots.inventorySlots) {
+			if (ItemStackUtil.isStackEmpty(slot.getStack()) && (slot instanceof SlotComponent)) {
 				TextureAtlasSprite typeicon;
-				if(!slot.canBeHovered()){
+				if (!slot.canBeHovered()) {
 					typeicon = SlotIcons.fromTier(-1);
 				}
 				else {
 					typeicon = SlotIcons.fromType(((SlotComponent) slot).getSlotType());
 				}
-				if(typeicon!=null) {
-					this.drawTexturedModalRect(this.guiLeft+slot.xDisplayPosition,this.guiTop+slot.yDisplayPosition, typeicon, 16, 16);
+				if (typeicon != null) {
+					this.drawTexturedModalRect(this.guiLeft + slot.xDisplayPosition, this.guiTop + slot.yDisplayPosition, typeicon, 16, 16);
 				}
 			}
 		}
-		this.drawTexturedModalRect(this.guiLeft+170,this.guiTop+this.ySize-24, SlotIcons.fromTier(-1), 16, 16);
+		this.drawTexturedModalRect(this.guiLeft + 170, this.guiTop + this.ySize - 24, SlotIcons.fromTier(-1), 16, 16);
 		GlStateManager.disableBlend();
 	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mx, int my) {
-		super.drawGuiContainerForegroundLayer(mx,my);
-		if(this.screen!=null){
+		super.drawGuiContainerForegroundLayer(mx, my);
+		if (this.screen != null) {
 			this.drawBufferLayer();
 
 			double bw = this.txtWidth * TextBufferRenderCache.renderer().charRenderWidth();
 			double bh = this.txtHeight * TextBufferRenderCache.renderer().charRenderHeight();
-			double scaleX = Math.min(this.bufferRenderWidth / bw , 1);
-			double scaleY = Math.min(this.bufferRenderHeight / bh , 1);
+			double scaleX = Math.min(this.bufferRenderWidth / bw, 1);
+			double scaleY = Math.min(this.bufferRenderHeight / bh, 1);
 			this.bufferscale = Math.min(scaleX, scaleY);
 		}
 
-		EnergyBar.drawBar(26, 8 + offset, 12, 140, 150, (double)((ContainerComputerCart)this.inventorySlots).getEnergy() / ((ContainerComputerCart)this.inventorySlots).getMaxEnergy(), ResourceTexture.OC_GUI_POWERBAR.location);
+		EnergyBar.drawBar(26, 8 + offset, 12, 140, 150, (double) ((ContainerComputerCart) this.inventorySlots).getEnergy() / ((ContainerComputerCart) this.inventorySlots).getMaxEnergy(), ResourceTexture.OC_GUI_POWERBAR.location);
 
 		this.renderHighlights(mx, my);
 
-		EnergyBar.renderTooltip(26, 8 + offset, 12 ,140 ,this.guiLeft, this.guiTop, this.width, this.height, mx-this.guiLeft, my-this.guiTop, ((ContainerComputerCart)this.inventorySlots).getEnergy() , ((ContainerComputerCart)this.inventorySlots).getMaxEnergy());
+		EnergyBar.renderTooltip(26, 8 + offset, 12, 140, this.guiLeft, this.guiTop, this.width, this.height, mx - this.guiLeft, my - this.guiTop, ((ContainerComputerCart) this.inventorySlots).getEnergy(), ((ContainerComputerCart) this.inventorySlots).getMaxEnergy());
 	}
 
 	private void renderHighlights(int mx, int my) {
-		Slot slot = ContainerUtil.findSlotAt(mx-this.guiLeft, my-this.guiTop, inventorySlots.inventorySlots);
-		if(slot!=null){
-			if(slot instanceof SlotComponent){
+		Slot slot = ContainerUtil.findSlotAt(mx - this.guiLeft, my - this.guiTop, inventorySlots.inventorySlots);
+		if (slot != null) {
+			if (slot instanceof SlotComponent) {
 				GlStateManager.disableDepth();
 				GlStateManager.disableLighting();
 				this.zLevel += 100;
 
-				for(Slot slot2 : this.inventorySlots.inventorySlots){
-					if(!slot.equals(slot2) && slot2.getHasStack() && slot.isItemValid(slot2.getStack())){
+				for (Slot slot2 : this.inventorySlots.inventorySlots) {
+					if (!slot.equals(slot2) && slot2.getHasStack() && slot.isItemValid(slot2.getStack())) {
 						this.drawGradientRect(slot2.xDisplayPosition, slot2.yDisplayPosition, slot2.xDisplayPosition + 16, slot2.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
 					}
 				}
@@ -180,15 +179,15 @@ public class GuiComputerCart extends GuiContainer {
 					JeiAdapter.drawHighlights(JeiAdapter.getVisibleStacks().stream().filter((stack) -> slot.isItemValid(stack)).collect(Collectors.toList()));
 				}
 			}
-			else if(slot.getHasStack()){
+			else if (slot.getHasStack()) {
 				ItemStack stack = slot.getStack();
 				GlStateManager.disableDepth();
 				GlStateManager.disableLighting();
 				this.zLevel += 100;
 
-				for(Slot slot2 : this.inventorySlots.inventorySlots){
-					if(slot2 instanceof SlotComponent){
-						if(slot2.isItemValid(stack)){
+				for (Slot slot2 : this.inventorySlots.inventorySlots) {
+					if (slot2 instanceof SlotComponent) {
+						if (slot2.isItemValid(stack)) {
 							this.drawGradientRect(slot2.xDisplayPosition, slot2.yDisplayPosition, slot2.xDisplayPosition + 16, slot2.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
 						}
 					}
@@ -209,14 +208,14 @@ public class GuiComputerCart extends GuiContainer {
 		}
 
 		ItemStack jeiStack = JeiAdapter.getStackUnderMouse();
-		if(!ItemStackUtil.isStackEmpty(jeiStack)){
+		if (!ItemStackUtil.isStackEmpty(jeiStack)) {
 			GlStateManager.disableDepth();
 			GlStateManager.disableLighting();
 			this.zLevel += 100;
 
-			for(Slot slot2 : this.inventorySlots.inventorySlots){
-				if(slot2 instanceof SlotComponent){
-					if(slot2.isItemValid(jeiStack)){
+			for (Slot slot2 : this.inventorySlots.inventorySlots) {
+				if (slot2 instanceof SlotComponent) {
+					if (slot2.isItemValid(jeiStack)) {
 						this.drawGradientRect(slot2.xDisplayPosition, slot2.yDisplayPosition, slot2.xDisplayPosition + 16, slot2.yDisplayPosition + 16, 0x80FFFFFF, 0x80FFFFFF);
 					}
 				}
@@ -228,7 +227,7 @@ public class GuiComputerCart extends GuiContainer {
 		}
 	}
 
-	private void drawBufferLayer(){
+	private void drawBufferLayer() {
 		GlStateManager.pushMatrix();
 
 		GlStateManager.translate(bufferX, bufferY, 0);
@@ -250,7 +249,7 @@ public class GuiComputerCart extends GuiContainer {
 			GlStateManager.translate(this.screen.renderWidth() * (scaleX - scale) / 2, 0, 0);
 		}
 		else if (scaleY > scale) {
-			GlStateManager.translate(0,this.screen.renderHeight() * (scaleY - scale) / 2, 0);
+			GlStateManager.translate(0, this.screen.renderHeight() * (scaleY - scale) / 2, 0);
 		}
 		GlStateManager.scale(this.bufferscale * scale, this.bufferscale * scale, scale);
 		BufferRenderer.drawText(this.screen);
@@ -266,21 +265,21 @@ public class GuiComputerCart extends GuiContainer {
 
 		if (this.screen != null && this.keyboard && code != Keyboard.KEY_ESCAPE && code != Keyboard.KEY_F11 && code != Keyboard.KEY_F2) {
 			if (Keyboard.getEventKeyState()) {
-					char ch = Keyboard.getEventCharacter();
-					if (!pressedKeys.containsKey(code) || !ignoreRepeat(ch, code)) {
-						this.screen.keyDown(ch, code, null);
-						pressedKeys.put(code, ch);
-					}
+				char ch = Keyboard.getEventCharacter();
+				if (!pressedKeys.containsKey(code) || !ignoreRepeat(ch, code)) {
+					this.screen.keyDown(ch, code, null);
+					pressedKeys.put(code, ch);
 				}
-				else{
-					if(pressedKeys.containsKey(code)){
-						this.screen.keyUp(pressedKeys.remove(code), code, null);
-					}
+			}
+			else {
+				if (pressedKeys.containsKey(code)) {
+					this.screen.keyUp(pressedKeys.remove(code), code, null);
 				}
+			}
 
-				if (KeyBindings.isPastingClipboard()) {
-					this.screen.clipboard(GuiScreen.getClipboardString(), null);
-				}
+			if (KeyBindings.isPastingClipboard()) {
+				this.screen.clipboard(GuiScreen.getClipboardString(), null);
+			}
 		}
 		else {
 			super.handleKeyboardInput();
@@ -301,7 +300,7 @@ public class GuiComputerCart extends GuiContainer {
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
 		super.actionPerformed(button);
-		if(button.id == 0){
+		if (button.id == 0) {
 			NBTTagCompound data = new NBTTagCompound();
 			data.setInteger("button", 0);
 			ModNetwork.getWrapper().sendToServer(new MessageGuiEvent((IEventContainer) this.inventorySlots, data));

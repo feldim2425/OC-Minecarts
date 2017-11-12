@@ -23,8 +23,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
-import org.apache.commons.lang3.tuple.Pair;
-import scala.tools.cmd.gen.AnyVals;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -44,11 +42,11 @@ public class ComponentInventory implements IInventory, Environment {
 		this.slots = new ItemStack[size];
 		this.components = new ManagedEnvironment[size];
 		this.containerSlots = new HashMap<>();
-		if(containerSlots.length % 2 != 0){
+		if (containerSlots.length % 2 != 0) {
 			throw new IllegalArgumentException("containerSlots requires a even number of entries");
 		}
-		for(int i=0; i<containerSlots.length; i+=2){
-			this.containerSlots.put(containerSlots[i], containerSlots[i+1]);
+		for (int i = 0; i < containerSlots.length; i += 2) {
+			this.containerSlots.put(containerSlots[i], containerSlots[i + 1]);
 		}
 		clear();
 	}
@@ -76,27 +74,27 @@ public class ComponentInventory implements IInventory, Environment {
 	public void connectAllComponents() {
 		for (int i = 0; i < this.slots.length; i++) {
 			if (!ItemStackUtil.isStackEmpty(slots[i]) && this.components[i] == null) {
-					Item drv = CustomDriverRegistry.driverFor(slots[i], host.getClass());
-					if (drv != null) {
-						ManagedEnvironment env = drv.createEnvironment(slots[i], host);
-						if (env != null) {
-							try {
-								env.load(CustomDriverRegistry.dataTag(drv, slots[i]));
-							} catch (Throwable e) {
-								OCMinecart.getLogger().warn("An item component of type" + env.getClass().getName() + " (provided by driver " + drv.getClass().getName() + ") threw an error while loading.", e);
-							}
-							this.components[i] = env;
-							if (env.canUpdate() && !this.updatingComponents.contains(env)) {
-								this.updatingComponents.add(env);
-							}
-							this.save(env, drv, slots[i]);
+				Item drv = CustomDriverRegistry.driverFor(slots[i], host.getClass());
+				if (drv != null) {
+					ManagedEnvironment env = drv.createEnvironment(slots[i], host);
+					if (env != null) {
+						try {
+							env.load(CustomDriverRegistry.dataTag(drv, slots[i]));
+						} catch (Throwable e) {
+							OCMinecart.getLogger().warn("An item component of type" + env.getClass().getName() + " (provided by driver " + drv.getClass().getName() + ") threw an error while loading.", e);
 						}
+						this.components[i] = env;
+						if (env.canUpdate() && !this.updatingComponents.contains(env)) {
+							this.updatingComponents.add(env);
+						}
+						this.save(env, drv, slots[i]);
 					}
+				}
 			}
 		}
 
 		for (int i = 0; i < this.slots.length; i++) {
-			if(this.components[i]!=null){
+			if (this.components[i] != null) {
 				this.connectNode(this.components[i].node());
 			}
 		}
@@ -118,7 +116,7 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
-	private boolean loadEnv(int slot){
+	private boolean loadEnv(int slot) {
 		Item drv = CustomDriverRegistry.driverFor(slots[slot], host.getClass());
 		if (drv != null) {
 			ManagedEnvironment env = drv.createEnvironment(slots[slot], host);
@@ -142,7 +140,7 @@ public class ComponentInventory implements IInventory, Environment {
 	protected void connectItem(int slot) {
 		ItemStack stack = slots[slot];
 		if (!ItemStackUtil.isStackEmpty(stack) && this.components[slot] == null) {//&& this.isComponentSlot(slot, stack)){
-			if(loadEnv(slot)){
+			if (loadEnv(slot)) {
 				this.connectNode(components[slot].node());
 			}
 		}
@@ -156,11 +154,13 @@ public class ComponentInventory implements IInventory, Environment {
 				Arrays.asList(this.components).forEach((comp) -> {
 					if (comp instanceof Keyboard) {
 						node.connect(comp.node());
-					} else if (comp instanceof GraphicsCard) {
+					}
+					else if (comp instanceof GraphicsCard) {
 						node.connect(comp.node());
 					}
 				});
-			} else if (node.host() instanceof Keyboard) {
+			}
+			else if (node.host() instanceof Keyboard) {
 				Arrays.asList(this.components).forEach((comp) -> {
 					if (comp instanceof TextBuffer) {
 						node.connect(comp.node());
@@ -183,14 +183,14 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
-	protected void addedItem(int slot){
-		if(!this.host.world().isRemote && this.host.machine().node() != null) {
+	protected void addedItem(int slot) {
+		if (!this.host.world().isRemote && this.host.machine().node() != null) {
 			connectItem(slot);
 		}
 	}
 
-	protected void removedItem(int slot){
-		if(!this.host.world().isRemote) {
+	protected void removedItem(int slot) {
+		if (!this.host.world().isRemote) {
 			disconnectItem(slot);
 		}
 	}
@@ -202,37 +202,37 @@ public class ComponentInventory implements IInventory, Environment {
 	}
 
 	public void updateComponents() {
-		for(ManagedEnvironment env : updatingComponents){
+		for (ManagedEnvironment env : updatingComponents) {
 			env.update();
 		}
 	}
 
-	public Map<Integer, Integer> getContainerSlotConnections(){
+	public Map<Integer, Integer> getContainerSlotConnections() {
 		return Collections.unmodifiableMap(this.containerSlots);
 	}
 
-	public int getComponentSlot(String address){
+	public int getComponentSlot(String address) {
 		for (int i = 0; i < components.length; i++) {
-			if(components[i] != null && address.equals(components[i].node().address())){
+			if (components[i] != null && address.equals(components[i].node().address())) {
 				return i;
 			}
 		}
 		return -1;
 	}
 
-	public ManagedEnvironment getComponent(int slot){
-		if(slot < components.length){
+	public ManagedEnvironment getComponent(int slot) {
+		if (slot < components.length) {
 			return components[slot];
 		}
 		return null;
 	}
 
-	public Container getContainer(int slot){
-		if(!containerSlots.containsKey(slot)){
+	public Container getContainer(int slot) {
+		if (!containerSlots.containsKey(slot)) {
 			return null;
 		}
 		ItemStack containerStack = getStackInSlot(this.containerSlots.get(slot));
-		if(ItemStackUtil.isStackEmpty(containerStack)){
+		if (ItemStackUtil.isStackEmpty(containerStack)) {
 			return null;
 		}
 		Item driver = CustomDriverRegistry.driverFor(containerStack);
@@ -245,7 +245,7 @@ public class ComponentInventory implements IInventory, Environment {
 		NBTTagList nbtList = new NBTTagList();
 		for (int i = 0; i < slots.length; i++) {
 			ItemStack stack = this.slots[i];
-			if(ItemStackUtil.isStackEmpty(stack)){
+			if (ItemStackUtil.isStackEmpty(stack)) {
 				continue;
 			}
 			if (this.components[i] != null) {
@@ -271,7 +271,7 @@ public class ComponentInventory implements IInventory, Environment {
 				}
 				ItemStack stack = ItemStack.loadItemStackFromNBT(slotNBT.getCompoundTag("item"));
 				int slot = slotNBT.getInteger("slot");
-				if(slot < this.slots.length) {
+				if (slot < this.slots.length) {
 					this.slots[slot] = stack;
 				}
 				loadEnv(slot);
@@ -279,17 +279,17 @@ public class ComponentInventory implements IInventory, Environment {
 		}
 	}
 
-	public Map<Integer, ItemStack> copyItemMap(){
+	public Map<Integer, ItemStack> copyItemMap() {
 		Map<Integer, ItemStack> map = new HashMap<>();
-		for(int i=0;i<this.slots.length;i++){
-			if(ItemStackUtil.isStackEmpty(this.slots[i])){
+		for (int i = 0; i < this.slots.length; i++) {
+			if (ItemStackUtil.isStackEmpty(this.slots[i])) {
 				continue;
 			}
 			ItemStack stack = this.slots[i].copy();
 			ManagedEnvironment env = this.components[i];
 			Item drv = CustomDriverRegistry.driverFor(stack);
-			if(env!=null){
-				if(drv.getClass().equals(DriverScreen$.class)){
+			if (env != null) {
+				if (drv.getClass().equals(DriverScreen$.class)) {
 					NbtUtil.clearTag(CustomDriverRegistry.dataTag(drv, stack));
 				}
 				else {
@@ -301,21 +301,21 @@ public class ComponentInventory implements IInventory, Environment {
 		return map;
 	}
 
-	public void loadItemMap(Map<Integer, ItemStack> map){
-		for(Map.Entry<Integer, ItemStack> entry : map.entrySet()){
+	public void loadItemMap(Map<Integer, ItemStack> map) {
+		for (Map.Entry<Integer, ItemStack> entry : map.entrySet()) {
 			ItemStack stack = entry.getValue();
 			int slot = entry.getKey();
-			if(slot >= this.slots.length || ItemStackUtil.isStackEmpty(stack)){
+			if (slot >= this.slots.length || ItemStackUtil.isStackEmpty(stack)) {
 				continue;
 			}
 			this.slots[slot] = stack.copy();
 		}
 	}
 
-	public List<ItemStack> internalComponents(){
+	public List<ItemStack> internalComponents() {
 		LinkedList<ItemStack> list = new LinkedList<>();
-		for(int i = 0;i<slots.length ;i++){
-			if(components[i]!=null){
+		for (int i = 0; i < slots.length; i++) {
+			if (components[i] != null) {
 				list.add(slots[i]);
 			}
 		}
@@ -368,7 +368,8 @@ public class ComponentInventory implements IInventory, Environment {
 
 			if (ItemStackUtil.isStackEmpty(stack)) {
 				slots[index] = ItemStackUtil.getEmptyStack();
-			} else {
+			}
+			else {
 				stack = stack.copy();
 				if (stack.stackSize > 1) {
 					stack.stackSize = 1;
@@ -404,14 +405,14 @@ public class ComponentInventory implements IInventory, Environment {
 
 	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		if(this.containerSlots.containsKey(index)){
+		if (this.containerSlots.containsKey(index)) {
 			Container cDriver = getContainer(index);
-			if(cDriver == null){
+			if (cDriver == null) {
 				return false;
 			}
 			ItemStack containerStack = getStackInSlot(this.containerSlots.get(index));
 			Item drv = CustomDriverRegistry.driverFor(stack, host.getClass());
-			if(drv == null || DriverKeyboard$.class.isAssignableFrom(drv.getClass()) || DriverScreen$.class.isAssignableFrom(drv.getClass())){
+			if (drv == null || DriverKeyboard$.class.isAssignableFrom(drv.getClass()) || DriverScreen$.class.isAssignableFrom(drv.getClass())) {
 				return false;
 			}
 
@@ -429,7 +430,8 @@ public class ComponentInventory implements IInventory, Environment {
 	}
 
 	@Override
-	public void setField(int id, int value) {}
+	public void setField(int id, int value) {
+	}
 
 	@Override
 	public int getFieldCount() {

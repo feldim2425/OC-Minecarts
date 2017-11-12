@@ -15,6 +15,10 @@ public final class TextureHelper {
 	private static TextureAtlasSprite missing;
 	private static Map<String, TextureAtlasSprite> spriteMap = new HashMap<>();
 
+	private TextureHelper() {
+
+	}
+
 	public static void loadTextures(TextureMap map) {
 		missing = map.getMissingSprite();
 		for (String tex : prepareTextures()) {
@@ -31,19 +35,15 @@ public final class TextureHelper {
 		return spriteMap.get(tex);
 	}
 
-	public static TextureAtlasSprite getMissing(){
+	public static TextureAtlasSprite getMissing() {
 		return missing;
 	}
 
-	private static List<String> prepareTextures(){
+	private static List<String> prepareTextures() {
 		List<String> preparing = new LinkedList<>();
 
 		preparing.addAll(SlotIcons.getIconResources());
 
 		return preparing;
-	}
-
-	private TextureHelper() {
-
 	}
 }

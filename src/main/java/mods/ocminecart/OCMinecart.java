@@ -19,8 +19,8 @@ public class OCMinecart {
 	public static final String MOD_ID = "ocminecart";
 	public static final String NAME = "OC-Minecart";
 	public static final String VERSION = "0.0.1";
-	public static final String DEPENDENCIES = "required-after:Forge@[12.18.3.2511,);"+
-			"required-after:OpenComputers@[1.7.0.128,);"+
+	public static final String DEPENDENCIES = "required-after:Forge@[12.18.3.2511,);" +
+			"required-after:OpenComputers@[1.7.0.128,);" +
 			"required-after:CodeChickenLib@[2.5.9.308,);";
 
 	@Instance
@@ -30,6 +30,18 @@ public class OCMinecart {
 
 	private static Configuration config;
 	private static Logger logger = LogManager.getLogger(OCMinecart.NAME);
+
+	public static OCMinecart getInstance() {
+		return instance;
+	}
+
+	public static Logger getLogger() {
+		return logger;
+	}
+
+	public static Configuration getConfig() {
+		return config;
+	}
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
@@ -47,17 +59,5 @@ public class OCMinecart {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		proxy.postInit();
-	}
-
-	public static OCMinecart getInstance() {
-		return instance;
-	}
-
-	public static Logger getLogger() {
-		return logger;
-	}
-
-	public static Configuration getConfig(){
-		return config;
 	}
 }

@@ -12,9 +12,12 @@ import java.util.Map;
 @TransformerExclusions({"mods.ocminecart.asm"})
 public class OCMinecartFMLPlugin implements IFMLLoadingPlugin {
 
+	public static Logger logger = LogManager.getLogger(OCMinecart.NAME);
 	private static boolean isObf;
 
-	public static Logger logger = LogManager.getLogger(OCMinecart.NAME);
+	public static boolean isObfuscatedEnv() {
+		return isObf;
+	}
 
 	@Override
 	public String[] getASMTransformerClass() {
@@ -39,10 +42,6 @@ public class OCMinecartFMLPlugin implements IFMLLoadingPlugin {
 	@Override
 	public String getAccessTransformerClass() {
 		return null;
-	}
-
-	public static boolean isObfuscatedEnv() {
-		return isObf;
 	}
 
 }

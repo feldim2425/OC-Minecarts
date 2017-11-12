@@ -1,7 +1,6 @@
 package mods.ocminecart.network.messages;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import mods.ocminecart.network.ISyncObject;
 import mods.ocminecart.network.ModNetwork;
 import mods.ocminecart.network.SyncMessageType;
@@ -10,12 +9,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-
-import java.util.UUID;
 
 public class MessageNbtSyncRequest implements IMessage {
 
@@ -33,11 +28,13 @@ public class MessageNbtSyncRequest implements IMessage {
 			type = SyncMessageType.TILE_ENTITY;
 			pos = ((TileEntity) object).getPos();
 			worldId = ((TileEntity) object).getWorld().provider.getDimension();
-		} else if (object instanceof Entity) {
+		}
+		else if (object instanceof Entity) {
 			type = SyncMessageType.ENTITY;
 			entityId = ((Entity) object).getEntityId();
 			worldId = ((Entity) object).getEntityWorld().provider.getDimension();
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException("Only TileEntities and Entities are allowed for NBT Sync Request");
 		}
 	}

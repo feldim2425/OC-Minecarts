@@ -3,11 +3,8 @@ package mods.ocminecart.common.tanks;
 import li.cil.oc.api.internal.MultiTank;
 import li.cil.oc.api.network.Environment;
 import mods.ocminecart.common.entity.EntityComputerCart;
-import mods.ocminecart.utils.ItemStackUtil;
 import mods.ocminecart.utils.NBTTypes;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.fluids.IFluidTank;
 
 import java.util.ArrayList;
@@ -32,7 +29,7 @@ public class ComputerCartMultiTank implements MultiTank {
 
 	@Override
 	public IFluidTank getFluidTank(int index) {
-		if(checkIndex(index)){
+		if (checkIndex(index)) {
 			return tanks.get(index);
 		}
 		return null;
@@ -43,25 +40,24 @@ public class ComputerCartMultiTank implements MultiTank {
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {
-		if(nbt.hasKey("selected", NBTTypes.INT.getTypeID())) {
+		if (nbt.hasKey("selected", NBTTypes.INT.getTypeID())) {
 			selectedTank = nbt.getInteger("selected");
 		}
-	}
-
-	public void setSelectedTank(int selectedTank) {
-		this.selectedTank = selectedTank;
 	}
 
 	public int getSelectedTank() {
 		return selectedTank;
 	}
 
-	public void reloadTanks(){
+	public void setSelectedTank(int selectedTank) {
+		this.selectedTank = selectedTank;
+	}
+
+	public void reloadTanks() {
 		List<IFluidTank> tanks = new LinkedList<>();
-		for(int i=0;i<cart.getComponentInventory().getSizeInventory();i++)
-		{
+		for (int i = 0; i < cart.getComponentInventory().getSizeInventory(); i++) {
 			Environment env = cart.getComponentInventory().getComponent(i);
-			if(env instanceof IFluidTank){
+			if (env instanceof IFluidTank) {
 				tanks.add((IFluidTank) env);
 			}
 		}
@@ -69,7 +65,7 @@ public class ComputerCartMultiTank implements MultiTank {
 		this.tanks.addAll(tanks);
 	}
 
-	public boolean checkIndex(int index){
+	public boolean checkIndex(int index) {
 		return index >= 0 && index < tanks.size();
 	}
 }

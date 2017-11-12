@@ -12,6 +12,10 @@ import java.util.List;
 
 public final class NbtUtil {
 
+	private NbtUtil() {
+
+	}
+
 	public static NBTTagCompound getOrCreateTag(NBTTagCompound nbt) {
 		if (nbt == null) {
 			nbt = new NBTTagCompound();
@@ -33,13 +37,9 @@ public final class NbtUtil {
 
 	public static List<NBTBase> toArrayList(NBTTagList tagList) {
 		ArrayList<NBTBase> list = new ArrayList<>(tagList.tagCount());
-		for(int i = 0; i<tagList.tagCount();i++){
+		for (int i = 0; i < tagList.tagCount(); i++) {
 			list.add(tagList.get(i));
 		}
 		return list;
-	}
-
-	private NbtUtil() {
-
 	}
 }

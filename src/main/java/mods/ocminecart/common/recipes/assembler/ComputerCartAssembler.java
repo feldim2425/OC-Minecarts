@@ -25,30 +25,30 @@ public class ComputerCartAssembler {
 	private static final int MAX_COMPLEXITY_C = 9001;
 
 
-	public static Object[] assemble(IInventory inventory){
+	public static Object[] assemble(IInventory inventory) {
 		Map<Integer, ItemStack> comp = new HashMap<>();
 		int size = inventory.getSizeInventory();
-		for(int i=1;i<size;i+=1){
-			if(inventory.getStackInSlot(i)!=null) {
-				comp.put(i-1,inventory.getStackInSlot(i));
+		for (int i = 1; i < size; i += 1) {
+			if (inventory.getStackInSlot(i) != null) {
+				comp.put(i - 1, inventory.getStackInSlot(i));
 			}
 		}
 
-		ItemStack stack = new  ItemStack(ModItems.Items.COMPUTER_CART.get());
+		ItemStack stack = new ItemStack(ModItems.Items.COMPUTER_CART.get());
 		DataComputerCart data = new DataComputerCart();
 		data.setComponents(comp);
 		data.setTier(inventory.getStackInSlot(0).getMetadata());
 		data.setEnergy((float) ConfigSettings.cart_energy_start);
 
-		((ItemComputerCart)ModItems.Items.COMPUTER_CART.get()).setData(stack,data);
+		((ItemComputerCart) ModItems.Items.COMPUTER_CART.get()).setData(stack, data);
 
 
 		int energy = (data.getTier() < 3) ? ConfigSettings.cart_basecost + ConfigSettings.cart_costmult * AssemblerUtils.calculateFromAssemblerInv(inventory) : 0;
 		return new Object[]{stack, energy};
 	}
 
-	public static Object[] validate(IInventory inventory){
-		switch (inventory.getStackInSlot(0).getMetadata()){
+	public static Object[] validate(IInventory inventory) {
+		switch (inventory.getStackInSlot(0).getMetadata()) {
 			case 0:
 				return AssemblerUtils.validate(inventory, MAX_COMPLEXITY_1);
 			case 1:
@@ -63,62 +63,62 @@ public class ComputerCartAssembler {
 
 	// === SELECT == //
 
-	public static boolean select_t1(ItemStack stack){
-		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage()==0;
+	public static boolean select_t1(ItemStack stack) {
+		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage() == 0;
 	}
 
-	public static boolean select_t2(ItemStack stack){
-		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage()==1;
+	public static boolean select_t2(ItemStack stack) {
+		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage() == 1;
 	}
 
-	public static boolean select_t3(ItemStack stack){
-		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage()==2;
+	public static boolean select_t3(ItemStack stack) {
+		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage() == 2;
 	}
 
-	public static boolean select_tc(ItemStack stack){
-		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage()==3;
+	public static boolean select_tc(ItemStack stack) {
+		return stack.getItem().equals(ModItems.Items.COMPUTER_CART_CASE.get()) && stack.getItemDamage() == 3;
 	}
 
 
 	// === CONTAINER === //
 
-	public static int[] getContainer_t1(){
-		return new int[]{1,0,0};
+	public static int[] getContainer_t1() {
+		return new int[]{1, 0, 0};
 	}
 
-	public static int[] getContainer_t2(){
-		return new int[]{2,1,0};
+	public static int[] getContainer_t2() {
+		return new int[]{2, 1, 0};
 	}
 
-	public static int[] getContainer_t3(){
-		return new int[]{2,2,1};
+	public static int[] getContainer_t3() {
+		return new int[]{2, 2, 1};
 	}
 
-	public static int[] getContainer_tc(){
-		return new int[]{2,2,2};
+	public static int[] getContainer_tc() {
+		return new int[]{2, 2, 2};
 	}
 
 	// === UPGRADE === //
 
-	public static int[] getUpgrade_t1(){
-		return new int[]{0,0,0};
+	public static int[] getUpgrade_t1() {
+		return new int[]{0, 0, 0};
 	}
 
-	public static int[] getUpgrade_t2(){
-		return new int[]{1,1,1,0,0,0};
+	public static int[] getUpgrade_t2() {
+		return new int[]{1, 1, 1, 0, 0, 0};
 	}
 
-	public static int[] getUpgrade_t3(){
-		return new int[]{2,2,2,1,1,1,0,0,0};
+	public static int[] getUpgrade_t3() {
+		return new int[]{2, 2, 2, 1, 1, 1, 0, 0, 0};
 	}
 
-	public static int[] getUpgrade_tc(){
-		return new int[]{2,2,2,2,2,2,2,2,2};
+	public static int[] getUpgrade_tc() {
+		return new int[]{2, 2, 2, 2, 2, 2, 2, 2, 2};
 	}
 
 	// === COMPONENT SLOTS === //
 
-	public static Iterable<Pair<String, Integer>> getComponentSlots_t1(){
+	public static Iterable<Pair<String, Integer>> getComponentSlots_t1() {
 		List<Pair<String, Integer>> list = new LinkedList<Pair<String, Integer>>();
 		list.add(Pair.of(Slot.Card, 0));
 		list.add(Pair.of(Slot.None, -1));
@@ -133,7 +133,7 @@ public class ComputerCartAssembler {
 		return list;
 	}
 
-	public static Iterable<Pair<String, Integer>> getComponentSlots_t2(){
+	public static Iterable<Pair<String, Integer>> getComponentSlots_t2() {
 		List<Pair<String, Integer>> list = new LinkedList<Pair<String, Integer>>();
 		list.add(Pair.of(Slot.Card, 1));
 		list.add(Pair.of(Slot.Card, 0));
@@ -148,7 +148,7 @@ public class ComputerCartAssembler {
 		return list;
 	}
 
-	public static Iterable<Pair<String, Integer>> getComponentSlots_t3(){
+	public static Iterable<Pair<String, Integer>> getComponentSlots_t3() {
 		List<Pair<String, Integer>> list = new LinkedList<Pair<String, Integer>>();
 		list.add(Pair.of(Slot.Card, 2));
 		list.add(Pair.of(Slot.Card, 1));
@@ -163,7 +163,7 @@ public class ComputerCartAssembler {
 		return list;
 	}
 
-	public static Iterable<Pair<String, Integer>> getComponentSlots_tc(){
+	public static Iterable<Pair<String, Integer>> getComponentSlots_tc() {
 		List<Pair<String, Integer>> list = new LinkedList<Pair<String, Integer>>();
 		list.add(Pair.of(Slot.Card, 2));
 		list.add(Pair.of(Slot.Card, 2));

@@ -49,7 +49,8 @@ public class ModelComputerCart extends ModelBase {
 			Minecraft.getMinecraft().entityRenderer.disableLightmap();
 			GlStateManager.enableBlend();
 			GlStateManager.color(r, g, b);
-		} else {
+		}
+		else {
 			GlStateManager.color(0, 0, 0);
 		}
 		Shape2.render(scale);

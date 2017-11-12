@@ -23,7 +23,6 @@ import mods.ocminecart.network.messages.MessageNbtSyncRequest;
 import mods.ocminecart.network.messages.MessageNbtSyncResponse;
 import mods.ocminecart.utils.ItemStackUtil;
 import mods.ocminecart.utils.NBTTypes;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayer;
@@ -35,7 +34,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.*;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -50,18 +48,18 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	private ComputerCartInventory mainInv = new ComputerCartInventory(this);
 	private ComputerCartMultiTank multiTank = new ComputerCartMultiTank(this);
 
-	private ComponentInventory compInventory = new ComponentInventory(this, 24, new int[]{20, 0, 21, 1, 22, 2}){
+	private ComponentInventory compInventory = new ComponentInventory(this, 24, new int[]{20, 0, 21, 1, 22, 2}) {
 		@Override
 		protected void addedItem(int slot) {
 			super.addedItem(slot);
-			if(!EntityComputerCart.this.world().isRemote){
+			if (!EntityComputerCart.this.world().isRemote) {
 				Container cDriver = getContainer(slot);
-				if(cDriver == null){
+				if (cDriver == null) {
 					return;
 				}
 
-				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
-					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_insert")), SoundCategory.BLOCKS , ConfigSettings.oc_soundvol,1);
+				if (Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))) {
+					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_insert")), SoundCategory.BLOCKS, ConfigSettings.oc_soundvol, 1);
 				}
 			}
 		}
@@ -69,13 +67,13 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		@Override
 		protected void removedItem(int slot) {
 			super.removedItem(slot);
-			if(!EntityComputerCart.this.world().isRemote){
+			if (!EntityComputerCart.this.world().isRemote) {
 				Container cDriver = getContainer(slot);
-				if(cDriver == null){
+				if (cDriver == null) {
 					return;
 				}
-				if(Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))){
-					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_eject")), SoundCategory.BLOCKS , ConfigSettings.oc_soundvol,1);
+				if (Slot.Floppy.equals(cDriver.providedSlot(getStackInSlot(slot)))) {
+					worldObj.playSound(null, posX, posY, posZ, new SoundEvent(new ResourceLocation("opencomputers", "floppy_eject")), SoundCategory.BLOCKS, ConfigSettings.oc_soundvol, 1);
 				}
 			}
 		}
@@ -83,7 +81,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		@Override
 		public void markDirty() {
 			super.markDirty();
-			if(!EntityComputerCart.this.world().isRemote){
+			if (!EntityComputerCart.this.world().isRemote) {
 				mainInv.recalculateSize();
 				multiTank.reloadTanks();
 				ModNetwork.getWrapper().sendToServer(new MessageNbtSyncResponse(EntityComputerCart.this));
@@ -124,28 +122,28 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	@Override
 	public void onUpdate() {
 		super.onUpdate();
-		if(worldObj.isRemote){
-			if(!setup){
+		if (worldObj.isRemote) {
+			if (!setup) {
 				setup = true;
 				ModNetwork.getWrapper().sendToServer(new MessageNbtSyncRequest(this));
 			}
 		}
 		else {
-			if(!setup) {
+			if (!setup) {
 				setup = true;
 				wireUp();
 			}
 			else {
-				if(machine.isRunning()) {
+				if (machine.isRunning()) {
 					machine.update();
 					compInventory.updateComponents();
 				}
-				if(this.tier > 2){
+				if (this.tier > 2) {
 					((Connector) this.machine.node()).changeBuffer(999999);
 				}
 			}
 
-			if(machine.isRunning() != dataManager.get(PARAM_MACHINE_RUNNING)){
+			if (machine.isRunning() != dataManager.get(PARAM_MACHINE_RUNNING)) {
 				dataManager.set(PARAM_MACHINE_RUNNING, machine.isRunning());
 			}
 		}
@@ -169,20 +167,19 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		try {
 			isChangingDimension = true;
 			newEntity = super.changeDimension(dimension);
-		}
-		finally {
+		} finally {
 			isChangingDimension = false;
 			setDead();
 		}
 		return newEntity;
 	}
 
-	private void wireUp(){
+	private void wireUp() {
 		API.network.joinNewNetwork(machine.node());
 		compInventory.connectAllComponents();
 	}
 
-	public DataComputerCart getData(){
+	public DataComputerCart getData() {
 		DataComputerCart data = new DataComputerCart();
 		data.setComponents(compInventory.copyItemMap());
 		data.setTier(this.tier);
@@ -204,29 +201,28 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	protected void readEntityFromNBT(NBTTagCompound compound) {
 		super.readEntityFromNBT(compound);
 
-		if(this.worldObj.isRemote)
-		{
+		if (this.worldObj.isRemote) {
 			return;
 		}
 
-		if(compound.hasKey("tier", NBTTypes.INT.getTypeID())){
+		if (compound.hasKey("tier", NBTTypes.INT.getTypeID())) {
 			tier = compound.getInteger("tier");
 		}
-		if(compound.hasKey("lightColor", NBTTypes.INT.getTypeID())){
+		if (compound.hasKey("lightColor", NBTTypes.INT.getTypeID())) {
 			this.dataManager.set(PARAM_LIGHT_COLOR, compound.getInteger("lightColor"));
 		}
-		if(compound.hasKey("components", NBTTypes.TAG_COMPOUND.getTypeID())){
+		if (compound.hasKey("components", NBTTypes.TAG_COMPOUND.getTypeID())) {
 			compInventory.readFromNBT(compound.getCompoundTag("components"));
 		}
-		if(compound.hasKey("maininv", NBTTypes.TAG_COMPOUND.getTypeID())){
+		if (compound.hasKey("maininv", NBTTypes.TAG_COMPOUND.getTypeID())) {
 			mainInv.readFromNBT(compound.getCompoundTag("maininv"));
 		}
-		if(compound.hasKey("tanks", NBTTypes.TAG_COMPOUND.getTypeID())){
+		if (compound.hasKey("tanks", NBTTypes.TAG_COMPOUND.getTypeID())) {
 			multiTank.readFromNBT(compound.getCompoundTag("tanks"));
 		}
 
 		machine.onHostChanged();
-		if(compound.hasKey("machine", NBTTypes.TAG_COMPOUND.getTypeID())){
+		if (compound.hasKey("machine", NBTTypes.TAG_COMPOUND.getTypeID())) {
 			machine.load(compound.getCompoundTag("machine"));
 		}
 
@@ -239,8 +235,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	protected void writeEntityToNBT(NBTTagCompound compound) {
 		super.writeEntityToNBT(compound);
 
-		if(this.worldObj.isRemote)
-		{
+		if (this.worldObj.isRemote) {
 			return;
 		}
 
@@ -256,9 +251,9 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		mainInv.writeToNBT(nbtMainInv);
 		compound.setTag("maininv", nbtMainInv);
 
-        NBTTagCompound nbtMachine = new NBTTagCompound();
-        machine.save(nbtMachine);
-        compound.setTag("machine", nbtMachine);
+		NBTTagCompound nbtMachine = new NBTTagCompound();
+		machine.save(nbtMachine);
+		compound.setTag("machine", nbtMachine);
 	}
 
 	@Override
@@ -271,7 +266,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 
 	@Override
 	public void readSyncData(NBTTagCompound data) {
-		if(data.hasKey("components", NBTTypes.TAG_COMPOUND.getTypeID())){
+		if (data.hasKey("components", NBTTypes.TAG_COMPOUND.getTypeID())) {
 			compInventory.readFromNBT(data.getCompoundTag("components"));
 			compInventory.connectAllComponents();
 		}
@@ -279,16 +274,16 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 
 	@Override
 	public EnumActionResult applyPlayerInteraction(EntityPlayer player, Vec3d vec, @Nullable ItemStack stack, EnumHand hand) {
-		if(!player.isSneaking() || (ItemStackUtil.isStackEmpty(player.getHeldItem(EnumHand.MAIN_HAND)) && ItemStackUtil.isStackEmpty(player.getHeldItem(EnumHand.OFF_HAND)))){
-			if(!this.worldObj.isRemote && machine.canInteract(player.getName())){
+		if (!player.isSneaking() || (ItemStackUtil.isStackEmpty(player.getHeldItem(EnumHand.MAIN_HAND)) && ItemStackUtil.isStackEmpty(player.getHeldItem(EnumHand.OFF_HAND)))) {
+			if (!this.worldObj.isRemote && machine.canInteract(player.getName())) {
 				player.openGui(OCMinecart.getInstance(), 0, this.worldObj, this.getEntityId(), 0, 0);
 			}
 			return EnumActionResult.SUCCESS;
 		}
 
-		if(player.isSneaking() && !ItemStackUtil.isStackEmpty(stack) && stack.isItemEqual(API.items.get("manual").createItemStack(1))){
-			if(this.worldObj.isRemote){
-				Manual.navigate(OCMinecart.MOD_ID+"/%LANGUAGE%/item/cart.md");
+		if (player.isSneaking() && !ItemStackUtil.isStackEmpty(stack) && stack.isItemEqual(API.items.get("manual").createItemStack(1))) {
+			if (this.worldObj.isRemote) {
+				Manual.navigate(OCMinecart.MOD_ID + "/%LANGUAGE%/item/cart.md");
 				Manual.openFor(player);
 			}
 			player.swingArm(hand);
@@ -298,15 +293,15 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 		return EnumActionResult.PASS;
 	}
 
-	public ComponentInventory getComponentInventory(){
+	public ComponentInventory getComponentInventory() {
 		return compInventory;
 	}
 
-	public ComputerCartInventory getMainInventory(){
+	public ComputerCartInventory getMainInventory() {
 		return mainInv;
 	}
 
-	public ComputerCartMultiTank getMutliTank(){
+	public ComputerCartMultiTank getMutliTank() {
 		return multiTank;
 	}
 
@@ -326,16 +321,15 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 	}
 
 	@Override
-	public void killMinecart(DamageSource dms){
+	public void killMinecart(DamageSource dms) {
 		this.setDead();
 
-		if (this.worldObj.getGameRules().getBoolean("doEntityDrops"))
-		{
+		if (this.worldObj.getGameRules().getBoolean("doEntityDrops")) {
 			List<ItemStack> drop = new ArrayList<>();
 
-			for(int cslot : compInventory.getContainerSlotConnections().keySet()){
+			for (int cslot : compInventory.getContainerSlotConnections().keySet()) {
 				ItemStack compStack = compInventory.removeStackFromSlot(cslot);
-				if(!ItemStackUtil.isStackEmpty(compStack)){
+				if (!ItemStackUtil.isStackEmpty(compStack)) {
 					drop.add(compStack);
 				}
 			}
@@ -344,7 +338,7 @@ public class EntityComputerCart extends EntityMinecart implements MachineHost, A
 			((ItemComputerCart) cartItemStack.getItem()).setData(cartItemStack, getData());
 			drop.add(cartItemStack);
 
-			ItemStackUtil.dropItemList(drop, this.worldObj, this.posX, this.posY, this.posZ,true);
+			ItemStackUtil.dropItemList(drop, this.worldObj, this.posX, this.posY, this.posZ, true);
 		}
 	}
 

@@ -15,13 +15,17 @@ public final class ModItems {
 
 	private static Map<String, Item> items = new HashMap<>();
 
+	private ModItems() {
+
+	}
+
 	public static void init() {
-		for(Items regItem : Items.values()){
+		for (Items regItem : Items.values()) {
 			try {
 				Constructor<? extends Item> construct = regItem.itemClass.getConstructor();
 				registerItem(construct.newInstance(), regItem.name);
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-				OCMinecart.getLogger().warn("Error while registering item '"+regItem.name+"'", e);
+				OCMinecart.getLogger().warn("Error while registering item '" + regItem.name + "'", e);
 			}
 		}
 	}
@@ -54,11 +58,7 @@ public final class ModItems {
 		return item;
 	}
 
-	private ModItems() {
-
-	}
-
-	public enum Items{
+	public enum Items {
 		COMPUTER_CART(ItemComputerCart.class, "computer_cart"),
 		COMPUTER_CART_CASE(ItemComputerCartCase.class, "computer_cart_case");
 
@@ -70,7 +70,7 @@ public final class ModItems {
 			this.name = name;
 		}
 
-		public Item get(){
+		public Item get() {
 			return ModItems.getItem(name);
 		}
 	}

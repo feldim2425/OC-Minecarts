@@ -13,7 +13,8 @@ abstract public class SynchronizedMessageHandler<REQ extends IMessage> implement
 		final IThreadListener thread = FMLCommonHandler.instance().getWorldThread(ctx.netHandler);
 		if (thread.isCallingFromMinecraftThread()) {
 			handleMessage(message, ctx);
-		} else {
+		}
+		else {
 			thread.addScheduledTask(() -> handleMessage(message, ctx));
 		}
 		return getReplyMessage(message, ctx);

@@ -9,16 +9,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nullable;
 
-public class ComputerCartInventory implements IInventory {
+public class ComputerCartInventory implements IInventory, IItemHandlerModifiable {
 
 	public static final int MAX_SIZE = 27;
-
-	private int actualSize;
 	private final ItemStack[] slots = new ItemStack[MAX_SIZE];
-
+	private int actualSize;
 	private int selectedSlot;
 
 	public ComputerCartInventory(EntityComputerCart entityComputerCart) {
@@ -30,7 +29,7 @@ public class ComputerCartInventory implements IInventory {
 		NBTTagList nbtList = new NBTTagList();
 		for (int i = 0; i < slots.length; i++) {
 			ItemStack stack = this.slots[i];
-			if(ItemStackUtil.isStackEmpty(stack)){
+			if (ItemStackUtil.isStackEmpty(stack)) {
 				continue;
 			}
 			NBTTagCompound slotNBT = new NBTTagCompound();
@@ -44,7 +43,7 @@ public class ComputerCartInventory implements IInventory {
 	}
 
 	public void readFromNBT(NBTTagCompound nbt) {
-		if(nbt.hasKey("selected", NBTTypes.INT.getTypeID())) {
+		if (nbt.hasKey("selected", NBTTypes.INT.getTypeID())) {
 			selectedSlot = nbt.getInteger("selected");
 		}
 
@@ -57,43 +56,100 @@ public class ComputerCartInventory implements IInventory {
 				}
 				ItemStack stack = ItemStack.loadItemStackFromNBT(slotNBT.getCompoundTag("item"));
 				int slot = slotNBT.getInteger("slot");
-				if(slot < this.slots.length) {
+				if (slot < this.slots.length) {
 					this.slots[slot] = stack;
 				}
 			}
 		}
 	}
 
-	public void recalculateSize(){
+	public void recalculateSize() {
 
 	}
-	
+
 	@Override
 	public int getSizeInventory() {
+		return actualSize;
+	}
+
+	@Override
+	public int getSlots() {
 		return actualSize;
 	}
 
 	@Nullable
 	@Override
 	public ItemStack getStackInSlot(int index) {
-		if(checkSlot(index)){
+		if (checkSlot(index)) {
 			return slots[index];
 		}
 		return ItemStackUtil.getEmptyStack();
 	}
 
+	@Override
+	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+		if (!checkSlot(slot) || ItemStackUtil.isStackEmpty(stack)) {
+			return stack;
+		}
+
+		ItemStack remain = stack.copy();
+
+		if (ItemStackUtil.isStackEmpty(slots[slot])) {
+			if (simulate) {
+				remain.splitStack(getInventoryStackLimit());
+			}
+			else {
+				slots[slot] = remain.splitStack(getInventoryStackLimit());
+			}
+		}
+		else if (ItemStack.areItemsEqual(stack, slots[slot])) {
+			int curSize = slots[slot].stackSize;
+			int amount = Math.max(Math.min(getInventoryStackLimit(), slots[slot].getMaxStackSize()) - curSize, 0);
+			if (simulate) {
+				remain.splitStack(amount);
+			}
+			else {
+				ItemStack toAdd = remain.splitStack(amount);
+				slots[slot].stackSize += toAdd.stackSize;
+			}
+		}
+
+		if (remain.stackSize < 1) {
+			return ItemStackUtil.getEmptyStack();
+		}
+		return remain;
+	}
+
+	@Override
+	public ItemStack extractItem(int slot, int amount, boolean simulate) {
+		if (!checkSlot(slot) || amount < 1 || ItemStackUtil.isStackEmpty(slots[slot])) {
+			return ItemStackUtil.getEmptyStack();
+		}
+
+		ItemStack inslot = (simulate) ? slots[slot].copy() : slots[slot];
+		return inslot.splitStack(amount);
+	}
+
+	@Override
+	public void setStackInSlot(int slot, ItemStack stack) {
+		if (!checkSlot(slot)) {
+			return;
+		}
+		slots[slot] = stack;
+	}
+
 	@Nullable
 	@Override
 	public ItemStack decrStackSize(int index, int count) {
-		if(!checkSlot(index) || count < 1){
+		if (!checkSlot(index) || count < 1) {
 			return ItemStackUtil.getEmptyStack();
 		}
 		ItemStack stack = slots[index];
-		if(ItemStackUtil.isStackEmpty(stack)){
+		if (ItemStackUtil.isStackEmpty(stack)) {
 			return ItemStackUtil.getEmptyStack();
 		}
 		ItemStack ret = stack.splitStack(count);
-		if(stack.stackSize < 1){
+		if (stack.stackSize < 1) {
 			slots[index] = ItemStackUtil.getEmptyStack();
 		}
 		return ret;
@@ -102,7 +158,7 @@ public class ComputerCartInventory implements IInventory {
 	@Nullable
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
-		if(!checkSlot(index)){
+		if (!checkSlot(index)) {
 			return ItemStackUtil.getEmptyStack();
 		}
 		ItemStack stack = slots[index];
@@ -112,8 +168,8 @@ public class ComputerCartInventory implements IInventory {
 
 	@Override
 	public void setInventorySlotContents(int index, @Nullable ItemStack stack) {
-		if(checkSlot(index)){
-			if(ItemStackUtil.isStackEmpty(stack)){
+		if (checkSlot(index)) {
+			if (ItemStackUtil.isStackEmpty(stack)) {
 				slots[index] = ItemStackUtil.getEmptyStack();
 			}
 			else {
@@ -187,15 +243,15 @@ public class ComputerCartInventory implements IInventory {
 		return null;
 	}
 
-	public boolean checkSlot(int index){
+	public boolean checkSlot(int index) {
 		return index >= 0 && index < actualSize;
-	}
-
-	public void setSelectedSlot(int selectedSlot) {
-		this.selectedSlot = selectedSlot;
 	}
 
 	public int getSelectedSlot() {
 		return selectedSlot;
+	}
+
+	public void setSelectedSlot(int selectedSlot) {
+		this.selectedSlot = selectedSlot;
 	}
 }

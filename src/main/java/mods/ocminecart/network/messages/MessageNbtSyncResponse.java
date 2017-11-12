@@ -33,11 +33,13 @@ public class MessageNbtSyncResponse implements IMessage {
 			type = SyncMessageType.TILE_ENTITY;
 			pos = ((TileEntity) object).getPos();
 			worldId = ((TileEntity) object).getWorld().provider.getDimension();
-		} else if (object instanceof Entity) {
+		}
+		else if (object instanceof Entity) {
 			type = SyncMessageType.ENTITY;
 			entityId = ((Entity) object).getEntityId();
 			worldId = ((Entity) object).getEntityWorld().provider.getDimension();
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException("Only TileEntities and Entities are allowed for NBT Sync Request");
 		}
 	}

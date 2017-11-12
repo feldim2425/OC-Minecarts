@@ -72,7 +72,8 @@ public class RendererComputerCartItem implements IItemRenderer, IPerspectiveAwar
 			GlStateManager.rotate(30f, 1, 0, 0);
 			GlStateManager.rotate(225f, 0, 1, 0);
 			GlStateManager.rotate(180f, 1, 0, 0);
-		} else {
+		}
+		else {
 			GlStateManager.translate(0.5, 0.175, 0.5);
 			GlStateManager.scale(0.04, 0.04, 0.04);
 			GlStateManager.rotate(180f, 1, 0, 0);
