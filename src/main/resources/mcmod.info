@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
+  "modid": "ocminecart",
+  "name": "OC-Minecart",
+  "description": "Adds OpenComputers Computer Minecarts",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["feldim2425"],
+  "credits": "Sangar for making OpenComputers (also all contributors)",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
